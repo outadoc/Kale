@@ -2,6 +2,9 @@
 Kotlin IRC message parsing, serialising and notifying.
 
 ## Project goals
+* [Tags parsing](http://ircv3.net/specs/core/message-tags-3.2.html)
+  * 512 bytes for tags, 512 for main message
+  * Escape values
 * [RFC 1459](https://tools.ietf.org/html/rfc1459)
 * [IRC v3](http://ircv3.net/irc/) (including BATCH extension)
 
