@@ -55,6 +55,12 @@ class IrcMessageParserTests {
         assertEquals(message, IrcMessage(command = "TEST", parameters = listOf("parameter1")))
     }
 
+    @Test fun test_extremeWhitespace() {
+        val message = parseLine(":x ONE        TWO          THREE :  FOUR       FIVE     ")
+
+        assertEquals(message, IrcMessage(prefix = "x", command = "ONE", parameters = listOf("TWO", "THREE", "  FOUR       FIVE     ")))
+    }
+
     @Test fun test_tags_specExample() {
         val message = parseLine("@aaa=bbb;ccc;example.com/ddd=eee :nick!ident@host.com PRIVMSG me :Hello")
 
