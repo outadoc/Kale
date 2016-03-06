@@ -25,6 +25,12 @@ class IrcMessageParserTests {
         assertEquals(message, IrcMessage(prefix = "user!host@server", command = "TEST", parameters = listOf("some", "parameters", "And some trailing parameters! ")))
     }
 
+    @Test fun test_parametersStartingColonIsPreserved() {
+        val message = parseLine("TEST ::Trailing parameters")
+
+        assertEquals(message, IrcMessage(command = "TEST", parameters = listOf(":Trailing parameters")))
+    }
+
     @Test fun test_commandAndTrailingParameters() {
         val message = parseLine("TEST :Trailing parameters")
 
