@@ -7,5 +7,5 @@ interface IMessageFactory<T: IMessage> {
 
     fun parse(message: IrcMessage): T?
 
-    fun serialise(messageOne: T): IrcMessage?
+    fun serialise(message: T): IrcMessage?
 }

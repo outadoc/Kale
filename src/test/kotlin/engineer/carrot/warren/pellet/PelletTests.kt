@@ -74,8 +74,8 @@ class PelletTests {
                 return MockMessageOne(message.parameters[0])
             }
 
-            override fun serialise(messageOne: MockMessageOne): IrcMessage? {
-                return IrcMessage(command = command, parameters = listOf(messageOne.mockToken))
+            override fun serialise(message: MockMessageOne): IrcMessage? {
+                return IrcMessage(command = command, parameters = listOf(message.mockToken))
             }
         }
     }

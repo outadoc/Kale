@@ -10,8 +10,8 @@ data class PongMessage(val token: String): IMessage {
         override val messageType = PongMessage::class.java
         override val command = "PONG"
 
-        override fun serialise(messageOne: PongMessage): IrcMessage? {
-            return IrcMessage(command = command, parameters = listOf(messageOne.token))
+        override fun serialise(message: PongMessage): IrcMessage? {
+            return IrcMessage(command = command, parameters = listOf(message.token))
         }
 
         override fun parse(message: IrcMessage): PongMessage? {
