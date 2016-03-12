@@ -6,6 +6,7 @@ import engineer.carrot.warren.pellet.irc.message.IrcMessageParser
 import engineer.carrot.warren.pellet.irc.message.rfc1459.NickMessage
 import engineer.carrot.warren.pellet.irc.message.rfc1459.PingMessage
 import engineer.carrot.warren.pellet.irc.message.rfc1459.PongMessage
+import engineer.carrot.warren.pellet.irc.message.rfc1459.UserMessage
 
 class Pellet: IPellet {
     private var messageFactories: MutableMap<String, IMessageFactory<*>> = hashMapOf()
@@ -17,6 +18,7 @@ class Pellet: IPellet {
         addMessageFromFactory(PingMessage.Factory)
         addMessageFromFactory(PongMessage.Factory)
         addMessageFromFactory(NickMessage.Factory)
+        addMessageFromFactory(UserMessage.Factory)
 
         return this
     }
