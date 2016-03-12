@@ -61,7 +61,7 @@ class Pellet: IPellet {
 
         val handler = handlers[ircMessage.command]
         if (handler == null) {
-            println("failed to find handler for message: $message")
+            println("no handler for: $message")
             return
         }
 

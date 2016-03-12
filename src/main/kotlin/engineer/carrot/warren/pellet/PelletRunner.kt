@@ -17,6 +17,7 @@ object PelletRunner {
         pellet.process("@tag;key=value :user!host@server WHATEVER :more stuff")
         pellet.process("PING :token")
         pellet.process("PONG :token2")
+        pellet.process("NICK nickname")
     }
 
     class PingHandler: IPelletHandler<PingMessage> {
