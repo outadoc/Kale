@@ -3,6 +3,7 @@ package engineer.carrot.warren.pellet
 import engineer.carrot.warren.pellet.irc.message.IMessage
 import engineer.carrot.warren.pellet.irc.message.IMessageFactory
 import engineer.carrot.warren.pellet.irc.message.IrcMessageParser
+import engineer.carrot.warren.pellet.irc.message.rfc1459.NickMessage
 import engineer.carrot.warren.pellet.irc.message.rfc1459.PingMessage
 import engineer.carrot.warren.pellet.irc.message.rfc1459.PongMessage
 
@@ -15,6 +16,7 @@ class Pellet: IPellet {
     fun addDefaultMessages(): Pellet {
         addMessageFromFactory(PingMessage.Factory)
         addMessageFromFactory(PongMessage.Factory)
+        addMessageFromFactory(NickMessage.Factory)
 
         return this
     }
