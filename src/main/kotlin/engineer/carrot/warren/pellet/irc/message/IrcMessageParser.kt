@@ -38,7 +38,7 @@ object IrcMessageParser: IIrcMessageParser {
             return IrcMessage(tags, prefix, command)
         }
 
-        var (parameters, endOfParameters) = parseParameters(line, endOfCommand) ?: return null
+        var (parameters, @Suppress("UNUSED_VARIABLE") endOfParameters) = parseParameters(line, endOfCommand) ?: return null
 
         return IrcMessage(tags, prefix, command, parameters)
     }
