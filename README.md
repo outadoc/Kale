@@ -1,5 +1,7 @@
 # Pellet
-Kotlin IRC message parsing, serialising and notifying. Written for fun and personal projects, and open sourced.
+Kotlin IRC message parsing, serialising and notifying. Provides useful abstractions with the intention of splitting message parsing and IRC state management.
+
+Written for fun and personal projects, and open sourced.
 
 ## Project goals
 * [Tags parsing](http://ircv3.net/specs/core/message-tags-3.2.html)
