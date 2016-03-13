@@ -3,10 +3,7 @@ package engineer.carrot.warren.pellet
 import engineer.carrot.warren.pellet.irc.message.IMessage
 import engineer.carrot.warren.pellet.irc.message.IMessageFactory
 import engineer.carrot.warren.pellet.irc.message.IrcMessageParser
-import engineer.carrot.warren.pellet.irc.message.rfc1459.NickMessage
-import engineer.carrot.warren.pellet.irc.message.rfc1459.PingMessage
-import engineer.carrot.warren.pellet.irc.message.rfc1459.PongMessage
-import engineer.carrot.warren.pellet.irc.message.rfc1459.UserMessage
+import engineer.carrot.warren.pellet.irc.message.rfc1459.*
 
 class Pellet: IPellet {
     private var messageFactories: MutableMap<String, IMessageFactory<*>> = hashMapOf()
@@ -19,6 +16,7 @@ class Pellet: IPellet {
         addMessageFromFactory(PongMessage.Factory)
         addMessageFromFactory(NickMessage.Factory)
         addMessageFromFactory(UserMessage.Factory)
+        addMessageFromFactory(QuitMessage.Factory)
 
         return this
     }
