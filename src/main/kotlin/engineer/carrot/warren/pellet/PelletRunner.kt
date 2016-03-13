@@ -20,6 +20,7 @@ object PelletRunner {
         pellet.process("NICK nickname")
         pellet.process("USER 1 2 3 4")
         pellet.process("QUIT :")
+        pellet.process("JOIN #channel,#channel2 key1")
     }
 
     class PingHandler: IPelletHandler<PingMessage> {

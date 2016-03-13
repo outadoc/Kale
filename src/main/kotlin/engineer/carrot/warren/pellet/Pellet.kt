@@ -17,6 +17,7 @@ class Pellet: IPellet {
         addMessageFromFactory(NickMessage.Factory)
         addMessageFromFactory(UserMessage.Factory)
         addMessageFromFactory(QuitMessage.Factory)
+        addMessageFromFactory(JoinMessage.Factory)
 
         return this
     }
