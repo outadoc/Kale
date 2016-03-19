@@ -56,7 +56,7 @@ class Kale : IKale {
 
         val factory = messageFactories[ircMessage.command]
         if (factory == null) {
-            println("failed to find factory for message: $ircMessage")
+            println("failed to find factory for message parsing: $ircMessage")
             return
         }
 
@@ -84,7 +84,11 @@ class Kale : IKale {
 
     override fun <T: IMessage> serialise(message: T): IrcMessage? {
         @Suppress("UNCHECKED_CAST")
-        val factory = factoryFromMessage(message.javaClass) as? IMessageFactory<IMessage> ?: return null
+        val factory = factoryFromMessage(message.javaClass) as? IMessageFactory<IMessage>
+        if (factory == null) {
+            println("failed to find factory for message serialisation: $message")
+            return null
+        }
 
         return factory.serialise(message)
     }
