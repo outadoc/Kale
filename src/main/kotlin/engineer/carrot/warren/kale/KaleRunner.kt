@@ -21,6 +21,7 @@ object KaleRunner {
         kale.process("USER 1 2 3 4")
         kale.process("QUIT :")
         kale.process("JOIN #channel,#channel2 key1")
+        kale.process("PART #channel,#channel2")
     }
 
     class PingHandler: IKaleHandler<PingMessage> {

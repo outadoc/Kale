@@ -18,11 +18,16 @@ class Kale : IKale {
         addMessageFromFactory(UserMessage.Factory)
         addMessageFromFactory(QuitMessage.Factory)
         addMessageFromFactory(JoinMessage.Factory)
+        addMessageFromFactory(PartMessage.Factory)
 
         return this
     }
 
     fun <T: IMessage> addMessageFromFactory(factory: IMessageFactory<T>) {
+        if (messageFactories.containsKey(factory.command)) {
+            throw RuntimeException("Tried to add message factory for ${factory.command}, but one already exists!")
+        }
+
         messageFactories.put(factory.command, factory)
         messageToFactory.put(factory.messageType, factory)
     }
