@@ -1,4 +1,4 @@
-# Pellet
+# Kale
 Kotlin IRC message parsing, serialising and notifying. Provides useful abstractions with the intention of splitting message parsing and IRC state management.
 
 Written for fun and personal projects, and open sourced.

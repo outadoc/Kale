@@ -47,7 +47,7 @@ shadowJar {
         exclude(dependency('com.google.guava:guava:.*'))
     }
 
-    def repack_location = "engineer.carrot.warren.pellet.repack"
+    def repack_location = "engineer.carrot.warren.kale.repack"
 
     relocate 'kotlin', "${repack_location}.kotlin"
 }
@@ -63,8 +63,8 @@ task wrapper(type: Wrapper) {
 }
 
 version = version_major + '.' + version_minor + '.' + version_patch
-group = "engineer.carrot.warren.pellet"
-archivesBaseName = "Pellet"
+group = "engineer.carrot.warren.kale"
+archivesBaseName = "Kale"
 
 if (System.getenv().BUILD_NUMBER != null) {//adds the build number to the end of the version string if on a build server
     version += ".${System.getenv().BUILD_NUMBER}"
