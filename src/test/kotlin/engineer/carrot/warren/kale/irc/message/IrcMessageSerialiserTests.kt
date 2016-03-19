@@ -1,7 +1,5 @@
-package engineer.carrot.warren.warren.irc.message
+package engineer.carrot.warren.kale.irc.message
 
-import engineer.carrot.warren.kale.irc.message.IrcMessage
-import engineer.carrot.warren.kale.irc.message.IrcMessageSerialiser
 import org.junit.Assert.*
 import org.junit.Test
 
