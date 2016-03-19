@@ -1,7 +1,6 @@
 package engineer.carrot.warren.kale
 
-import engineer.carrot.warren.kale.irc.message.rfc1459.PingMessage
-import engineer.carrot.warren.kale.irc.message.rfc1459.PongMessage
+import engineer.carrot.warren.kale.irc.message.rfc1459.*
 
 object KaleRunner {
     @JvmStatic fun main(args: Array<String>) {
@@ -22,6 +21,14 @@ object KaleRunner {
         kale.process("QUIT :")
         kale.process("JOIN #channel,#channel2 key1")
         kale.process("PART #channel,#channel2")
+
+        println(kale.serialise(PingMessage(token = "token")))
+        println(kale.serialise(PongMessage(token = "token2")))
+        println(kale.serialise(NickMessage(nickname = "nickname")))
+        println(kale.serialise(UserMessage(username = "1", hostname = "2", servername = "3", realname = "4")))
+        println(kale.serialise(QuitMessage(message = "")))
+        println(kale.serialise(JoinMessage(channels = listOf("#channel", "#channel2"), keys = listOf("key1"))))
+        println(kale.serialise(PartMessage(channels = listOf("#channel", "#channel2"))))
     }
 
     class PingHandler: IKaleHandler<PingMessage> {

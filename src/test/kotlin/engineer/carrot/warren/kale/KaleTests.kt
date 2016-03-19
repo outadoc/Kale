@@ -55,6 +55,18 @@ class KaleTests {
         assertEquals(MockMessageOne(mockToken = "token3"), mockHandler.spyHandleInvokations[2])
     }
 
+    @Test fun test_serialise_SanityCheck() {
+        val message = kale.serialise(MockMessageOne(mockToken = "TestToken1"))
+
+        assertEquals(message, IrcMessage(command = "TEST1", parameters = listOf("TestToken1")))
+    }
+
+    @Test fun test_serialise_UnknownMessage() {
+        val message = kale.serialise(MockUnknownMessage(unknownParameter = "UnknownParameter1"))
+
+        assertEquals(message, null)
+    }
+
     class MockHandler: IKaleHandler<MockMessageOne> {
         var spyHandleInvokations: List<MockMessageOne> = mutableListOf()
 
@@ -79,4 +91,6 @@ class KaleTests {
             }
         }
     }
+
+    data class MockUnknownMessage(val unknownParameter: String): IMessage { }
 }

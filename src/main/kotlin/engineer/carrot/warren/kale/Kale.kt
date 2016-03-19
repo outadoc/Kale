@@ -2,6 +2,7 @@ package engineer.carrot.warren.kale
 
 import engineer.carrot.warren.kale.irc.message.IMessage
 import engineer.carrot.warren.kale.irc.message.IMessageFactory
+import engineer.carrot.warren.kale.irc.message.IrcMessage
 import engineer.carrot.warren.kale.irc.message.IrcMessageParser
 import engineer.carrot.warren.kale.irc.message.rfc1459.*
 
@@ -79,6 +80,13 @@ class Kale : IKale {
         }
 
         typedHandler.handle(message)
+    }
+
+    override fun <T: IMessage> serialise(message: T): IrcMessage? {
+        @Suppress("UNCHECKED_CAST")
+        val factory = factoryFromMessage(message.javaClass) as? IMessageFactory<IMessage> ?: return null
+
+        return factory.serialise(message)
     }
 
 }
