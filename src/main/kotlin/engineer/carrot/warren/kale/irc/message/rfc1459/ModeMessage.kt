@@ -10,6 +10,17 @@ import java.util.*
 
 data class ModeMessage(val target: String, val source: String? = null, val modifiers: List<ModeModifier>? = null): IMessage {
 
+    data class ModeModifier(val type: Char? = null, val mode: Char, var parameter: String? = null) {
+        val isAdding: Boolean
+            get() = this.type == CharacterCodes.PLUS
+
+        val isRemoving: Boolean
+            get() = this.type == CharacterCodes.MINUS
+
+        val isListing: Boolean
+            get() = this.type == null
+    }
+
     companion object Factory: IMessageFactory<ModeMessage> {
         override val messageType = ModeMessage::class.java
         override val command = "MODE"
@@ -49,24 +60,7 @@ data class ModeMessage(val target: String, val source: String? = null, val modif
             }
         }
 
-        data class ModeModifier(val type: Char? = null, val mode: Char, var parameter: String? = null) {
-            val isAdding: Boolean
-                get() = this.type == CharacterCodes.PLUS
-
-            val isRemoving: Boolean
-                get() = this.type == CharacterCodes.MINUS
-
-            val isListing: Boolean
-                get() = this.type == null
-        }
-
-        private class ModeChunk(val modes: String) {
-            val parameters: Queue<String>
-
-            init {
-                this.parameters = LinkedList<String>()
-            }
-        }
+        private data class ModeChunk(val modes: String, val parameters: Queue<String> = LinkedList()) { }
 
         private fun parseIrcParameters(parameters: List<String>): List<ModeModifier> {
             val chunks = this.parseParametersToModeChunks(parameters)

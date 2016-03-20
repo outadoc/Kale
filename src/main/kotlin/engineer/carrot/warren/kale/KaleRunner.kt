@@ -30,7 +30,7 @@ object KaleRunner {
         println(kale.serialise(QuitMessage(message = "")))
         println(kale.serialise(JoinMessage(channels = listOf("#channel", "#channel2"), keys = listOf("key1"))))
         println(kale.serialise(PartMessage(channels = listOf("#channel", "#channel2"))))
-        println(kale.serialise(ModeMessage(target = "#channel", modifiers = listOf(ModeMessage.Factory.ModeModifier(type = '+', mode = 'b', parameter = "somebody")))))
+        println(kale.serialise(ModeMessage(target = "#channel", modifiers = listOf(ModeMessage.ModeModifier(type = '+', mode = 'b', parameter = "somebody")))))
     }
 
     class PingHandler: IKaleHandler<PingMessage> {
