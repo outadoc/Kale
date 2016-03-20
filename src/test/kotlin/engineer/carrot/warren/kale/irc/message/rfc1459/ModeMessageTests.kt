@@ -89,4 +89,15 @@ class ModeMessageTests {
         assertEquals(ModeMessage(target = "Angel", modifiers = listOf(firstModifier)), message)
     }
 
+    @Test fun test_parse_NoParameters() {
+        val message = factory.parse(IrcMessage(command = "MODE", parameters = listOf()))
+
+        assertEquals(null, message)
+    }
+
+    @Test fun test_parse_OneParameter() {
+        val message = factory.parse(IrcMessage(command = "MODE", parameters = listOf("parameter")))
+
+        assertEquals(null, message)
+    }
 }

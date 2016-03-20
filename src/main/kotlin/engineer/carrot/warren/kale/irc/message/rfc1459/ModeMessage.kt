@@ -8,7 +8,7 @@ import engineer.carrot.warren.kale.irc.message.IMessageFactory
 import engineer.carrot.warren.kale.irc.message.IrcMessage
 import java.util.*
 
-data class ModeMessage(val target: String, val source: String? = null, val modifiers: List<ModeModifier>? = null): IMessage {
+data class ModeMessage(val target: String, val source: String? = null, val modifiers: List<ModeModifier>): IMessage {
 
     data class ModeModifier(val type: Char? = null, val mode: Char, var parameter: String? = null) {
         val isAdding: Boolean
@@ -56,7 +56,7 @@ data class ModeMessage(val target: String, val source: String? = null, val modif
 
                 return ModeMessage(target = target, source = message.prefix, modifiers = modifiers)
             } else {
-                return ModeMessage(target = target, source = message.prefix)
+                return null
             }
         }
 
