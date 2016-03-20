@@ -21,6 +21,7 @@ object KaleRunner {
         kale.process("QUIT :")
         kale.process("JOIN #channel,#channel2 key1")
         kale.process("PART #channel,#channel2")
+        kale.process("MODE &oulu +b *!*@*.edu -e *!*@*.bu.edu")
 
         println(kale.serialise(PingMessage(token = "token")))
         println(kale.serialise(PongMessage(token = "token2")))
@@ -29,6 +30,7 @@ object KaleRunner {
         println(kale.serialise(QuitMessage(message = "")))
         println(kale.serialise(JoinMessage(channels = listOf("#channel", "#channel2"), keys = listOf("key1"))))
         println(kale.serialise(PartMessage(channels = listOf("#channel", "#channel2"))))
+        println(kale.serialise(ModeMessage(target = "#channel", modifiers = listOf(ModeMessage.Factory.ModeModifier(type = '+', mode = 'b', parameter = "somebody")))))
     }
 
     class PingHandler: IKaleHandler<PingMessage> {

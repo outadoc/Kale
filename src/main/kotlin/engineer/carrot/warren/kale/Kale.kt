@@ -20,6 +20,7 @@ class Kale : IKale {
         addMessageFromFactory(QuitMessage.Factory)
         addMessageFromFactory(JoinMessage.Factory)
         addMessageFromFactory(PartMessage.Factory)
+        addMessageFromFactory(ModeMessage.Factory)
 
         return this
     }
