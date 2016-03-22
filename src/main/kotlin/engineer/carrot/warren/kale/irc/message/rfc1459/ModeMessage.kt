@@ -26,8 +26,29 @@ data class ModeMessage(val target: String, val source: String? = null, val modif
         override val command = "MODE"
 
         override fun serialise(message: ModeMessage): IrcMessage? {
-            // FIXME: implement
-            return null
+            val parameters = serialise(message.modifiers).toMutableList()
+            parameters.add(0, message.target)
+
+            return IrcMessage(command = command, parameters = parameters)
+        }
+
+        private fun serialise(modifiers: List<ModeModifier>): List<String> {
+            var parameters: MutableList<String> = mutableListOf()
+
+            for (modifier in modifiers) {
+                if (modifier.type != null) {
+                    parameters.add("${modifier.type}${modifier.mode}")
+                } else {
+                    parameters.add("${modifier.mode}")
+                }
+
+                val parameter = modifier.parameter
+                if (parameter != null) {
+                    parameters.add(parameter)
+                }
+            }
+
+            return parameters
         }
 
         override fun parse(message: IrcMessage): ModeMessage? {
