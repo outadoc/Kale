@@ -1,6 +1,7 @@
 package engineer.carrot.warren.kale
 
 import engineer.carrot.warren.kale.irc.message.rfc1459.*
+import engineer.carrot.warren.kale.irc.message.rpl.Rpl001Message
 
 object KaleRunner {
     @JvmStatic fun main(args: Array<String>) {
@@ -24,6 +25,7 @@ object KaleRunner {
         kale.process("MODE &oulu +b *!*@*.edu -e *!*@*.bu.edu")
         kale.process("PRIVMSG #mychannel :this is a message! ")
         kale.process("NOTICE #mychannel :this is a notice! ")
+        kale.process(":test.server 001 testnickname :welcome to test server!")
 
         println(kale.serialise(PingMessage(token = "token")))
         println(kale.serialise(PongMessage(token = "token2")))
@@ -35,6 +37,7 @@ object KaleRunner {
         println(kale.serialise(ModeMessage(target = "#channel", modifiers = listOf(ModeMessage.ModeModifier(type = '+', mode = 'b', parameter = "somebody")))))
         println(kale.serialise(PrivMsgMessage(source = "somebody@somewhere", target = "person", message = "hello")))
         println(kale.serialise(PrivMsgMessage(source = "abot@aserver", target = "#channel", message = "I am a bot")))
+        println(kale.serialise(Rpl001Message(source = "test.server", target = "testnickname", contents = "welcome to test server!")))
     }
 
     class PingHandler: IKaleHandler<PingMessage> {
