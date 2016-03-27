@@ -22,6 +22,7 @@ class Kale : IKale {
         addMessageFromFactory(PartMessage.Factory)
         addMessageFromFactory(ModeMessage.Factory)
         addMessageFromFactory(PrivMsgMessage.Factory)
+        addMessageFromFactory(NoticeMessage.Factory)
 
         return this
     }
