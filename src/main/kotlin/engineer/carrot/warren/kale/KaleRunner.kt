@@ -25,6 +25,7 @@ object KaleRunner {
         kale.process("MODE &oulu +b *!*@*.edu -e *!*@*.bu.edu")
         kale.process("PRIVMSG #mychannel :this is a message! ")
         kale.process("NOTICE #mychannel :this is a notice! ")
+        kale.process(":someone INVITE user #channel")
         kale.process(":test.server 001 testnickname :welcome to test server!")
 
         println(kale.serialise(PingMessage(token = "token")))
@@ -37,6 +38,7 @@ object KaleRunner {
         println(kale.serialise(ModeMessage(target = "#channel", modifiers = listOf(ModeMessage.ModeModifier(type = '+', mode = 'b', parameter = "somebody")))))
         println(kale.serialise(PrivMsgMessage(source = "somebody@somewhere", target = "person", message = "hello")))
         println(kale.serialise(PrivMsgMessage(source = "abot@aserver", target = "#channel", message = "I am a bot")))
+        println(kale.serialise(InviteMessage(source = "someone", user = "user", channel = "#channel")))
         println(kale.serialise(Rpl001Message(source = "test.server", target = "testnickname", contents = "welcome to test server!")))
     }
 
