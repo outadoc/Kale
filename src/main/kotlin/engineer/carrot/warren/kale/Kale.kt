@@ -26,6 +26,7 @@ class Kale : IKale {
         addMessageFromFactory(NoticeMessage.Factory)
         addMessageFromFactory(InviteMessage.Factory)
         addMessageFromFactory(TopicMessage.Factory)
+        addMessageFromFactory(KickMessage.Factory)
 
         addMessageFromFactory(Rpl001Message.Factory)
 
