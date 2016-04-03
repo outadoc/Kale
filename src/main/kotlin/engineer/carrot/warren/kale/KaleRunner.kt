@@ -26,6 +26,7 @@ object KaleRunner {
         kale.process("PRIVMSG #mychannel :this is a message! ")
         kale.process("NOTICE #mychannel :this is a notice! ")
         kale.process(":someone INVITE user #channel")
+        kale.process(":someone TOPIC #channel :a topic!")
         kale.process(":test.server 001 testnickname :welcome to test server!")
 
         println(kale.serialise(PingMessage(token = "token")))
@@ -39,6 +40,7 @@ object KaleRunner {
         println(kale.serialise(PrivMsgMessage(source = "somebody@somewhere", target = "person", message = "hello")))
         println(kale.serialise(PrivMsgMessage(source = "abot@aserver", target = "#channel", message = "I am a bot")))
         println(kale.serialise(InviteMessage(source = "someone", user = "user", channel = "#channel")))
+        println(kale.serialise(TopicMessage(source = "someone", channel = "#channel", topic = "a topic!")))
         println(kale.serialise(Rpl001Message(source = "test.server", target = "testnickname", contents = "welcome to test server!")))
     }
 
