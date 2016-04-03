@@ -6,7 +6,7 @@ import engineer.carrot.warren.kale.irc.message.IMessage
 import engineer.carrot.warren.kale.irc.message.IMessageFactory
 import engineer.carrot.warren.kale.irc.message.IrcMessage
 
-data class KickMessage(val users: List<String>, val channels: List<String>, val comment: String? = null): IMessage {
+data class KickMessage(val source: String? = null, val users: List<String>, val channels: List<String>, val comment: String? = null): IMessage {
 
     companion object Factory: IMessageFactory<KickMessage> {
         override val messageType = KickMessage::class.java
@@ -18,9 +18,9 @@ data class KickMessage(val users: List<String>, val channels: List<String>, val 
             val comment = message.comment
 
             if (comment != null) {
-                return IrcMessage(command = command, parameters = listOf(channels, users, comment))
+                return IrcMessage(prefix = message.source, command = command, parameters = listOf(channels, users, comment))
             } else {
-                return IrcMessage(command = command, parameters = listOf(channels, users))
+                return IrcMessage(prefix = message.source, command = command, parameters = listOf(channels, users))
             }
         }
 
@@ -29,6 +29,7 @@ data class KickMessage(val users: List<String>, val channels: List<String>, val 
                 return null
             }
 
+            val source = message.prefix
             val channels = Splitter.on(",").split(message.parameters[0]).toList()
             val users = Splitter.on(",").split(message.parameters[1]).toList()
 
@@ -38,7 +39,7 @@ data class KickMessage(val users: List<String>, val channels: List<String>, val 
 
             val comment = message.parameters.getOrNull(2)
 
-            return KickMessage(users = users, channels = channels, comment = comment)
+            return KickMessage(source = source, users = users, channels = channels, comment = comment)
         }
     }
 

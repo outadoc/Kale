@@ -18,6 +18,12 @@ class KickMessageTests {
 
         assertEquals(KickMessage(channels = listOf("#channel1"), users = listOf("user1")), message)
     }
+
+    @Test fun test_parse_OneChannel_OneUser_NoComment_WithSource() {
+        val message = factory.parse(IrcMessage(command = "KICK", prefix = "kicker", parameters = listOf("#channel1", "user1")))
+
+        assertEquals(KickMessage(source = "kicker", channels = listOf("#channel1"), users = listOf("user1")), message)
+    }
     
     @Test fun test_parse_OneChannel_OneUser_WithComment() {
         val message = factory.parse(IrcMessage(command = "KICK", parameters = listOf("#channel1", "user1", "kicked!")))
@@ -49,6 +55,12 @@ class KickMessageTests {
 
         assertNull(messageOne)
         assertNull(messageTwo)
+    }
+
+    @Test fun test_serialise_OneChannel_OneUser_NoComment_WithSource() {
+        val message = factory.serialise(KickMessage(source = "kicker", channels = listOf("#channel1"), users = listOf("user1")))
+
+        assertEquals(IrcMessage(prefix = "kicker", command = "KICK", parameters = listOf("#channel1", "user1")), message)
     }
 
     @Test fun test_serialise_OneChannel_OneUser_NoComment() {
