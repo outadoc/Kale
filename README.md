@@ -9,6 +9,8 @@ Written for fun and personal projects, and open sourced.
   * Escape values
 * [RFC 1459](https://tools.ietf.org/html/rfc1459)
 * [IRC v3](http://ircv3.net/irc/) (including BATCH extension)
+* Channel abstraction
+* User abstraction
 
 ## Code License
 The source code of this project is licensed under the terms of the ISC license, listed in the [LICENSE](LICENSE.md) file. A concise summary of the ISC license is available at [choosealicense.org](http://choosealicense.com/licenses/isc/).
