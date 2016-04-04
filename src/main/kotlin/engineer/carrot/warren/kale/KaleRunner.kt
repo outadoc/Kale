@@ -2,6 +2,8 @@ package engineer.carrot.warren.kale
 
 import engineer.carrot.warren.kale.irc.message.rfc1459.*
 import engineer.carrot.warren.kale.irc.message.rpl.Rpl001Message
+import engineer.carrot.warren.kale.irc.message.rpl.Rpl002Message
+import engineer.carrot.warren.kale.irc.message.rpl.Rpl003Message
 
 object KaleRunner {
     @JvmStatic fun main(args: Array<String>) {
@@ -29,6 +31,8 @@ object KaleRunner {
         kale.process(":someone TOPIC #channel :a topic!")
         kale.process("KICK #channel1,#channel2 user1,user2 :kicked!")
         kale.process(":test.server 001 testnickname :welcome to test server!")
+        kale.process(":test.server 002 testnickname :your host is imaginary.server, running version x")
+        kale.process(":test.server 003 testnickname :this server was created date")
 
         println(kale.serialise(PingMessage(token = "token")))
         println(kale.serialise(PongMessage(token = "token2")))
@@ -44,6 +48,8 @@ object KaleRunner {
         println(kale.serialise(TopicMessage(source = "someone", channel = "#channel", topic = "a topic!")))
         println(kale.serialise(KickMessage(channels = listOf("#channel1", "#channel2"), users = listOf("user1", "user2"), comment = "kicked!")))
         println(kale.serialise(Rpl001Message(source = "test.server", target = "testnickname", contents = "welcome to test server!")))
+        println(kale.serialise(Rpl002Message(source = "test.server", target = "testnickname", contents = "your host is imaginary.server, running version x")))
+        println(kale.serialise(Rpl003Message(source = "test.server", target = "testnickname", contents = "this server was created date")))
     }
 
     class PingHandler: IKaleHandler<PingMessage> {
