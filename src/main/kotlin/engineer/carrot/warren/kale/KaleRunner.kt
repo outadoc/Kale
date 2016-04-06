@@ -4,6 +4,7 @@ import engineer.carrot.warren.kale.irc.message.rfc1459.*
 import engineer.carrot.warren.kale.irc.message.rpl.Rpl001Message
 import engineer.carrot.warren.kale.irc.message.rpl.Rpl002Message
 import engineer.carrot.warren.kale.irc.message.rpl.Rpl003Message
+import engineer.carrot.warren.kale.irc.message.rpl.Rpl005Message
 
 object KaleRunner {
     @JvmStatic fun main(args: Array<String>) {
@@ -33,6 +34,7 @@ object KaleRunner {
         kale.process(":test.server 001 testnickname :welcome to test server!")
         kale.process(":test.server 002 testnickname :your host is imaginary.server, running version x")
         kale.process(":test.server 003 testnickname :this server was created date")
+        kale.process(":test.server 005 testnickname KEY=VALUE KEY2= KEY3=\uD83D\uDC30")
 
         println(kale.serialise(PingMessage(token = "token")))
         println(kale.serialise(PongMessage(token = "token2")))
@@ -50,6 +52,7 @@ object KaleRunner {
         println(kale.serialise(Rpl001Message(source = "test.server", target = "testnickname", contents = "welcome to test server!")))
         println(kale.serialise(Rpl002Message(source = "test.server", target = "testnickname", contents = "your host is imaginary.server, running version x")))
         println(kale.serialise(Rpl003Message(source = "test.server", target = "testnickname", contents = "this server was created date")))
+        println(kale.serialise(Rpl005Message(source = "test.server", target = "testnickname", tokens = mapOf("KEY" to "VALUE", "KEY2" to null, "KEY3" to "\uD83D\uDC30"))))
     }
 
     class PingHandler: IKaleHandler<PingMessage> {
