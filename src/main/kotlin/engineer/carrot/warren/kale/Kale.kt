@@ -5,10 +5,7 @@ import engineer.carrot.warren.kale.irc.message.IMessageFactory
 import engineer.carrot.warren.kale.irc.message.IrcMessage
 import engineer.carrot.warren.kale.irc.message.IrcMessageParser
 import engineer.carrot.warren.kale.irc.message.rfc1459.*
-import engineer.carrot.warren.kale.irc.message.rpl.Rpl001Message
-import engineer.carrot.warren.kale.irc.message.rpl.Rpl002Message
-import engineer.carrot.warren.kale.irc.message.rpl.Rpl003Message
-import engineer.carrot.warren.kale.irc.message.rpl.Rpl005Message
+import engineer.carrot.warren.kale.irc.message.rpl.*
 
 class Kale : IKale {
     private var messageFactories: MutableMap<String, IMessageFactory<*>> = hashMapOf()
@@ -35,6 +32,7 @@ class Kale : IKale {
         addMessageFromFactory(Rpl002Message.Factory)
         addMessageFromFactory(Rpl003Message.Factory)
         addMessageFromFactory(Rpl005Message.Factory)
+        addMessageFromFactory(Rpl331Message.Factory)
 
         return this
     }
