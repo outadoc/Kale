@@ -33,6 +33,7 @@ object KaleRunner {
         kale.process(":test.server 003 testnickname :this server was created date")
         kale.process(":test.server 005 testnickname KEY=VALUE KEY2= KEY3=\uD83D\uDC30")
         kale.process(":test.server 331 #channel :no topic is set")
+        kale.process(":test.server 332 #channel :channel topic!")
 
         println(kale.serialise(PingMessage(token = "token")))
         println(kale.serialise(PongMessage(token = "token2")))
@@ -52,6 +53,7 @@ object KaleRunner {
         println(kale.serialise(Rpl003Message(source = "test.server", target = "testnickname", contents = "this server was created date")))
         println(kale.serialise(Rpl005Message(source = "test.server", target = "testnickname", tokens = mapOf("KEY" to "VALUE", "KEY2" to null, "KEY3" to "\uD83D\uDC30"))))
         println(kale.serialise(Rpl331Message(source = "test.server", channel = "#channel", contents = "no topic is set")))
+        println(kale.serialise(Rpl332Message(source = "test.server", channel = "#channel", topic = "channel topic!")))
     }
 
     class PingHandler: IKaleHandler<PingMessage> {
