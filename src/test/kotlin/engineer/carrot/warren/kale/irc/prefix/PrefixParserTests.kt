@@ -5,7 +5,7 @@ import org.junit.Test
 
 import org.junit.Assert.*
 
-class PrefixParserTest {
+class PrefixParserTests {
     lateinit var prefixParser: IPrefixParser
 
     @Before fun setUp() {
