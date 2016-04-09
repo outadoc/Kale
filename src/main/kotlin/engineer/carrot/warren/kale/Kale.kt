@@ -34,6 +34,7 @@ class Kale : IKale {
         addMessageFromFactory(Rpl005Message.Factory)
         addMessageFromFactory(Rpl331Message.Factory)
         addMessageFromFactory(Rpl332Message.Factory)
+        addMessageFromFactory(Rpl353Message.Factory)
 
         return this
     }
