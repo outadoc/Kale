@@ -35,6 +35,10 @@ object KaleRunner {
         kale.process(":test.server 331 #channel :no topic is set")
         kale.process(":test.server 332 #channel :channel topic!")
         kale.process(":test.server 353 testnickname @ #channel :testnickname @another-nick")
+        kale.process(":test.server 372 testnickname :- MOTD contents")
+        kale.process(":test.server 375 testnickname :- test.server Message of the day - ")
+        kale.process(":test.server 376 testnickname :End of MOTD command")
+        kale.process(":test.server 422 testnickname :MOTD File is missing")
 
         println(kale.serialise(PingMessage(token = "token")))
         println(kale.serialise(PongMessage(token = "token2")))
@@ -56,6 +60,10 @@ object KaleRunner {
         println(kale.serialise(Rpl331Message(source = "test.server", channel = "#channel", contents = "no topic is set")))
         println(kale.serialise(Rpl332Message(source = "test.server", channel = "#channel", topic = "channel topic!")))
         println(kale.serialise(Rpl353Message(source = "test.server", target = "testnickname", visibility = "@", channel = "#channel", names = listOf("testnickname", "@another-nick"))))
+        println(kale.serialise(Rpl372Message(source = "test.server", target = "testnickname", contents = "- MOTD contents")))
+        println(kale.serialise(Rpl375Message(source = "test.server", target = "testnickname", contents = "- test.server Message of the day - ")))
+        println(kale.serialise(Rpl376Message(source = "test.server", target = "testnickname", contents = "End of MOTD command")))
+        println(kale.serialise(Rpl422Message(source = "test.server", target = "testnickname", contents = "MOTD File is missing")))
     }
 
     class PingHandler: IKaleHandler<PingMessage> {
