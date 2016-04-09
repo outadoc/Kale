@@ -14,9 +14,9 @@ class UserMessageTests {
     }
 
     @Test fun test_parse() {
-        val message = factory.parse(IrcMessage(command = "USER", parameters = listOf("1", "2", "3", "4")))
+        val message = factory.parse(IrcMessage(command = "USER", parameters = listOf("username", "mode", "unused", "realname")))
 
-        assertEquals(message, UserMessage(username = "1", hostname = "2", servername = "3", realname = "4"))
+        assertEquals(message, UserMessage(username = "username", mode = "mode", realname = "realname"))
     }
 
     @Test fun test_parse_tooFewParameters() {
@@ -32,8 +32,8 @@ class UserMessageTests {
     }
 
     @Test fun test_serialise() {
-        val message = factory.serialise(UserMessage(username = "username", hostname = "hostname", servername = "servername", realname = "realname"))
+        val message = factory.serialise(UserMessage(username = "username", mode = "mode", realname = "realname"))
 
-        assertEquals(message, IrcMessage(command = "USER", parameters = listOf("username", "hostname", "servername", "realname")))
+        assertEquals(message, IrcMessage(command = "USER", parameters = listOf("username", "mode", "*", "realname")))
     }
 }

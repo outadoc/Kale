@@ -4,14 +4,14 @@ import engineer.carrot.warren.kale.irc.message.IMessage
 import engineer.carrot.warren.kale.irc.message.IMessageFactory
 import engineer.carrot.warren.kale.irc.message.IrcMessage
 
-data class UserMessage(val username: String, val hostname: String, val servername: String, val realname: String): IMessage {
+data class UserMessage(val username: String, val mode: String, val realname: String): IMessage {
 
     companion object Factory: IMessageFactory<UserMessage> {
         override val messageType = UserMessage::class.java
         override val command = "USER"
 
         override fun serialise(message: UserMessage): IrcMessage? {
-            return IrcMessage(command = UserMessage.command, parameters = listOf(message.username, message.hostname, message.servername, message.realname))
+            return IrcMessage(command = UserMessage.command, parameters = listOf(message.username, message.mode, "*", message.realname))
         }
 
         override fun parse(message: IrcMessage): UserMessage? {
@@ -20,11 +20,11 @@ data class UserMessage(val username: String, val hostname: String, val servernam
             }
 
             val username = message.parameters[0]
-            val hostname = message.parameters[1]
-            val servername = message.parameters[2]
+            val mode = message.parameters[1]
+            val unused = message.parameters[2]
             val realname = message.parameters[3]
 
-            return UserMessage(username = username, hostname = hostname, servername = servername, realname = realname)
+            return UserMessage(username = username, mode = mode, realname = realname)
         }
     }
 
