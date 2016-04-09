@@ -2,6 +2,7 @@ package engineer.carrot.warren.kale.irc.message.rfc1459
 
 import engineer.carrot.warren.kale.irc.message.IMessageFactory
 import engineer.carrot.warren.kale.irc.message.IrcMessage
+import engineer.carrot.warren.kale.irc.prefix.Prefix
 import org.junit.Before
 import org.junit.Test
 import org.junit.Assert.*
@@ -16,7 +17,7 @@ class PrivMsgMessageTests {
     @Test fun test_parse_MessageFromUser() {
         val message = factory.parse(IrcMessage(command = "PRIVMSG", prefix = "Angel", parameters = listOf("Wiz", "Hello are you receiving this message ?")))
 
-        assertEquals(message, PrivMsgMessage(source = "Angel", target = "Wiz", message = "Hello are you receiving this message ?"))
+        assertEquals(message, PrivMsgMessage(source = Prefix(nick = "Angel"), target = "Wiz", message = "Hello are you receiving this message ?"))
     }
 
     @Test fun test_parse_MessageToUser() {
@@ -52,7 +53,7 @@ class PrivMsgMessageTests {
     }
 
     @Test fun test_serialise_MessageFromUser() {
-        val message = factory.serialise(PrivMsgMessage(source = "Angel", target = "Wiz", message = "Hello are you receiving this message ?"))
+        val message = factory.serialise(PrivMsgMessage(source = Prefix(nick = "Angel"), target = "Wiz", message = "Hello are you receiving this message ?"))
 
         assertEquals(message, IrcMessage(command = "PRIVMSG", prefix = "Angel", parameters = listOf("Wiz", "Hello are you receiving this message ?")))
     }

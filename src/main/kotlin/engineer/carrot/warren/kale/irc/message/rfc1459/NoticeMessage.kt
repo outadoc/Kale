@@ -3,15 +3,19 @@ package engineer.carrot.warren.kale.irc.message.rfc1459
 import engineer.carrot.warren.kale.irc.message.IMessage
 import engineer.carrot.warren.kale.irc.message.IMessageFactory
 import engineer.carrot.warren.kale.irc.message.IrcMessage
+import engineer.carrot.warren.kale.irc.prefix.Prefix
+import engineer.carrot.warren.kale.irc.prefix.PrefixParser
+import engineer.carrot.warren.kale.irc.prefix.PrefixSerialiser
 
-data class NoticeMessage(val source: String? = null, val target: String, val message: String): IMessage {
+data class NoticeMessage(val source: Prefix? = null, val target: String, val message: String): IMessage {
 
     companion object Factory: IMessageFactory<NoticeMessage> {
         override val messageType = NoticeMessage::class.java
         override val command = "NOTICE"
 
         override fun serialise(message: NoticeMessage): IrcMessage? {
-            return IrcMessage(command = command, prefix = message.source, parameters = listOf(message.target, message.message))
+            val prefix = if (message.source != null) { PrefixSerialiser.serialise(message.source) } else { null }
+            return IrcMessage(command = command, prefix = prefix, parameters = listOf(message.target, message.message))
         }
 
         override fun parse(message: IrcMessage): NoticeMessage? {
@@ -19,10 +23,11 @@ data class NoticeMessage(val source: String? = null, val target: String, val mes
                 return null
             }
 
+            val source = PrefixParser.parse(message.prefix ?: "")
             val target = message.parameters[0]
             val privMessage = message.parameters[1]
 
-            return NoticeMessage(source = message.prefix, target = target, message = privMessage)
+            return NoticeMessage(source = source, target = target, message = privMessage)
         }
     }
 

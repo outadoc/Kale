@@ -2,6 +2,7 @@ package engineer.carrot.warren.kale.irc.message.rfc1459
 
 import engineer.carrot.warren.kale.irc.message.IMessageFactory
 import engineer.carrot.warren.kale.irc.message.IrcMessage
+import engineer.carrot.warren.kale.irc.prefix.Prefix
 import org.junit.Before
 import org.junit.Test
 import org.junit.Assert.*
@@ -16,7 +17,7 @@ class InviteMessageTests {
     @Test fun test_parse_Source_User_Channel() {
         val message = factory.parse(IrcMessage(command = "INVITE", prefix = "someone", parameters = listOf("nickname", "#channel")))
 
-        assertEquals(InviteMessage(source = "someone", user = "nickname", channel = "#channel"), message)
+        assertEquals(InviteMessage(source = Prefix(nick = "someone"), user = "nickname", channel = "#channel"), message)
     }
 
     @Test fun test_parse_User_Channel_NoSource() {
@@ -34,7 +35,7 @@ class InviteMessageTests {
     }
 
     @Test fun test_serialise_Source_User_Channel() {
-        val message = factory.serialise(InviteMessage(source = "source", user = "user", channel = "channel"))
+        val message = factory.serialise(InviteMessage(source = Prefix(nick = "source"), user = "user", channel = "channel"))
 
         assertEquals(IrcMessage(command = "INVITE", prefix = "source", parameters = listOf("user", "channel")), message)
     }

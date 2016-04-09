@@ -5,22 +5,26 @@ import com.google.common.base.Splitter
 import engineer.carrot.warren.kale.irc.message.IMessage
 import engineer.carrot.warren.kale.irc.message.IMessageFactory
 import engineer.carrot.warren.kale.irc.message.IrcMessage
+import engineer.carrot.warren.kale.irc.prefix.Prefix
+import engineer.carrot.warren.kale.irc.prefix.PrefixParser
+import engineer.carrot.warren.kale.irc.prefix.PrefixSerialiser
 
-data class KickMessage(val source: String? = null, val users: List<String>, val channels: List<String>, val comment: String? = null): IMessage {
+data class KickMessage(val source: Prefix? = null, val users: List<String>, val channels: List<String>, val comment: String? = null): IMessage {
 
     companion object Factory: IMessageFactory<KickMessage> {
         override val messageType = KickMessage::class.java
         override val command = "KICK"
 
         override fun serialise(message: KickMessage): IrcMessage? {
+            val prefix = if (message.source != null) { PrefixSerialiser.serialise(message.source) } else { null }
             val channels = Joiner.on(",").join(message.channels)
             val users = Joiner.on(",").join(message.users)
             val comment = message.comment
 
             if (comment != null) {
-                return IrcMessage(prefix = message.source, command = command, parameters = listOf(channels, users, comment))
+                return IrcMessage(prefix = prefix, command = command, parameters = listOf(channels, users, comment))
             } else {
-                return IrcMessage(prefix = message.source, command = command, parameters = listOf(channels, users))
+                return IrcMessage(prefix = prefix, command = command, parameters = listOf(channels, users))
             }
         }
 
@@ -29,7 +33,7 @@ data class KickMessage(val source: String? = null, val users: List<String>, val 
                 return null
             }
 
-            val source = message.prefix
+            val source = PrefixParser.parse(message.prefix ?: "")
             val channels = Splitter.on(",").split(message.parameters[0]).toList()
             val users = Splitter.on(",").split(message.parameters[1]).toList()
 

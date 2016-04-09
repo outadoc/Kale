@@ -7,6 +7,10 @@ object PrefixParser : IPrefixParser {
     override fun parse(rawPrefix: String): Prefix? {
         var raw = rawPrefix
 
+        if (raw.isEmpty()) {
+            return null
+        }
+
         var nick = raw
         var user: String? = null
         var host: String? = null

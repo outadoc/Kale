@@ -2,6 +2,7 @@ package engineer.carrot.warren.kale.irc.message.rfc1459
 
 import engineer.carrot.warren.kale.irc.message.IMessageFactory
 import engineer.carrot.warren.kale.irc.message.IrcMessage
+import engineer.carrot.warren.kale.irc.prefix.Prefix
 import org.junit.Before
 import org.junit.Test
 import org.junit.Assert.*
@@ -34,7 +35,7 @@ class PartMessageTests {
     @Test fun test_parse_SomeoneParted() {
         val message = factory.parse(IrcMessage(command = "PART", prefix = "someone@somewhere", parameters = listOf("#channel")))
 
-        assertEquals(PartMessage(source = "someone@somewhere", channels = listOf("#channel")), message)
+        assertEquals(PartMessage(source = Prefix(nick = "someone", host = "somewhere"), channels = listOf("#channel")), message)
     }
 
     @Test fun test_serialise_OneChannel() {
@@ -50,7 +51,7 @@ class PartMessageTests {
     }
 
     @Test fun test_serialise_SomeoneParted() {
-        val message = factory.serialise(PartMessage(source = "someone@somewhere", channels = listOf("#channel")))
+        val message = factory.serialise(PartMessage(source = Prefix(nick = "someone", host = "somewhere"), channels = listOf("#channel")))
 
         assertEquals(IrcMessage(command = "PART", prefix = "someone@somewhere", parameters = listOf("#channel")), message)
     }

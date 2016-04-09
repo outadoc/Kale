@@ -2,6 +2,7 @@ package engineer.carrot.warren.kale
 
 import engineer.carrot.warren.kale.irc.message.rfc1459.*
 import engineer.carrot.warren.kale.irc.message.rpl.*
+import engineer.carrot.warren.kale.irc.prefix.Prefix
 
 object KaleRunner {
     @JvmStatic fun main(args: Array<String>) {
@@ -48,10 +49,10 @@ object KaleRunner {
         println(kale.serialise(JoinMessage(channels = listOf("#channel", "#channel2"), keys = listOf("key1"))))
         println(kale.serialise(PartMessage(channels = listOf("#channel", "#channel2"))))
         println(kale.serialise(ModeMessage(target = "#channel", modifiers = listOf(ModeMessage.ModeModifier(type = '+', mode = 'b', parameter = "somebody")))))
-        println(kale.serialise(PrivMsgMessage(source = "somebody@somewhere", target = "person", message = "hello")))
-        println(kale.serialise(PrivMsgMessage(source = "abot@aserver", target = "#channel", message = "I am a bot")))
-        println(kale.serialise(InviteMessage(source = "someone", user = "user", channel = "#channel")))
-        println(kale.serialise(TopicMessage(source = "someone", channel = "#channel", topic = "a topic!")))
+        println(kale.serialise(PrivMsgMessage(source = Prefix(nick = "somebody", host = "somewhere"), target = "person", message = "hello")))
+        println(kale.serialise(PrivMsgMessage(source = Prefix(nick = "abot", host = "aserver"), target = "#channel", message = "I am a bot")))
+        println(kale.serialise(InviteMessage(source = Prefix(nick = "someone"), user = "user", channel = "#channel")))
+        println(kale.serialise(TopicMessage(source = Prefix(nick = "someone"), channel = "#channel", topic = "a topic!")))
         println(kale.serialise(KickMessage(channels = listOf("#channel1", "#channel2"), users = listOf("user1", "user2"), comment = "kicked!")))
         println(kale.serialise(Rpl001Message(source = "test.server", target = "testnickname", contents = "welcome to test server!")))
         println(kale.serialise(Rpl002Message(source = "test.server", target = "testnickname", contents = "your host is imaginary.server, running version x")))

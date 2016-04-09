@@ -2,6 +2,7 @@ package engineer.carrot.warren.kale.irc.message.rfc1459
 
 import engineer.carrot.warren.kale.irc.message.IMessageFactory
 import engineer.carrot.warren.kale.irc.message.IrcMessage
+import engineer.carrot.warren.kale.irc.prefix.Prefix
 import org.junit.Before
 import org.junit.Test
 import org.junit.Assert.*
@@ -22,7 +23,7 @@ class KickMessageTests {
     @Test fun test_parse_OneChannel_OneUser_NoComment_WithSource() {
         val message = factory.parse(IrcMessage(command = "KICK", prefix = "kicker", parameters = listOf("#channel1", "user1")))
 
-        assertEquals(KickMessage(source = "kicker", channels = listOf("#channel1"), users = listOf("user1")), message)
+        assertEquals(KickMessage(source = Prefix(nick = "kicker"), channels = listOf("#channel1"), users = listOf("user1")), message)
     }
     
     @Test fun test_parse_OneChannel_OneUser_WithComment() {
@@ -58,7 +59,7 @@ class KickMessageTests {
     }
 
     @Test fun test_serialise_OneChannel_OneUser_NoComment_WithSource() {
-        val message = factory.serialise(KickMessage(source = "kicker", channels = listOf("#channel1"), users = listOf("user1")))
+        val message = factory.serialise(KickMessage(source = Prefix(nick = "kicker"), channels = listOf("#channel1"), users = listOf("user1")))
 
         assertEquals(IrcMessage(prefix = "kicker", command = "KICK", parameters = listOf("#channel1", "user1")), message)
     }
