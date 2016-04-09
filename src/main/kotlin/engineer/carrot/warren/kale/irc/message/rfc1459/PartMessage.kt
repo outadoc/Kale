@@ -6,7 +6,7 @@ import engineer.carrot.warren.kale.irc.message.IMessage
 import engineer.carrot.warren.kale.irc.message.IMessageFactory
 import engineer.carrot.warren.kale.irc.message.IrcMessage
 
-data class PartMessage(val channels: List<String>): IMessage {
+data class PartMessage(val source: String? = null, val channels: List<String>): IMessage {
 
     companion object Factory: IMessageFactory<PartMessage> {
         override val messageType = PartMessage::class.java
@@ -15,7 +15,7 @@ data class PartMessage(val channels: List<String>): IMessage {
         override fun serialise(message: PartMessage): IrcMessage? {
             val channels = Joiner.on(",").join(message.channels)
 
-            return IrcMessage(command = command, parameters = listOf(channels))
+            return IrcMessage(command = command, prefix = message.source, parameters = listOf(channels))
         }
 
         override fun parse(message: IrcMessage): PartMessage? {
@@ -23,10 +23,11 @@ data class PartMessage(val channels: List<String>): IMessage {
                 return null
             }
 
+            val source = message.prefix
             val unsplitChannels = message.parameters[0]
             val channels = Splitter.on(",").split(unsplitChannels).toList()
 
-            return PartMessage(channels = channels)
+            return PartMessage(source = source, channels = channels)
         }
     }
 

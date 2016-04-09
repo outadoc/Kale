@@ -31,6 +31,12 @@ class PartMessageTests {
         assertEquals(message, null)
     }
 
+    @Test fun test_parse_SomeoneParted() {
+        val message = factory.parse(IrcMessage(command = "PART", prefix = "someone@somewhere", parameters = listOf("#channel")))
+
+        assertEquals(PartMessage(source = "someone@somewhere", channels = listOf("#channel")), message)
+    }
+
     @Test fun test_serialise_OneChannel() {
         val message = factory.serialise(PartMessage(channels = listOf("channel1")))
 
@@ -41,6 +47,12 @@ class PartMessageTests {
         val message = factory.serialise(PartMessage(channels = listOf("channel1", "channel2")))
 
         assertEquals(message, IrcMessage(command = "PART", parameters = listOf("channel1,channel2")))
+    }
+
+    @Test fun test_serialise_SomeoneParted() {
+        val message = factory.serialise(PartMessage(source = "someone@somewhere", channels = listOf("#channel")))
+
+        assertEquals(IrcMessage(command = "PART", prefix = "someone@somewhere", parameters = listOf("#channel")), message)
     }
 
 }
