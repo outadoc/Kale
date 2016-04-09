@@ -49,6 +49,12 @@ class JoinMessageTests {
         assertNull(message)
     }
 
+    @Test fun test_parse_SomeoneJoiningAChannel() {
+        val message = factory.parse(IrcMessage(command = "JOIN", prefix = "someone@somewhere", parameters = listOf("#channel")))
+
+        assertEquals(JoinMessage(source = "someone@somewhere", channels = listOf("#channel")), message)
+    }
+
     @Test fun test_serialise_MultipleChannels() {
         val message = factory.serialise(JoinMessage(channels = listOf("channel1", "channel2")))
 
@@ -65,6 +71,12 @@ class JoinMessageTests {
         val message = factory.serialise(JoinMessage(channels = listOf("channel1", "channel2", "channel3"), keys = listOf("key1", "key2")))
 
         assertEquals(message, IrcMessage(command = "JOIN", parameters = listOf("channel1,channel2,channel3", "key1,key2")))
+    }
+
+    @Test fun test_serialise_SomeoneJoiningAChannel() {
+        val message = factory.serialise(JoinMessage(source = "someone@somewhere", channels = listOf("#channel")))
+
+        assertEquals(IrcMessage(command = "JOIN", prefix = "someone@somewhere", parameters = listOf("#channel")), message)
     }
 
 }

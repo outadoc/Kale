@@ -6,7 +6,7 @@ import engineer.carrot.warren.kale.irc.message.IMessage
 import engineer.carrot.warren.kale.irc.message.IMessageFactory
 import engineer.carrot.warren.kale.irc.message.IrcMessage
 
-data class JoinMessage(val channels: List<String>, val keys: List<String>? = null): IMessage {
+data class JoinMessage(val source: String? = null, val channels: List<String>, val keys: List<String>? = null): IMessage {
 
     companion object Factory: IMessageFactory<JoinMessage> {
         override val messageType = JoinMessage::class.java
@@ -16,11 +16,11 @@ data class JoinMessage(val channels: List<String>, val keys: List<String>? = nul
             val channels = Joiner.on(",").join(message.channels)
 
             if (message.keys == null || message.keys.isEmpty()) {
-                return IrcMessage(command = command, parameters = listOf(channels))
+                return IrcMessage(command = command, prefix = message.source, parameters = listOf(channels))
             } else {
                 val keys = Joiner.on(",").join(message.keys)
 
-                return IrcMessage(command = command, parameters = listOf(channels, keys))
+                return IrcMessage(command = command, prefix = message.source, parameters = listOf(channels, keys))
             }
         }
 
@@ -29,16 +29,17 @@ data class JoinMessage(val channels: List<String>, val keys: List<String>? = nul
                 return null
             }
 
+            val source = message.prefix
             val unsplitChannels = message.parameters[0]
             val channels = Splitter.on(",").split(unsplitChannels).toList()
 
             if (message.parameters.size < 2) {
-                return JoinMessage(channels = channels)
+                return JoinMessage(source = source, channels = channels)
             } else {
                 val unsplitKeys = message.parameters[1]
                 val keys = Splitter.on(",").split(unsplitKeys).toList()
 
-                return JoinMessage(channels = channels, keys = keys)
+                return JoinMessage(source = source, channels = channels, keys = keys)
             }
         }
     }
