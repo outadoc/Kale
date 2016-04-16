@@ -75,7 +75,7 @@ class Kale : IKale {
 
         val factory = messageFactories[ircMessage.command]
         if (factory == null) {
-            println("failed to find factory for message parsing: $ircMessage")
+            println("no factory for: $ircMessage")
             return
         }
 
