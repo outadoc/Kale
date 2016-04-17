@@ -14,32 +14,34 @@ class Rpl332MessageTests {
     }
 
     @Test fun test_parse_SourceChannelContents() {
-        val message = factory.parse(IrcMessage(command = "332", prefix = "imaginary.bunnies.io", parameters = listOf("#channel", "Channel topic!")))
+        val message = factory.parse(IrcMessage(command = "332", prefix = "imaginary.bunnies.io", parameters = listOf("test-user", "#channel", "Channel topic!")))
 
-        assertEquals(Rpl332Message(source = "imaginary.bunnies.io", channel = "#channel", topic = "Channel topic!"), message)
+        assertEquals(Rpl332Message(source = "imaginary.bunnies.io", target = "test-user", channel = "#channel", topic = "Channel topic!"), message)
     }
 
     @Test fun test_parse_ChannelContents_SourceIsEmptyString() {
-        val message = factory.parse(IrcMessage(command = "332", parameters = listOf("#channel2", "Channel topic!")))
+        val message = factory.parse(IrcMessage(command = "332", parameters = listOf("test-user", "#channel2", "Channel topic!")))
 
-        assertEquals(Rpl332Message(source = "", channel = "#channel2", topic = "Channel topic!"), message)
+        assertEquals(Rpl332Message(source = "", target = "test-user", channel = "#channel2", topic = "Channel topic!"), message)
     }
 
     @Test fun test_parse_TooFewParameters() {
-        val message = factory.parse(IrcMessage(command = "332", parameters = listOf("#channel3")))
+        val messageOne = factory.parse(IrcMessage(command = "332", parameters = listOf("test-user")))
+        val messageTwo = factory.parse(IrcMessage(command = "332", parameters = listOf("test-user", "#channel")))
 
-        assertNull(message)
+        assertNull(messageOne)
+        assertNull(messageTwo)
     }
 
     @Test fun test_serialise_SourceChannelContents() {
-        val message = factory.serialise(Rpl332Message(source = "", channel = "#channel2", topic = "Channel topic!"))
+        val message = factory.serialise(Rpl332Message(source = "", target = "test-user", channel = "#channel2", topic = "Channel topic!"))
 
-        assertEquals(IrcMessage(command = "332", prefix = "", parameters = listOf("#channel2", "Channel topic!")), message)
+        assertEquals(IrcMessage(command = "332", prefix = "", parameters = listOf("test-user", "#channel2", "Channel topic!")), message)
     }
 
     @Test fun test_serialise_ChannelContents_SourceIsEmptyString() {
-        val message = factory.serialise(Rpl332Message(source = "", channel = "#channel2", topic = "Channel topic!"))
+        val message = factory.serialise(Rpl332Message(source = "", target = "test-user", channel = "#channel2", topic = "Channel topic!"))
 
-        assertEquals(IrcMessage(command = "332", prefix = "", parameters = listOf("#channel2", "Channel topic!")), message)
+        assertEquals(IrcMessage(command = "332", prefix = "", parameters = listOf("test-user", "#channel2", "Channel topic!")), message)
     }
 }
