@@ -70,8 +70,8 @@ object KaleRunner {
     class PingHandler: IKaleHandler<PingMessage> {
         override val messageType = PingMessage::class.java
 
-        override fun handle(messageOne: PingMessage) {
-            println("handling ping message: $messageOne")
+        override fun handle(message: PingMessage) {
+            println("handling ping message: $message")
         }
 
     }
@@ -79,8 +79,8 @@ object KaleRunner {
     class PongHandler: IKaleHandler<PongMessage> {
         override val messageType = PongMessage::class.java
 
-        override fun handle(messageOne: PongMessage) {
-            println("handling pong message: $messageOne")
+        override fun handle(message: PongMessage) {
+            println("handling pong message: $message")
         }
 
     }
