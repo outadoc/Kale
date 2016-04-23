@@ -2,6 +2,7 @@ package engineer.carrot.warren.kale.irc.message.rfc1459
 
 import engineer.carrot.warren.kale.irc.message.IMessageFactory
 import engineer.carrot.warren.kale.irc.message.IrcMessage
+import engineer.carrot.warren.kale.irc.prefix.Prefix
 import org.junit.Before
 import org.junit.Test
 import org.junit.Assert.*
@@ -37,6 +38,12 @@ class QuitMessageTests {
         assertEquals(message, QuitMessage(message = "1"))
     }
 
+    @Test fun test_parse_WithSource() {
+        val message = factory.parse(IrcMessage(command = "QUIT", prefix = "someone@somewhere"))
+
+        assertEquals(QuitMessage(source = Prefix(nick = "someone", host = "somewhere")), message)
+    }
+
     @Test fun test_serialise_noMessage() {
         val message = factory.serialise(QuitMessage())
 
@@ -47,5 +54,11 @@ class QuitMessageTests {
         val message = factory.serialise(QuitMessage(message = "A test quit message"))
 
         assertEquals(message, IrcMessage(command = "QUIT", parameters = listOf("A test quit message")))
+    }
+
+    @Test fun test_serialise_WithSource() {
+        val message = factory.serialise(QuitMessage(source = Prefix(nick = "someone", host = "somewhere")))
+
+        assertEquals(IrcMessage(command = "QUIT", prefix = "someone@somewhere"), message)
     }
 }
