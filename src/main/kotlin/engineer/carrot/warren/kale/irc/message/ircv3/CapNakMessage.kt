@@ -16,9 +16,9 @@ data class CapNakMessage(val target: String? = null, val caps: List<String>): IM
             val caps = Joiner.on(' ').join(message.caps)
 
             if (message.target != null) {
-                return IrcMessage(command = "CAP", parameters = listOf(message.target, "NAK"))
+                return IrcMessage(command = "CAP", parameters = listOf(message.target, "NAK", caps))
             } else {
-                return IrcMessage(command = "CAP", parameters = listOf("NAK"))
+                return IrcMessage(command = "CAP", parameters = listOf("NAK", caps))
             }
         }
 
