@@ -166,7 +166,7 @@ object ParseHelper {
 
                 if (nextEquals + 1 >= chunk.length) {
                     // key but no value
-                    value = null
+                    value = ""
                 } else {
                     value = chunk.substring(nextEquals + 1, chunk.length)
                 }
