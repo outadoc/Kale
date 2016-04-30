@@ -5,6 +5,10 @@ import engineer.carrot.warren.kale.irc.message.IMessageFactory
 import engineer.carrot.warren.kale.irc.message.IrcMessage
 import engineer.carrot.warren.kale.irc.message.IrcMessageParser
 import engineer.carrot.warren.kale.irc.message.ircv3.*
+import engineer.carrot.warren.kale.irc.message.ircv3.sasl.AuthenticateMessage
+import engineer.carrot.warren.kale.irc.message.ircv3.sasl.Rpl903Message
+import engineer.carrot.warren.kale.irc.message.ircv3.sasl.Rpl904Message
+import engineer.carrot.warren.kale.irc.message.ircv3.sasl.Rpl905Message
 import engineer.carrot.warren.kale.irc.message.rfc1459.*
 import engineer.carrot.warren.kale.irc.message.rpl.*
 
@@ -62,6 +66,10 @@ class Kale : IKale {
         addMessageFromFactory(CapLsMessage.Factory)
         addMessageFromFactory(CapNakMessage.Factory)
         addMessageFromFactory(CapReqMessage.Factory)
+        addMessageFromFactory(AuthenticateMessage.Factory)
+        addMessageFromFactory(Rpl903Message.Factory)
+        addMessageFromFactory(Rpl904Message.Factory)
+        addMessageFromFactory(Rpl905Message.Factory)
 
         addMessageFromFactory(Rpl001Message.Factory)
         addMessageFromFactory(Rpl002Message.Factory)
