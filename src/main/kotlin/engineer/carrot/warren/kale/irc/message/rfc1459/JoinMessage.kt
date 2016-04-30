@@ -13,18 +13,18 @@ data class JoinMessage(val source: Prefix? = null, val channels: List<String>, v
 
     companion object Factory: IMessageFactory<JoinMessage> {
         override val messageType = JoinMessage::class.java
-        override val command = "JOIN"
+        override val key = "JOIN"
 
         override fun serialise(message: JoinMessage): IrcMessage? {
             val prefix = if (message.source != null) { PrefixSerialiser.serialise(message.source) } else { null }
             val channels = Joiner.on(",").join(message.channels)
 
             if (message.keys == null || message.keys.isEmpty()) {
-                return IrcMessage(command = command, prefix = prefix, parameters = listOf(channels))
+                return IrcMessage(command = key, prefix = prefix, parameters = listOf(channels))
             } else {
                 val keys = Joiner.on(",").join(message.keys)
 
-                return IrcMessage(command = command, prefix = prefix, parameters = listOf(channels, keys))
+                return IrcMessage(command = key, prefix = prefix, parameters = listOf(channels, keys))
             }
         }
 

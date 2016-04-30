@@ -13,13 +13,13 @@ data class PartMessage(val source: Prefix? = null, val channels: List<String>): 
 
     companion object Factory: IMessageFactory<PartMessage> {
         override val messageType = PartMessage::class.java
-        override val command = "PART"
+        override val key = "PART"
 
         override fun serialise(message: PartMessage): IrcMessage? {
             val prefix = if (message.source != null) { PrefixSerialiser.serialise(message.source) } else { null }
             val channels = Joiner.on(",").join(message.channels)
 
-            return IrcMessage(command = command, prefix = prefix, parameters = listOf(channels))
+            return IrcMessage(command = key, prefix = prefix, parameters = listOf(channels))
         }
 
         override fun parse(message: IrcMessage): PartMessage? {

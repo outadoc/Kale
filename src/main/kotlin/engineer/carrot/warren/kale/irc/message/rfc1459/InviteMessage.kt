@@ -11,11 +11,11 @@ data class InviteMessage(val source: Prefix? = null, val user: String, val chann
 
     companion object Factory: IMessageFactory<InviteMessage> {
         override val messageType = InviteMessage::class.java
-        override val command = "INVITE"
+        override val key = "INVITE"
 
         override fun serialise(message: InviteMessage): IrcMessage? {
             val prefix = if (message.source != null) { PrefixSerialiser.serialise(message.source) } else { null }
-            return IrcMessage(command = InviteMessage.command, prefix = prefix, parameters = listOf(message.user, message.channel))
+            return IrcMessage(command = key, prefix = prefix, parameters = listOf(message.user, message.channel))
         }
 
         override fun parse(message: IrcMessage): InviteMessage? {

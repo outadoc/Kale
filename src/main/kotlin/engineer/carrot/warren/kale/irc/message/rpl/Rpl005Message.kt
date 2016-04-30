@@ -10,7 +10,7 @@ data class Rpl005Message(val source: String, val target: String, val tokens: Map
 
     companion object Factory: IMessageFactory<Rpl005Message> {
         override val messageType = Rpl005Message::class.java
-        override val command = "005"
+        override val key = "005"
 
         override fun serialise(message: Rpl005Message): IrcMessage? {
             var tokens = mutableListOf<String>()
@@ -25,7 +25,7 @@ data class Rpl005Message(val source: String, val target: String, val tokens: Map
 
             val parameters = listOf(message.target) + tokens
 
-            return IrcMessage(command = command, prefix = message.source, parameters = parameters)
+            return IrcMessage(command = key, prefix = message.source, parameters = parameters)
         }
 
         override fun parse(message: IrcMessage): Rpl005Message? {

@@ -11,7 +11,7 @@ data class NickMessage(val source: Prefix? = null, val nickname: String, val hop
 
     companion object Factory: IMessageFactory<NickMessage> {
         override val messageType = NickMessage::class.java
-        override val command = "NICK"
+        override val key = "NICK"
 
         override fun serialise(message: NickMessage): IrcMessage? {
             val prefix = if (message.source != null) { PrefixSerialiser.serialise(message.source) } else { null }
@@ -22,7 +22,7 @@ data class NickMessage(val source: Prefix? = null, val nickname: String, val hop
                 parameters += message.hopcount.toString()
             }
 
-            return IrcMessage(command = command, prefix = prefix, parameters = parameters)
+            return IrcMessage(command = key, prefix = prefix, parameters = parameters)
         }
 
         override fun parse(message: IrcMessage): NickMessage? {

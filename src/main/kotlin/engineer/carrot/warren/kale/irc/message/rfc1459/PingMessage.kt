@@ -8,10 +8,10 @@ data class PingMessage(val token: String): IMessage {
 
     companion object Factory: IMessageFactory<PingMessage> {
         override val messageType = PingMessage::class.java
-        override val command = "PING"
+        override val key = "PING"
 
         override fun serialise(message: PingMessage): IrcMessage? {
-            return IrcMessage(command = PingMessage.command, parameters = listOf(message.token))
+            return IrcMessage(command = key, parameters = listOf(message.token))
         }
 
         override fun parse(message: IrcMessage): PingMessage? {

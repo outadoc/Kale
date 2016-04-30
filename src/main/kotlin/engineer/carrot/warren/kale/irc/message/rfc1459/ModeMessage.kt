@@ -26,14 +26,14 @@ data class ModeMessage(val source: Prefix? = null, val target: String, val modif
 
     companion object Factory: IMessageFactory<ModeMessage> {
         override val messageType = ModeMessage::class.java
-        override val command = "MODE"
+        override val key = "MODE"
 
         override fun serialise(message: ModeMessage): IrcMessage? {
             val prefix = if (message.source != null) { PrefixSerialiser.serialise(message.source) } else { null }
             val parameters = serialise(message.modifiers).toMutableList()
             parameters.add(0, message.target)
 
-            return IrcMessage(command = command, prefix = prefix, parameters = parameters)
+            return IrcMessage(command = key, prefix = prefix, parameters = parameters)
         }
 
         private fun serialise(modifiers: List<ModeModifier>): List<String> {

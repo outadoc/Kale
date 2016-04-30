@@ -10,12 +10,12 @@ data class Rpl353Message(val source: String, val target: String, val visibility:
 
     companion object Factory: IMessageFactory<Rpl353Message> {
         override val messageType = Rpl353Message::class.java
-        override val command = "353"
+        override val key = "353"
 
         override fun serialise(message: Rpl353Message): IrcMessage? {
             val names = Joiner.on(" ").join(message.names)
 
-            return IrcMessage(command = command, prefix = message.source, parameters = listOf(message.target, message.visibility, message.channel, names))
+            return IrcMessage(command = key, prefix = message.source, parameters = listOf(message.target, message.visibility, message.channel, names))
         }
 
         override fun parse(message: IrcMessage): Rpl353Message? {

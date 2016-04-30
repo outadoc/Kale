@@ -2,8 +2,7 @@ package engineer.carrot.warren.kale.irc.message
 
 interface IMessageFactory<T: IMessage> {
     val messageType: Class<T>
-
-    val command: String
+    val key: String
 
     fun parse(message: IrcMessage): T?
 

@@ -8,10 +8,10 @@ data class Rpl422Message(val source: String, val target: String, val contents: S
 
     companion object Factory: IMessageFactory<Rpl422Message> {
         override val messageType = Rpl422Message::class.java
-        override val command = "422"
+        override val key = "422"
 
         override fun serialise(message: Rpl422Message): IrcMessage? {
-            return IrcMessage(command = command, prefix = message.source, parameters = listOf(message.target, message.contents))
+            return IrcMessage(command = key, prefix = message.source, parameters = listOf(message.target, message.contents))
         }
 
         override fun parse(message: IrcMessage): Rpl422Message? {

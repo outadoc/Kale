@@ -11,15 +11,15 @@ data class QuitMessage(val source: Prefix? = null, val message: String? = null):
 
     companion object Factory: IMessageFactory<QuitMessage> {
         override val messageType = QuitMessage::class.java
-        override val command = "QUIT"
+        override val key = "QUIT"
 
         override fun serialise(message: QuitMessage): IrcMessage? {
             val prefix = if (message.source != null) { PrefixSerialiser.serialise(message.source) } else { null }
 
             if (message.message == null) {
-                return IrcMessage(command = command, prefix = prefix)
+                return IrcMessage(command = key, prefix = prefix)
             } else {
-                return IrcMessage(command = command, prefix = prefix, parameters = listOf(message.message))
+                return IrcMessage(command = key, prefix = prefix, parameters = listOf(message.message))
             }
         }
 

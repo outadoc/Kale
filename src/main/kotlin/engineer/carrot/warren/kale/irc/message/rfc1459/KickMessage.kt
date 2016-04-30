@@ -13,7 +13,7 @@ data class KickMessage(val source: Prefix? = null, val users: List<String>, val 
 
     companion object Factory: IMessageFactory<KickMessage> {
         override val messageType = KickMessage::class.java
-        override val command = "KICK"
+        override val key = "KICK"
 
         override fun serialise(message: KickMessage): IrcMessage? {
             val prefix = if (message.source != null) { PrefixSerialiser.serialise(message.source) } else { null }
@@ -22,9 +22,9 @@ data class KickMessage(val source: Prefix? = null, val users: List<String>, val 
             val comment = message.comment
 
             if (comment != null) {
-                return IrcMessage(prefix = prefix, command = command, parameters = listOf(channels, users, comment))
+                return IrcMessage(prefix = prefix, command = key, parameters = listOf(channels, users, comment))
             } else {
-                return IrcMessage(prefix = prefix, command = command, parameters = listOf(channels, users))
+                return IrcMessage(prefix = prefix, command = key, parameters = listOf(channels, users))
             }
         }
 

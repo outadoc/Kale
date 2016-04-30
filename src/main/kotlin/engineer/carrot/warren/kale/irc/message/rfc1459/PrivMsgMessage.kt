@@ -11,11 +11,11 @@ data class PrivMsgMessage(val source: Prefix? = null, val target: String, val me
 
     companion object Factory: IMessageFactory<PrivMsgMessage> {
         override val messageType = PrivMsgMessage::class.java
-        override val command = "PRIVMSG"
+        override val key = "PRIVMSG"
 
         override fun serialise(message: PrivMsgMessage): IrcMessage? {
             val prefix = if (message.source != null) { PrefixSerialiser.serialise(message.source) } else { null }
-            return IrcMessage(command = command, prefix = prefix, parameters = listOf(message.target, message.message))
+            return IrcMessage(command = key, prefix = prefix, parameters = listOf(message.target, message.message))
         }
 
         override fun parse(message: IrcMessage): PrivMsgMessage? {

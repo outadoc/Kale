@@ -11,11 +11,11 @@ data class NoticeMessage(val source: Prefix? = null, val target: String, val mes
 
     companion object Factory: IMessageFactory<NoticeMessage> {
         override val messageType = NoticeMessage::class.java
-        override val command = "NOTICE"
+        override val key = "NOTICE"
 
         override fun serialise(message: NoticeMessage): IrcMessage? {
             val prefix = if (message.source != null) { PrefixSerialiser.serialise(message.source) } else { null }
-            return IrcMessage(command = command, prefix = prefix, parameters = listOf(message.target, message.message))
+            return IrcMessage(command = key, prefix = prefix, parameters = listOf(message.target, message.message))
         }
 
         override fun parse(message: IrcMessage): NoticeMessage? {

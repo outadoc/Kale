@@ -8,10 +8,10 @@ data class UserMessage(val username: String, val mode: String, val realname: Str
 
     companion object Factory: IMessageFactory<UserMessage> {
         override val messageType = UserMessage::class.java
-        override val command = "USER"
+        override val key = "USER"
 
         override fun serialise(message: UserMessage): IrcMessage? {
-            return IrcMessage(command = UserMessage.command, parameters = listOf(message.username, message.mode, "*", message.realname))
+            return IrcMessage(command = key, parameters = listOf(message.username, message.mode, "*", message.realname))
         }
 
         override fun parse(message: IrcMessage): UserMessage? {

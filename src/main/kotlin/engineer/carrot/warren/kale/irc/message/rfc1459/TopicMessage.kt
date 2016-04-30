@@ -11,15 +11,15 @@ data class TopicMessage(val source: Prefix? = null, val channel: String, val top
 
     companion object Factory: IMessageFactory<TopicMessage> {
         override val messageType = TopicMessage::class.java
-        override val command = "TOPIC"
+        override val key = "TOPIC"
 
         override fun serialise(message: TopicMessage): IrcMessage? {
             val prefix = if (message.source != null) { PrefixSerialiser.serialise(message.source) } else { null }
 
             if (message.topic != null) {
-                return IrcMessage(command = TopicMessage.command, prefix = prefix, parameters = listOf(message.channel, message.topic))
+                return IrcMessage(command = key, prefix = prefix, parameters = listOf(message.channel, message.topic))
             } else {
-                return IrcMessage(command = TopicMessage.command, prefix = prefix, parameters = listOf(message.channel))
+                return IrcMessage(command = key, prefix = prefix, parameters = listOf(message.channel))
             }
         }
 

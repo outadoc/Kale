@@ -8,10 +8,10 @@ data class Rpl332Message(val source: String, val target: String, val channel: St
 
     companion object Factory: IMessageFactory<Rpl332Message> {
         override val messageType = Rpl332Message::class.java
-        override val command = "332"
+        override val key = "332"
 
         override fun serialise(message: Rpl332Message): IrcMessage? {
-            return IrcMessage(command = command, prefix = message.source, parameters = listOf(message.target, message.channel, message.topic))
+            return IrcMessage(command = key, prefix = message.source, parameters = listOf(message.target, message.channel, message.topic))
         }
 
         override fun parse(message: IrcMessage): Rpl332Message? {
