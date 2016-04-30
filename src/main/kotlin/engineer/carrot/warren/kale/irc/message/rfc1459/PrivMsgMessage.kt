@@ -7,7 +7,7 @@ import engineer.carrot.warren.kale.irc.prefix.Prefix
 import engineer.carrot.warren.kale.irc.prefix.PrefixParser
 import engineer.carrot.warren.kale.irc.prefix.PrefixSerialiser
 
-data class PrivMsgMessage(val source: Prefix? = null, val target: String, val message: String): IMessage {
+data class PrivMsgMessage(val source: Prefix? = null, val time: String? = null, val target: String, val message: String): IMessage {
 
     companion object Factory: IMessageFactory<PrivMsgMessage> {
         override val messageType = PrivMsgMessage::class.java
@@ -27,7 +27,9 @@ data class PrivMsgMessage(val source: Prefix? = null, val target: String, val me
             val target = message.parameters[0]
             val privMessage = message.parameters[1]
 
-            return PrivMsgMessage(source = source, target = target, message = privMessage)
+            val serverTime = message.tags["time"]
+
+            return PrivMsgMessage(source = source, time = serverTime, target = target, message = privMessage)
         }
     }
 

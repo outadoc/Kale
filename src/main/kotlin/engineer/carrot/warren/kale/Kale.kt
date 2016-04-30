@@ -57,6 +57,11 @@ class Kale : IKale {
         addMessageFromFactory(InviteMessage.Factory)
         addMessageFromFactory(TopicMessage.Factory)
         addMessageFromFactory(KickMessage.Factory)
+        addMessageFromFactory(CapAckMessage.Factory)
+        addMessageFromFactory(CapEndMessage.Factory)
+        addMessageFromFactory(CapLsMessage.Factory)
+        addMessageFromFactory(CapNakMessage.Factory)
+        addMessageFromFactory(CapReqMessage.Factory)
 
         addMessageFromFactory(Rpl001Message.Factory)
         addMessageFromFactory(Rpl002Message.Factory)
