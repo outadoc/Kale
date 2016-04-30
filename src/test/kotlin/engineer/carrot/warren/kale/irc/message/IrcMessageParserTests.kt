@@ -85,6 +85,12 @@ class IrcMessageParserTests {
         assertEquals(message, IrcMessage(tags = mapOf("test" to "value1"), command = "TEST"))
     }
 
+    @Test fun test_tag_keyButNoValue() {
+        val message = parseLine("@test= TEST")
+
+        assertEquals(message, IrcMessage(tags = mapOf("test" to null), command = "TEST"))
+    }
+
     // Malformed test cases
 
     @Test fun test_emptyString() {
@@ -119,12 +125,6 @@ class IrcMessageParserTests {
 
     @Test fun test_colonsOnly() {
         val message = parseLine(":::::")
-
-        assertNull(message)
-    }
-
-    @Test fun test_tag_keyButNoValue() {
-        val message = parseLine("@test= TEST")
 
         assertNull(message)
     }

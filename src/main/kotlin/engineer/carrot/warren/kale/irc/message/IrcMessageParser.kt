@@ -51,33 +51,16 @@ object IrcMessageParser: IIrcMessageParser {
         if (line[position] == CharacterCodes.AT) {
             position++
 
-            val nextSpace = findNext(line, position, CharacterCodes.SPACE) ?: return null
+            val nextSpace = ParseHelper.findNext(line, position, CharacterCodes.SPACE) ?: return null
             if (nextSpace <= 0) {
                 // @ but no tags
                 return null
             }
 
-            val tags = hashMapOf<String, String?>()
+            val unparsedTags = line.substring(position, nextSpace)
+            val tags = ParseHelper.parseToKeysAndOptionalValues(unparsedTags, CharacterCodes.SEMICOLON, CharacterCodes.EQUALS)
 
-            val unparsedTags = Splitter.on(CharacterCodes.SEMICOLON).split(line.substring(position, nextSpace))
-            for (tag in unparsedTags) {
-                val nextEquals = findNext(tag, 0, CharacterCodes.EQUALS)
-                if (nextEquals != null) {
-                    if (nextEquals + 1 >= tag.length) {
-                        // key but no value
-                        return null
-                    }
-
-                    val key = tag.substring(0, nextEquals)
-                    val value = tag.substring(nextEquals + 1, tag.length)
-
-                    tags.put(key, value)
-                } else {
-                    tags.put(tag, null)
-                }
-            }
-
-            position = skipSpaces(line, nextSpace + 1)
+            position = ParseHelper.skipSpaces(line, nextSpace + 1)
             return Pair(tags, position)
         }
 
@@ -90,7 +73,7 @@ object IrcMessageParser: IIrcMessageParser {
         if (line[position] == CharacterCodes.COLON) {
             position++
 
-            val nextSpace = findNext(line, position, CharacterCodes.SPACE) ?: return null
+            val nextSpace = ParseHelper.findNext(line, position, CharacterCodes.SPACE) ?: return null
             if (nextSpace < position + 1) {
                 // : but nothing else
                 return null
@@ -98,7 +81,7 @@ object IrcMessageParser: IIrcMessageParser {
 
             val prefix = line.substring(position, nextSpace)
 
-            position = skipSpaces(line, nextSpace + 1)
+            position = ParseHelper.skipSpaces(line, nextSpace + 1)
 
             return Pair(prefix, position)
         }
@@ -109,7 +92,7 @@ object IrcMessageParser: IIrcMessageParser {
     private fun parseCommand(line: String, fromPosition: Int): Pair<String, Int>? {
         var position = fromPosition
 
-        val nextSpace = findNext(line, position, CharacterCodes.SPACE)
+        val nextSpace = ParseHelper.findNext(line, position, CharacterCodes.SPACE)
 
         val command: String
 
@@ -127,7 +110,7 @@ object IrcMessageParser: IIrcMessageParser {
 
             command = line.substring(position, nextSpace)
 
-            position = skipSpaces(line, nextSpace + 1)
+            position = ParseHelper.skipSpaces(line, nextSpace + 1)
         }
 
         return Pair(command, position)
@@ -150,12 +133,12 @@ object IrcMessageParser: IIrcMessageParser {
                 return Pair(parameters, line.length)
             }
 
-            val nextSpace = findNext(line, position, CharacterCodes.SPACE)
+            val nextSpace = ParseHelper.findNext(line, position, CharacterCodes.SPACE)
             if (nextSpace != null) {
                 val parameter = line.substring(position, nextSpace)
                 parameters.add(parameter)
 
-                position = skipSpaces(line, nextSpace + 1)
+                position = ParseHelper.skipSpaces(line, nextSpace + 1)
             } else {
                 val parameter = line.substring(position)
                 parameters.add(parameter)
@@ -167,7 +150,37 @@ object IrcMessageParser: IIrcMessageParser {
         return Pair(parameters, position)
     }
 
-    private fun findNext(line: String, fromPosition: Int, character: Char): Int? {
+}
+
+object ParseHelper {
+
+    fun parseToKeysAndOptionalValues(string: String, chunkSeparator: Char, keyValueSeparator: Char): Map<String, String?> {
+        val keyValues = mutableMapOf<String, String?>()
+
+        val unparsedChunks = Splitter.on(chunkSeparator).omitEmptyStrings().split(string)
+        for (chunk in unparsedChunks) {
+            val nextEquals = ParseHelper.findNext(chunk, 0, keyValueSeparator)
+            if (nextEquals != null) {
+                val key = chunk.substring(0, nextEquals)
+                val value: String?
+
+                if (nextEquals + 1 >= chunk.length) {
+                    // key but no value
+                    value = null
+                } else {
+                    value = chunk.substring(nextEquals + 1, chunk.length)
+                }
+
+                keyValues.put(key, value)
+            } else {
+                keyValues.put(chunk, null)
+            }
+        }
+
+        return keyValues
+    }
+
+    fun findNext(line: String, fromPosition: Int, character: Char): Int? {
         val nextSpacePosition = line.indexOf(character, fromPosition)
 
         if (nextSpacePosition >= 0) {
@@ -177,7 +190,7 @@ object IrcMessageParser: IIrcMessageParser {
         }
     }
 
-    private fun skipSpaces(line: String, fromPosition: Int): Int {
+    fun skipSpaces(line: String, fromPosition: Int): Int {
         var position = fromPosition
 
         while (position < line.length && line[position] == CharacterCodes.SPACE) {

@@ -9,18 +9,10 @@ object IrcMessageSerialiser : IIrcMessageSerialiser {
         val builder = StringBuilder()
 
         if (message.tags.isNotEmpty()) {
-            val serialisedTags = mutableListOf<String>()
-
-            for ((key, value) in message.tags) {
-                if (value == null) {
-                    serialisedTags.add(key)
-                } else {
-                    serialisedTags.add("${key}${CharacterCodes.EQUALS}${value}")
-                }
-            }
+            val tags = SerialiserHelper.serialiseKeysAndOptionalValues(message.tags, CharacterCodes.EQUALS, CharacterCodes.SEMICOLON)
 
             builder.append(CharacterCodes.AT)
-            builder.append(Joiner.on(CharacterCodes.SEMICOLON).join(serialisedTags))
+            builder.append(tags)
             builder.append(CharacterCodes.SPACE)
         }
 
@@ -55,6 +47,24 @@ object IrcMessageSerialiser : IIrcMessageSerialiser {
         }
 
         return output
+    }
+
+}
+
+object SerialiserHelper {
+
+    fun serialiseKeysAndOptionalValues(keyValues: Map<String, String?>, keyValueSeparator: Char, chunkSeparator: Char): String {
+        val serialisedKeyValues = mutableListOf<String>()
+
+        for ((key, value) in keyValues) {
+            if (value == null) {
+                serialisedKeyValues.add(key)
+            } else {
+                serialisedKeyValues.add("$key$keyValueSeparator$value")
+            }
+        }
+
+        return Joiner.on(chunkSeparator).skipNulls().join(serialisedKeyValues)
     }
 
 }
