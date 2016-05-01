@@ -1,6 +1,5 @@
 package engineer.carrot.warren.kale.irc.message
 
-import com.google.common.base.Splitter
 import engineer.carrot.warren.kale.irc.CharacterCodes
 
 object IrcMessageParser: IIrcMessageParser {
@@ -157,7 +156,7 @@ object ParseHelper {
     fun parseToKeysAndOptionalValues(string: String, chunkSeparator: Char, keyValueSeparator: Char): Map<String, String?> {
         val keyValues = mutableMapOf<String, String?>()
 
-        val unparsedChunks = Splitter.on(chunkSeparator).omitEmptyStrings().split(string)
+        val unparsedChunks = string.split(delimiters = chunkSeparator).filterNot { it.isEmpty() }
         for (chunk in unparsedChunks) {
             val nextEquals = ParseHelper.findNext(chunk, 0, keyValueSeparator)
             if (nextEquals != null) {

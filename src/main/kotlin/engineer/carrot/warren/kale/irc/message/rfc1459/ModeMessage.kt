@@ -1,7 +1,5 @@
 package engineer.carrot.warren.kale.irc.message.rfc1459
 
-import com.google.common.base.Strings
-import com.google.common.collect.Lists
 import engineer.carrot.warren.kale.irc.CharacterCodes
 import engineer.carrot.warren.kale.irc.message.IMessage
 import engineer.carrot.warren.kale.irc.message.IMessageFactory
@@ -99,7 +97,7 @@ data class ModeMessage(val source: Prefix? = null, val target: String, val modif
         }
 
         private fun parseParametersToModeChunks(parameters: List<String>): List<ModeChunk> {
-            val chunks = Lists.newArrayList<ModeChunk>()
+            val chunks = mutableListOf<ModeChunk>()
 
             if (parameters.isEmpty()) {
                 return chunks
@@ -134,7 +132,7 @@ data class ModeMessage(val source: Prefix? = null, val target: String, val modif
         }
 
         private fun parseChunksToModifiers(chunks: List<ModeChunk>): List<ModeModifier> {
-            val modifiers = Lists.newArrayList<ModeModifier>()
+            val modifiers = mutableListOf<ModeModifier>()
 
             var currentType: Char? = null
 
@@ -160,7 +158,7 @@ data class ModeMessage(val source: Prefix? = null, val target: String, val modif
                     if (takesAParameter) {
                         val parameter = chunk.parameters.poll()
 
-                        if (Strings.isNullOrEmpty(parameter)) {
+                        if (parameter.isNullOrEmpty()) {
                             println("MODE modifier was missing an expected parameter - not processing it: '$token'")
 
                             continue
@@ -181,7 +179,7 @@ data class ModeMessage(val source: Prefix? = null, val target: String, val modif
         }
 
         private fun parseModes(token: String): List<Char> {
-            val modes = Lists.newArrayList<Char>()
+            val modes = mutableListOf<Char>()
 
             for (i in 0..token.length - 1) {
                 modes.add(token[i])

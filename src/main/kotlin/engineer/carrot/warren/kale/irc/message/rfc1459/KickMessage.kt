@@ -1,7 +1,6 @@
 package engineer.carrot.warren.kale.irc.message.rfc1459
 
-import com.google.common.base.Joiner
-import com.google.common.base.Splitter
+import engineer.carrot.warren.kale.irc.CharacterCodes
 import engineer.carrot.warren.kale.irc.message.IMessage
 import engineer.carrot.warren.kale.irc.message.IMessageFactory
 import engineer.carrot.warren.kale.irc.message.IrcMessage
@@ -17,8 +16,8 @@ data class KickMessage(val source: Prefix? = null, val users: List<String>, val 
 
         override fun serialise(message: KickMessage): IrcMessage? {
             val prefix = if (message.source != null) { PrefixSerialiser.serialise(message.source) } else { null }
-            val channels = Joiner.on(",").join(message.channels)
-            val users = Joiner.on(",").join(message.users)
+            val channels = message.channels.joinToString(separator = CharacterCodes.COMMA.toString())
+            val users = message.users.joinToString(separator = CharacterCodes.COMMA.toString())
             val comment = message.comment
 
             if (comment != null) {
@@ -34,8 +33,8 @@ data class KickMessage(val source: Prefix? = null, val users: List<String>, val 
             }
 
             val source = PrefixParser.parse(message.prefix ?: "")
-            val channels = Splitter.on(",").split(message.parameters[0]).toList()
-            val users = Splitter.on(",").split(message.parameters[1]).toList()
+            val channels = message.parameters[0].split(delimiters = CharacterCodes.COMMA)
+            val users = message.parameters[1].split(delimiters = CharacterCodes.COMMA)
 
             if (channels.isEmpty() || channels.size != users.size) {
                 return null

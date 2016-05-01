@@ -1,7 +1,5 @@
 package engineer.carrot.warren.kale.irc.message.ircv3
 
-import com.google.common.base.Joiner
-import com.google.common.base.Splitter
 import engineer.carrot.warren.kale.irc.message.IMessage
 import engineer.carrot.warren.kale.irc.message.IMessageFactory
 import engineer.carrot.warren.kale.irc.message.IrcMessage

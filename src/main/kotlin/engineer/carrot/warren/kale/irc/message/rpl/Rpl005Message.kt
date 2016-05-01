@@ -1,6 +1,5 @@
 package engineer.carrot.warren.kale.irc.message.rpl
 
-import com.google.common.base.Splitter
 import engineer.carrot.warren.kale.irc.CharacterCodes
 import engineer.carrot.warren.kale.irc.message.IMessage
 import engineer.carrot.warren.kale.irc.message.IMessageFactory
@@ -39,7 +38,7 @@ data class Rpl005Message(val source: String, val target: String, val tokens: Map
             var tokens = mutableMapOf<String, String?>()
 
             for (i in 1..message.parameters.size - 1) {
-                val token = Splitter.on(CharacterCodes.EQUALS).limit(2).splitToList(message.parameters[i])
+                val token = message.parameters[i].split(delimiters = CharacterCodes.EQUALS, limit = 2)
 
                 if (token.size <= 0 || token[0].isNullOrEmpty()) {
                     continue

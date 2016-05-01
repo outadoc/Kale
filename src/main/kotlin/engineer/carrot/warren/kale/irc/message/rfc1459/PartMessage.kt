@@ -1,7 +1,6 @@
 package engineer.carrot.warren.kale.irc.message.rfc1459
 
-import com.google.common.base.Joiner
-import com.google.common.base.Splitter
+import engineer.carrot.warren.kale.irc.CharacterCodes
 import engineer.carrot.warren.kale.irc.message.IMessage
 import engineer.carrot.warren.kale.irc.message.IMessageFactory
 import engineer.carrot.warren.kale.irc.message.IrcMessage
@@ -17,7 +16,7 @@ data class PartMessage(val source: Prefix? = null, val channels: List<String>): 
 
         override fun serialise(message: PartMessage): IrcMessage? {
             val prefix = if (message.source != null) { PrefixSerialiser.serialise(message.source) } else { null }
-            val channels = Joiner.on(",").join(message.channels)
+            val channels = message.channels.joinToString(separator = CharacterCodes.COMMA.toString())
 
             return IrcMessage(command = key, prefix = prefix, parameters = listOf(channels))
         }
@@ -29,7 +28,7 @@ data class PartMessage(val source: Prefix? = null, val channels: List<String>): 
 
             val source = PrefixParser.parse(message.prefix ?: "")
             val unsplitChannels = message.parameters[0]
-            val channels = Splitter.on(",").split(unsplitChannels).toList()
+            val channels = unsplitChannels.split(delimiters = CharacterCodes.COMMA)
 
             return PartMessage(source = source, channels = channels)
         }

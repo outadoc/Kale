@@ -1,7 +1,6 @@
 package engineer.carrot.warren.kale.irc.message.ircv3
 
-import com.google.common.base.Joiner
-import com.google.common.base.Splitter
+import engineer.carrot.warren.kale.irc.CharacterCodes
 import engineer.carrot.warren.kale.irc.message.IMessage
 import engineer.carrot.warren.kale.irc.message.IMessageFactory
 import engineer.carrot.warren.kale.irc.message.IrcMessage
@@ -13,7 +12,7 @@ data class CapNakMessage(val target: String? = null, val caps: List<String>): IM
         override val key = "CAPNAK"
 
         override fun serialise(message: CapNakMessage): IrcMessage? {
-            val caps = Joiner.on(' ').join(message.caps)
+            val caps = message.caps.joinToString(separator = CharacterCodes.SPACE.toString())
 
             if (message.target != null) {
                 return IrcMessage(command = "CAP", parameters = listOf(message.target, "NAK", caps))
@@ -31,7 +30,7 @@ data class CapNakMessage(val target: String? = null, val caps: List<String>): IM
             val subCommand = message.parameters[1]
             val rawCaps = message.parameters[2]
 
-            val caps = Splitter.on(' ').omitEmptyStrings().split(rawCaps).toList()
+            val caps = rawCaps.split(delimiters = CharacterCodes.SPACE).filterNot { it.isEmpty() }
 
             return CapNakMessage(target = target, caps = caps)
         }

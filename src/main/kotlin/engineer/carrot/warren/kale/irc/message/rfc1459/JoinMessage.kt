@@ -1,7 +1,6 @@
 package engineer.carrot.warren.kale.irc.message.rfc1459
 
-import com.google.common.base.Joiner
-import com.google.common.base.Splitter
+import engineer.carrot.warren.kale.irc.CharacterCodes
 import engineer.carrot.warren.kale.irc.message.IMessage
 import engineer.carrot.warren.kale.irc.message.IMessageFactory
 import engineer.carrot.warren.kale.irc.message.IrcMessage
@@ -17,12 +16,12 @@ data class JoinMessage(val source: Prefix? = null, val channels: List<String>, v
 
         override fun serialise(message: JoinMessage): IrcMessage? {
             val prefix = if (message.source != null) { PrefixSerialiser.serialise(message.source) } else { null }
-            val channels = Joiner.on(",").join(message.channels)
+            val channels = message.channels.joinToString(separator = CharacterCodes.COMMA.toString())
 
             if (message.keys == null || message.keys.isEmpty()) {
                 return IrcMessage(command = key, prefix = prefix, parameters = listOf(channels))
             } else {
-                val keys = Joiner.on(",").join(message.keys)
+                val keys = message.keys.joinToString(separator = CharacterCodes.COMMA.toString())
 
                 return IrcMessage(command = key, prefix = prefix, parameters = listOf(channels, keys))
             }
@@ -35,13 +34,13 @@ data class JoinMessage(val source: Prefix? = null, val channels: List<String>, v
 
             val source = PrefixParser.parse(message.prefix ?: "")
             val unsplitChannels = message.parameters[0]
-            val channels = Splitter.on(",").split(unsplitChannels).toList()
+            val channels = unsplitChannels.split(delimiters = CharacterCodes.COMMA).filterNot { it.isEmpty() }
 
             if (message.parameters.size < 2) {
                 return JoinMessage(source = source, channels = channels)
             } else {
                 val unsplitKeys = message.parameters[1]
-                val keys = Splitter.on(",").split(unsplitKeys).toList()
+                val keys = unsplitKeys.split(delimiters = CharacterCodes.COMMA).filterNot { it.isEmpty() }
 
                 return JoinMessage(source = source, channels = channels, keys = keys)
             }

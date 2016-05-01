@@ -9,6 +9,7 @@ object CharacterCodes {
     val LEFT_BRACKET: Char = 0x28.toChar()
     val RIGHT_BRACKET: Char = 0x29.toChar()
     val PLUS: Char = 0x2B.toChar()
+    val COMMA: Char = 0x2C.toChar()
     val MINUS: Char = 0x2D.toChar()
     val COLON: Char = 0x3A.toChar()
     val SEMICOLON: Char = 0x3B.toChar()

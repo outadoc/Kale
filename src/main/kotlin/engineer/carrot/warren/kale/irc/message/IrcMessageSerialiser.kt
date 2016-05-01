@@ -1,6 +1,5 @@
 package engineer.carrot.warren.kale.irc.message
 
-import com.google.common.base.Joiner
 import engineer.carrot.warren.kale.irc.CharacterCodes
 
 object IrcMessageSerialiser : IIrcMessageSerialiser {
@@ -64,7 +63,7 @@ object SerialiserHelper {
             }
         }
 
-        return Joiner.on(chunkSeparator).skipNulls().join(serialisedKeyValues)
+        return serialisedKeyValues.filterNotNull().joinToString(separator = chunkSeparator.toString())
     }
 
 }
