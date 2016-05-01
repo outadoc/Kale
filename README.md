@@ -3,9 +3,9 @@ Kotlin IRC message parsing, serialising and notifying. Provides useful abstracti
 
 [Warren](https://github.com/CarrotCodes/Warren) is the state tracking counterpart. Kale by itself does not track any IRC state.
 
-## Why is this better than other IRC libraries?
+## Why is this better than other IRC frameworks?
 
-Warren and Kale have a few advantages over other IRC libraries:
+Warren and Kale have a few advantages over other IRC frameworks:
 
 * The responsibilities of parsing and state management are separated
 * Both parsing and state management are verified by hundreds of unit tests
