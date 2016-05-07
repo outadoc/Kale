@@ -82,6 +82,10 @@ class Kale : IKale {
         addMessageFromFactory(Rpl375Message.Factory)
         addMessageFromFactory(Rpl376Message.Factory)
         addMessageFromFactory(Rpl422Message.Factory)
+        addMessageFromFactory(Rpl471Message.Factory)
+        addMessageFromFactory(Rpl473Message.Factory)
+        addMessageFromFactory(Rpl474Message.Factory)
+        addMessageFromFactory(Rpl475Message.Factory)
 
         return this
     }
