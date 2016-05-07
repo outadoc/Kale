@@ -14,15 +14,15 @@ class Rpl474MessageTests {
     }
 
     @Test fun test_parse_SourceTargetContents() {
-        val message = factory.parse(IrcMessage(command = "474", prefix = "imaginary.bunnies.io", parameters = listOf("test-nickname", "Cannot join channel (+b)")))
+        val message = factory.parse(IrcMessage(command = "474", prefix = "imaginary.bunnies.io", parameters = listOf("test-nickname", "#channel", "Cannot join channel (+b)")))
 
-        assertEquals(Rpl474Message(source = "imaginary.bunnies.io", target = "test-nickname", contents = "Cannot join channel (+b)"), message)
+        assertEquals(Rpl474Message(source = "imaginary.bunnies.io", target = "test-nickname", channel = "#channel", contents = "Cannot join channel (+b)"), message)
     }
 
     @Test fun test_parse_TargetContents_SourceIsEmptyString() {
-        val message = factory.parse(IrcMessage(command = "474", parameters = listOf("test-nickname2", "Cannot join channel (+b)")))
+        val message = factory.parse(IrcMessage(command = "474", parameters = listOf("test-nickname2", "#channel", "Cannot join channel (+b)")))
 
-        assertEquals(Rpl474Message(source = "", target = "test-nickname2", contents = "Cannot join channel (+b)"), message)
+        assertEquals(Rpl474Message(source = "", target = "test-nickname2", channel = "#channel", contents = "Cannot join channel (+b)"), message)
     }
 
     @Test fun test_parse_TooFewParameters() {
@@ -32,14 +32,14 @@ class Rpl474MessageTests {
     }
 
     @Test fun test_serialise_SourceTargetContents() {
-        val message = factory.serialise(Rpl474Message(source = "", target = "test-nickname2", contents = "Cannot join channel (+b)"))
+        val message = factory.serialise(Rpl474Message(source = "", target = "test-nickname2", channel = "#channel", contents = "Cannot join channel (+b)"))
 
-        assertEquals(IrcMessage(command = "474", prefix = "", parameters = listOf("test-nickname2", "Cannot join channel (+b)")), message)
+        assertEquals(IrcMessage(command = "474", prefix = "", parameters = listOf("test-nickname2", "#channel", "Cannot join channel (+b)")), message)
     }
 
     @Test fun test_serialise_TargetContents_SourceIsEmptyString() {
-        val message = factory.serialise(Rpl474Message(source = "", target = "test-nickname2", contents = "Cannot join channel (+b)"))
+        val message = factory.serialise(Rpl474Message(source = "", target = "test-nickname2", channel = "#channel", contents = "Cannot join channel (+b)"))
 
-        assertEquals(IrcMessage(command = "474", prefix = "", parameters = listOf("test-nickname2", "Cannot join channel (+b)")), message)
+        assertEquals(IrcMessage(command = "474", prefix = "", parameters = listOf("test-nickname2", "#channel", "Cannot join channel (+b)")), message)
     }
 }
