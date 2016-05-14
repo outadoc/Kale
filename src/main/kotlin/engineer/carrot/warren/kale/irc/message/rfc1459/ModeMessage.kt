@@ -7,6 +7,7 @@ import engineer.carrot.warren.kale.irc.message.IrcMessage
 import engineer.carrot.warren.kale.irc.prefix.Prefix
 import engineer.carrot.warren.kale.irc.prefix.PrefixParser
 import engineer.carrot.warren.kale.irc.prefix.PrefixSerialiser
+import engineer.carrot.warren.kale.loggerFor
 import java.util.*
 
 data class ModeMessage(val source: Prefix? = null, val target: String, val modifiers: List<ModeModifier>): IMessage {
@@ -23,6 +24,8 @@ data class ModeMessage(val source: Prefix? = null, val target: String, val modif
     }
 
     companion object Factory: IMessageFactory<ModeMessage> {
+        val LOGGER = loggerFor<Factory>()
+
         override val messageType = ModeMessage::class.java
         override val key = "MODE"
 
@@ -107,7 +110,7 @@ data class ModeMessage(val source: Prefix? = null, val target: String, val modif
 
             for (parameter in parameters) {
                 if (parameter.isEmpty()) {
-                    println("Attempted to parse an empty parameter in to a chunk - bailing")
+                    LOGGER.warn("Attempted to parse an empty parameter in to a chunk - bailing")
 
                     break
                 }
@@ -120,7 +123,7 @@ data class ModeMessage(val source: Prefix? = null, val target: String, val modif
                 }
 
                 if (currentChunk == null) {
-                    println("Attempted to add a chunk without having a type token first - bailing")
+                    LOGGER.warn("Attempted to add a chunk without having a type token first - bailing")
 
                     break
                 }
@@ -145,7 +148,7 @@ data class ModeMessage(val source: Prefix? = null, val target: String, val modif
                     }
 
                     if (currentType == null) {
-                        println("Tried to add a modifier that didn't start with +- - bailing: '$token'")
+                        LOGGER.warn("Tried to add a modifier that didn't start with +- - bailing: '$token'")
 
                         continue
                     }
@@ -159,7 +162,7 @@ data class ModeMessage(val source: Prefix? = null, val target: String, val modif
                         val parameter = chunk.parameters.poll()
 
                         if (parameter.isNullOrEmpty()) {
-                            println("MODE modifier was missing an expected parameter - not processing it: '$token'")
+                            LOGGER.warn("MODE modifier was missing an expected parameter - not processing it: '$token'")
 
                             continue
                         }
@@ -171,7 +174,7 @@ data class ModeMessage(val source: Prefix? = null, val target: String, val modif
                 }
 
                 if (!chunk.parameters.isEmpty()) {
-                    println("Chunk had parameters left after polling - something probably went wrong!")
+                    LOGGER.warn("Chunk had parameters left after polling - something probably went wrong!")
                 }
             }
 

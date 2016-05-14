@@ -19,6 +19,8 @@ interface IMessageHashingStrategy {
 }
 
 class Kale : IKale {
+    private val LOGGER = loggerFor<Kale>()
+
     private var messageFactories: MutableMap<String, IMessageFactory<*>> = hashMapOf()
     private var messageToFactory: MutableMap<Class<*>, IMessageFactory<*>> = hashMapOf()
 
@@ -117,32 +119,32 @@ class Kale : IKale {
     override fun process(line: String) {
         val ircMessage = IrcMessageParser.parse(line)
         if (ircMessage == null) {
-            println("failed to parse line to IrcMessage: $line")
+            LOGGER.warn("failed to parse line to IrcMessage: $line")
             return
         }
 
         val factory = findFactoryFor(ircMessage)
         if (factory == null) {
-            println("no factory for: $ircMessage")
+            LOGGER.debug("no factory for: $ircMessage")
             return
         }
 
         val message = factory.parse(ircMessage)
         if (message == null) {
-            println("factory failed to parse message: $factory $ircMessage")
+            LOGGER.warn("factory failed to parse message: $factory $ircMessage")
             return
         }
 
         val handler = handlers[factory.key]
         if (handler == null) {
-            println("no handler for: $message")
+            LOGGER.debug("no handler for: $message")
             return
         }
 
         @Suppress("UNCHECKED_CAST")
         val typedHandler = handler as? IKaleHandler<IMessage> ?: return
         if (!typedHandler.messageType.isInstance(message)) {
-            println("tried to pass wrong type to handler: ${message.javaClass} to ${handler.messageType}")
+            LOGGER.warn("tried to pass wrong type to handler: ${message.javaClass} to ${handler.messageType}")
             return
         }
 
@@ -167,7 +169,7 @@ class Kale : IKale {
         @Suppress("UNCHECKED_CAST")
         val factory = factoryFromMessage(message.javaClass) as? IMessageFactory<IMessage>
         if (factory == null) {
-            println("failed to find factory for message serialisation: $message")
+            LOGGER.warn("failed to find factory for message serialisation: $message")
             return null
         }
 

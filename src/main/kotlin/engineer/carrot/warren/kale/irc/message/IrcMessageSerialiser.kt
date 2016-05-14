@@ -1,8 +1,10 @@
 package engineer.carrot.warren.kale.irc.message
 
 import engineer.carrot.warren.kale.irc.CharacterCodes
+import engineer.carrot.warren.kale.loggerFor
 
 object IrcMessageSerialiser : IIrcMessageSerialiser {
+    private val LOGGER = loggerFor<IrcMessageSerialiser>()
 
     override fun serialise(message: IrcMessage): String? {
         val builder = StringBuilder()
@@ -41,7 +43,7 @@ object IrcMessageSerialiser : IIrcMessageSerialiser {
 
         val output = builder.toString()
         if (output.length < IrcMessageParser.MIN_LINE_LENGTH || output.length > IrcMessageParser.MAX_LINE_LENGTH) {
-            println("serialised message is too long: $output")
+            LOGGER.warn("serialised message is too long: $output")
             return null
         }
 
