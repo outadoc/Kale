@@ -3,6 +3,8 @@ Kotlin IRC message parsing, serialising and notifying. Provides useful abstracti
 
 [Warren](https://github.com/CarrotCodes/Warren) is the state tracking counterpart. Kale by itself does not track any IRC state.
 
+[Thump](https://github.com/CarrotCodes/Thump) is the primary upstream project - a bridge that lets people chat between Minecraft and IRC whilst they play.
+
 ## Why is this better than other IRC frameworks?
 
 Warren and Kale have a few advantages over other IRC frameworks:
