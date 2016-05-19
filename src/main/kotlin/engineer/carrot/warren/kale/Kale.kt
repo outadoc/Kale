@@ -11,6 +11,7 @@ import engineer.carrot.warren.kale.irc.message.ircv3.sasl.Rpl904Message
 import engineer.carrot.warren.kale.irc.message.ircv3.sasl.Rpl905Message
 import engineer.carrot.warren.kale.irc.message.rfc1459.*
 import engineer.carrot.warren.kale.irc.message.rpl.*
+import engineer.carrot.warren.kale.irc.message.utility.RawMessage
 
 interface IMessageHashingStrategy {
 
@@ -50,6 +51,8 @@ class Kale : IKale {
     var handlers: MutableMap<String, IKaleHandler<*>> = hashMapOf()
 
     fun addDefaultMessages(): Kale {
+        addMessageFromFactory(RawMessage.Factory)
+
         addMessageFromFactory(PingMessage.Factory)
         addMessageFromFactory(PongMessage.Factory)
         addMessageFromFactory(NickMessage.Factory)
