@@ -19,8 +19,29 @@ interface IMessageHashingStrategy {
 
 }
 
+interface IKaleParsingStateDelegate {
+
+    fun modeTakesAParameter(isAdding: Boolean, token: Char): Boolean
+
+}
+
+interface IKale {
+
+    fun <T: IMessage> register(handler: IKaleHandler<T>)
+    fun process(line: String)
+    fun <T: IMessage> serialise(message: T): IrcMessage?
+
+    var parsingStateDelegate: IKaleParsingStateDelegate?
+
+}
+
 class Kale : IKale {
     private val LOGGER = loggerFor<Kale>()
+
+    override var parsingStateDelegate: IKaleParsingStateDelegate? = null
+        set(value) {
+            ModeMessage.Factory.parsingStateDelegate = value
+        }
 
     private var messageFactories: MutableMap<String, IMessageFactory<*>> = hashMapOf()
     private var messageToFactory: MutableMap<Class<*>, IMessageFactory<*>> = hashMapOf()

@@ -1,5 +1,6 @@
 package engineer.carrot.warren.kale.irc.message.rfc1459
 
+import engineer.carrot.warren.kale.IKaleParsingStateDelegate
 import engineer.carrot.warren.kale.irc.CharacterCodes
 import engineer.carrot.warren.kale.irc.message.IMessage
 import engineer.carrot.warren.kale.irc.message.IMessageFactory
@@ -26,6 +27,8 @@ data class ModeMessage(val source: Prefix? = null, val target: String, val modif
     companion object Factory: IMessageFactory<ModeMessage> {
         val LOGGER = loggerFor<Factory>()
 
+        var parsingStateDelegate: IKaleParsingStateDelegate? = null
+
         override val messageType = ModeMessage::class.java
         override val key = "MODE"
 
@@ -38,7 +41,7 @@ data class ModeMessage(val source: Prefix? = null, val target: String, val modif
         }
 
         private fun serialise(modifiers: List<ModeModifier>): List<String> {
-            var parameters: MutableList<String> = mutableListOf()
+            val parameters = mutableListOf<String>()
 
             for (modifier in modifiers) {
                 if (modifier.type != null) {
@@ -63,8 +66,6 @@ data class ModeMessage(val source: Prefix? = null, val target: String, val modif
 
             val source = PrefixParser.parse(message.prefix ?: "")
             val target = message.parameters[0]
-
-            // FIXME: distinguish between channel mode message and user mode message using state delegate
 
             if (message.parameters.size >= 2) {
                 val secondParameter = message.parameters[1]
@@ -192,17 +193,16 @@ data class ModeMessage(val source: Prefix? = null, val target: String, val modif
         }
 
         private fun takesAParameter(isAdding: Boolean, token: Char): Boolean {
-            // FIXME: tie in to ISUPPORT
-
-            if (isAdding) {
-                return plusRequiringParameter.contains(token)
+            val delegateTakesAParameter = parsingStateDelegate?.modeTakesAParameter(isAdding, token)
+            return delegateTakesAParameter ?: if (isAdding) {
+                return defaultPlusRequiringParameter.contains(token)
             } else {
-                return minusRequiringParameter.contains(token)
+                return defaultMinusRequiringParameter.contains(token)
             }
         }
 
-        private val plusRequiringParameter: Set<Char> = setOf('o', 'v', 'h', 'b', 'l', 'k', 'q', 'e', 'I')
-        private val minusRequiringParameter: Set<Char> = setOf('o', 'v', 'h', 'b', 'k', 'q', 'e', 'I')
+        private val defaultPlusRequiringParameter: Set<Char> = setOf('o', 'v', 'h', 'b', 'l', 'k', 'q', 'e', 'I')
+        private val defaultMinusRequiringParameter: Set<Char> = setOf('o', 'v', 'h', 'b', 'k', 'q', 'e', 'I')
     }
 
 }

@@ -1,5 +1,6 @@
 package engineer.carrot.warren.kale.irc.message.rfc1459
 
+import engineer.carrot.warren.kale.IKaleParsingStateDelegate
 import engineer.carrot.warren.kale.irc.message.IMessageFactory
 import engineer.carrot.warren.kale.irc.message.IrcMessage
 import org.junit.Before
@@ -7,10 +8,13 @@ import org.junit.Test
 import org.junit.Assert.*
 
 class ModeMessageTests {
-    lateinit var factory: IMessageFactory<ModeMessage>
+    lateinit var factory: ModeMessage.Factory
 
     @Before fun setUp() {
-        factory = ModeMessage.Factory
+        val modeFactory = ModeMessage.Factory
+        modeFactory.parsingStateDelegate = null
+
+        factory = modeFactory
     }
 
     @Test fun test_parse_AddingSingleMode() {
@@ -69,6 +73,36 @@ class ModeMessageTests {
         val message = factory.parse(IrcMessage(command = "MODE", parameters = listOf("#Channel", "e")))
 
         val firstModifier = ModeMessage.ModeModifier(mode = 'e')
+
+        assertEquals(ModeMessage(target = "#Channel", modifiers = listOf(firstModifier)), message)
+    }
+
+    @Test fun test_parse_ChannelMode_UsingStateDelegate_ParsesWithParameter() {
+        factory.parsingStateDelegate = object : IKaleParsingStateDelegate {
+            override fun modeTakesAParameter(isAdding: Boolean, token: Char): Boolean {
+                return token == 'x'
+            }
+
+        }
+
+        val message = factory.parse(IrcMessage(command = "MODE", parameters = listOf("#Channel", "+x", "a parameter")))
+
+        val firstModifier = ModeMessage.ModeModifier(type = '+', mode = 'x', parameter = "a parameter")
+
+        assertEquals(ModeMessage(target = "#Channel", modifiers = listOf(firstModifier)), message)
+    }
+
+    @Test fun test_parse_ChannelMode_UsingStateDelegate_ParsesWithoutParameter() {
+        factory.parsingStateDelegate = object : IKaleParsingStateDelegate {
+            override fun modeTakesAParameter(isAdding: Boolean, token: Char): Boolean {
+                return token != 'x'
+            }
+
+        }
+
+        val message = factory.parse(IrcMessage(command = "MODE", parameters = listOf("#Channel", "-x", "extraneous parameter")))
+
+        val firstModifier = ModeMessage.ModeModifier(type = '-', mode = 'x', parameter = null)
 
         assertEquals(ModeMessage(target = "#Channel", modifiers = listOf(firstModifier)), message)
     }
