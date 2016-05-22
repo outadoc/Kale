@@ -49,6 +49,12 @@ class IrcMessageSerialiserTests {
         assertEquals(message, "@test TEST")
     }
 
+    @Test fun test_tag_EscapesValues() {
+        val message = serialiseMessage(IrcMessage(tags = mapOf("key" to "; \\\r\nabc"), command = "TEST"))
+
+        assertEquals("@key=\\:\\s\\\\\\r\\nabc TEST", message)
+    }
+
     // Helper functions
 
     private fun serialiseMessage(message: IrcMessage): String? {

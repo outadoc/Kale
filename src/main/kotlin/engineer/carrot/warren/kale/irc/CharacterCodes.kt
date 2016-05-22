@@ -14,6 +14,7 @@ object CharacterCodes {
     val COLON: Char = 0x3A.toChar()
     val SEMICOLON: Char = 0x3B.toChar()
     val EQUALS: Char = 0x3D.toChar()
+    val BACKSLASH: Char = 0x5C.toChar()
 
     val CTCP = '\u0001'
 }

@@ -91,6 +91,12 @@ class IrcMessageParserTests {
         assertEquals(message, IrcMessage(tags = mapOf("test" to ""), command = "TEST"))
     }
 
+    @Test fun test_tag_UnescapesValues() {
+        val message = parseLine("@key=\\:\\s\\\\\\r\\nabc TEST")
+
+        assertEquals(IrcMessage(tags = mapOf("key" to "; \\\r\nabc"), command = "TEST"), message)
+    }
+
     // Malformed test cases
 
     @Test fun test_emptyString() {

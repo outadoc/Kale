@@ -13,21 +13,21 @@ object IrcMessageParser: IIrcMessageParser {
             return null
         }
 
-        var (tags, endOfTags) = parseTags(line, 0) ?: return null
+        val (tags, endOfTags) = parseTags(line, 0) ?: return null
 
         if (endOfTags >= line.length) {
             // tags but no more
             return null
         }
 
-        var (prefix, endOfPrefix) = parsePrefix(line, endOfTags) ?: return null
+        val (prefix, endOfPrefix) = parsePrefix(line, endOfTags) ?: return null
 
         if (endOfPrefix >= line.length) {
             // prefix but no more
             return null
         }
 
-        var (command, endOfCommand) = parseCommand(line, endOfPrefix) ?: return null
+        val (command, endOfCommand) = parseCommand(line, endOfPrefix) ?: return null
 
         if (command.isEmpty()) {
             return null
@@ -37,14 +37,12 @@ object IrcMessageParser: IIrcMessageParser {
             return IrcMessage(tags, prefix, command)
         }
 
-        var (parameters, @Suppress("UNUSED_VARIABLE") endOfParameters) = parseParameters(line, endOfCommand) ?: return null
+        val (parameters, @Suppress("UNUSED_VARIABLE") endOfParameters) = parseParameters(line, endOfCommand) ?: return null
 
         return IrcMessage(tags, prefix, command, parameters)
     }
 
     private fun parseTags(line: String, fromPosition: Int): Pair<Map<String, String?>, Int>? {
-        // TODO: Unescape keys and values
-
         var position = fromPosition
 
         if (line[position] == CharacterCodes.AT) {
@@ -57,7 +55,13 @@ object IrcMessageParser: IIrcMessageParser {
             }
 
             val unparsedTags = line.substring(position, nextSpace)
-            val tags = ParseHelper.parseToKeysAndOptionalValues(unparsedTags, CharacterCodes.SEMICOLON, CharacterCodes.EQUALS)
+            val tags = ParseHelper.parseToKeysAndOptionalValues(unparsedTags, CharacterCodes.SEMICOLON, CharacterCodes.EQUALS) {
+                it.replace("\\:", CharacterCodes.SEMICOLON.toString())
+                  .replace("\\s", CharacterCodes.SPACE.toString())
+                  .replace("\\\\", CharacterCodes.BACKSLASH.toString())
+                  .replace("\\r", CharacterCodes.CR.toString())
+                  .replace("\\n", CharacterCodes.LF.toString())
+            }
 
             position = ParseHelper.skipSpaces(line, nextSpace + 1)
             return Pair(tags, position)
@@ -117,7 +121,7 @@ object IrcMessageParser: IIrcMessageParser {
 
     private fun parseParameters(line: String, fromPosition: Int): Pair<List<String>, Int>? {
         var position = fromPosition
-        var parameters = mutableListOf<String>()
+        val parameters = mutableListOf<String>()
 
         while (position < line.length) {
             if (line[position] == CharacterCodes.COLON) {
@@ -153,7 +157,7 @@ object IrcMessageParser: IIrcMessageParser {
 
 object ParseHelper {
 
-    fun parseToKeysAndOptionalValues(string: String, chunkSeparator: Char, keyValueSeparator: Char): Map<String, String?> {
+    fun parseToKeysAndOptionalValues(string: String, chunkSeparator: Char, keyValueSeparator: Char, valueTransform: ((String) -> (String))? = null): Map<String, String?> {
         val keyValues = mutableMapOf<String, String?>()
 
         val unparsedChunks = string.split(delimiters = chunkSeparator).filterNot { it.isEmpty() }
@@ -167,7 +171,12 @@ object ParseHelper {
                     // key but no value
                     value = ""
                 } else {
-                    value = chunk.substring(nextEquals + 1, chunk.length)
+                    val rawValue = chunk.substring(nextEquals + 1, chunk.length)
+                    if (valueTransform != null) {
+                        value = valueTransform(rawValue)
+                    } else {
+                        value = rawValue
+                    }
                 }
 
                 keyValues.put(key, value)

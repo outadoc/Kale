@@ -10,7 +10,13 @@ object IrcMessageSerialiser : IIrcMessageSerialiser {
         val builder = StringBuilder()
 
         if (message.tags.isNotEmpty()) {
-            val tags = SerialiserHelper.serialiseKeysAndOptionalValues(message.tags, CharacterCodes.EQUALS, CharacterCodes.SEMICOLON)
+            val tags = SerialiserHelper.serialiseKeysAndOptionalValues(message.tags, CharacterCodes.EQUALS, CharacterCodes.SEMICOLON) {
+                it.replace(CharacterCodes.BACKSLASH.toString(), "\\\\")
+                  .replace(CharacterCodes.SEMICOLON.toString(), "\\:")
+                  .replace(CharacterCodes.SPACE.toString(), "\\s")
+                  .replace(CharacterCodes.CR.toString(), "\\r")
+                  .replace(CharacterCodes.LF.toString(), "\\n")
+            }
 
             builder.append(CharacterCodes.AT)
             builder.append(tags)
@@ -54,14 +60,18 @@ object IrcMessageSerialiser : IIrcMessageSerialiser {
 
 object SerialiserHelper {
 
-    fun serialiseKeysAndOptionalValues(keyValues: Map<String, String?>, keyValueSeparator: Char, chunkSeparator: Char): String {
+    fun serialiseKeysAndOptionalValues(keyValues: Map<String, String?>, keyValueSeparator: Char, chunkSeparator: Char, valueTransform: ((String) -> (String))? = null): String {
         val serialisedKeyValues = mutableListOf<String>()
 
         for ((key, value) in keyValues) {
             if (value == null) {
                 serialisedKeyValues.add(key)
             } else {
-                serialisedKeyValues.add("$key$keyValueSeparator$value")
+                if (valueTransform != null) {
+                    serialisedKeyValues.add("$key$keyValueSeparator${valueTransform(value)}")
+                } else {
+                    serialisedKeyValues.add("$key$keyValueSeparator$value")
+                }
             }
         }
 
