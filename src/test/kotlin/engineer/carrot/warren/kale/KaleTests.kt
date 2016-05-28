@@ -28,23 +28,23 @@ class KaleTests {
     }
 
     @Test fun test_init_firesNoHandlers() {
-        assertEquals(0, mockHandlerOne.spyHandleInvokations.size)
+        assertEquals(0, mockHandlerOne.spyHandleMessageInvokations.size)
         assertEquals(0, mockHandlerSub.spyHandleInvokations.size)
     }
 
     @Test fun test_command_firesTestHandler() {
         kale.process("TEST1 :token1")
 
-        assertEquals(1, mockHandlerOne.spyHandleInvokations.size)
+        assertEquals(1, mockHandlerOne.spyHandleMessageInvokations.size)
         assertEquals(0, mockHandlerSub.spyHandleInvokations.size)
-        assertEquals(MockMessageOne(mockToken = "token1"), mockHandlerOne.spyHandleInvokations[0])
+        assertEquals(MockMessageOne(mockToken = "token1"), mockHandlerOne.spyHandleMessageInvokations[0])
     }
     
     @Test fun test_subcommand_firesTestHandler() {
         kale.process("TEST * SUB :token1")
 
         assertEquals(1, mockHandlerSub.spyHandleInvokations.size)
-        assertEquals(0, mockHandlerOne.spyHandleInvokations.size)
+        assertEquals(0, mockHandlerOne.spyHandleMessageInvokations.size)
         assertEquals(MockSubcommandMessage(mockToken = "token1"), mockHandlerSub.spyHandleInvokations[0])
     }
 
@@ -53,9 +53,9 @@ class KaleTests {
         kale.process("TEST2 :token1")
         kale.process("TEST1 :token2")
 
-        assertEquals(2, mockHandlerOne.spyHandleInvokations.size)
-        assertEquals(MockMessageOne(mockToken = "token1"), mockHandlerOne.spyHandleInvokations[0])
-        assertEquals(MockMessageOne(mockToken = "token2"), mockHandlerOne.spyHandleInvokations[1])
+        assertEquals(2, mockHandlerOne.spyHandleMessageInvokations.size)
+        assertEquals(MockMessageOne(mockToken = "token1"), mockHandlerOne.spyHandleMessageInvokations[0])
+        assertEquals(MockMessageOne(mockToken = "token2"), mockHandlerOne.spyHandleMessageInvokations[1])
     }
 
     @Test fun test_multipleCommands_orderPreserved() {
@@ -63,11 +63,30 @@ class KaleTests {
         kale.process("TEST1 :token2")
         kale.process("TEST1 :token3")
 
-        assertEquals(3, mockHandlerOne.spyHandleInvokations.size)
-        assertEquals(MockMessageOne(mockToken = "token1"), mockHandlerOne.spyHandleInvokations[0])
-        assertEquals(MockMessageOne(mockToken = "token2"), mockHandlerOne.spyHandleInvokations[1])
-        assertEquals(MockMessageOne(mockToken = "token3"), mockHandlerOne.spyHandleInvokations[2])
+        assertEquals(3, mockHandlerOne.spyHandleMessageInvokations.size)
+        assertEquals(MockMessageOne(mockToken = "token1"), mockHandlerOne.spyHandleMessageInvokations[0])
+        assertEquals(MockMessageOne(mockToken = "token2"), mockHandlerOne.spyHandleMessageInvokations[1])
+        assertEquals(MockMessageOne(mockToken = "token3"), mockHandlerOne.spyHandleMessageInvokations[2])
     }
+
+    @Test fun test_command_firesTestHandler_NoTags_ExpectNoTagsPassedToHandler() {
+        kale.process("TEST1 :token1")
+
+        assertEquals(1, mockHandlerOne.spyHandleMessageInvokations.size)
+        assertEquals(0, mockHandlerSub.spyHandleInvokations.size)
+        assertEquals(MockMessageOne(mockToken = "token1"), mockHandlerOne.spyHandleMessageInvokations[0])
+        assertEquals(mapOf<String, String?>(), mockHandlerOne.spyHandleTagsInvokations[0])
+    }
+
+    @Test fun test_command_firesTestHandler_HasTags_ExpectTagsPassedToHandler() {
+        kale.process("@tag1;tag2=2 TEST1 :token1")
+
+        assertEquals(1, mockHandlerOne.spyHandleMessageInvokations.size)
+        assertEquals(0, mockHandlerSub.spyHandleInvokations.size)
+        assertEquals(MockMessageOne(mockToken = "token1"), mockHandlerOne.spyHandleMessageInvokations[0])
+        assertEquals(mapOf<String, String?>("tag1" to null, "tag2" to "2"), mockHandlerOne.spyHandleTagsInvokations[0])
+    }
+
 
     @Test fun test_serialise_SanityCheck() {
         val message = kale.serialise(MockMessageOne(mockToken = "TestToken1"))
@@ -82,12 +101,14 @@ class KaleTests {
     }
 
     class MockHandlerOne : IKaleHandler<MockMessageOne> {
-        var spyHandleInvokations: List<MockMessageOne> = mutableListOf()
+        var spyHandleMessageInvokations: List<MockMessageOne> = mutableListOf()
+        var spyHandleTagsInvokations: List<Map<String, String?>> = mutableListOf()
 
         override val messageType = MockMessageOne::class.java
 
-        override fun handle(message: MockMessageOne) {
-            spyHandleInvokations += message
+        override fun handle(message: MockMessageOne, tags: Map<String, String?>) {
+            spyHandleMessageInvokations += message
+            spyHandleTagsInvokations += tags
         }
     }
 
@@ -111,7 +132,7 @@ class KaleTests {
 
         override val messageType = MockSubcommandMessage::class.java
 
-        override fun handle(message: MockSubcommandMessage) {
+        override fun handle(message: MockSubcommandMessage, tags: Map<String, String?>) {
             spyHandleInvokations += message
         }
     }

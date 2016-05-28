@@ -172,7 +172,7 @@ class Kale : IKale {
             return
         }
 
-        typedHandler.handle(message)
+        typedHandler.handle(message, ircMessage.tags)
     }
 
     private fun findFactoryFor(ircMessage: IrcMessage): IMessageFactory<*>? {

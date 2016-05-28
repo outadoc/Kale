@@ -5,5 +5,5 @@ import engineer.carrot.warren.kale.irc.message.IMessage
 interface IKaleHandler<T: IMessage> {
     val messageType: Class<T>
 
-    fun handle(message: T)
+    fun handle(message: T, tags: Map<String, String?>)
 }
