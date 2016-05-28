@@ -29,23 +29,23 @@ class KaleTests {
 
     @Test fun test_init_firesNoHandlers() {
         assertEquals(0, mockHandlerOne.spyHandleMessageInvokations.size)
-        assertEquals(0, mockHandlerSub.spyHandleInvokations.size)
+        assertEquals(0, mockHandlerSub.spyHandleMessageInvokations.size)
     }
 
     @Test fun test_command_firesTestHandler() {
         kale.process("TEST1 :token1")
 
         assertEquals(1, mockHandlerOne.spyHandleMessageInvokations.size)
-        assertEquals(0, mockHandlerSub.spyHandleInvokations.size)
+        assertEquals(0, mockHandlerSub.spyHandleMessageInvokations.size)
         assertEquals(MockMessageOne(mockToken = "token1"), mockHandlerOne.spyHandleMessageInvokations[0])
     }
     
     @Test fun test_subcommand_firesTestHandler() {
         kale.process("TEST * SUB :token1")
 
-        assertEquals(1, mockHandlerSub.spyHandleInvokations.size)
+        assertEquals(1, mockHandlerSub.spyHandleMessageInvokations.size)
         assertEquals(0, mockHandlerOne.spyHandleMessageInvokations.size)
-        assertEquals(MockSubcommandMessage(mockToken = "token1"), mockHandlerSub.spyHandleInvokations[0])
+        assertEquals(MockSubcommandMessage(mockToken = "token1"), mockHandlerSub.spyHandleMessageInvokations[0])
     }
 
     @Test fun test_multipleCommands_firesTestHandlerMultipleTimes() {
@@ -73,7 +73,7 @@ class KaleTests {
         kale.process("TEST1 :token1")
 
         assertEquals(1, mockHandlerOne.spyHandleMessageInvokations.size)
-        assertEquals(0, mockHandlerSub.spyHandleInvokations.size)
+        assertEquals(0, mockHandlerSub.spyHandleMessageInvokations.size)
         assertEquals(MockMessageOne(mockToken = "token1"), mockHandlerOne.spyHandleMessageInvokations[0])
         assertEquals(mapOf<String, String?>(), mockHandlerOne.spyHandleTagsInvokations[0])
     }
@@ -82,9 +82,28 @@ class KaleTests {
         kale.process("@tag1;tag2=2 TEST1 :token1")
 
         assertEquals(1, mockHandlerOne.spyHandleMessageInvokations.size)
-        assertEquals(0, mockHandlerSub.spyHandleInvokations.size)
+        assertEquals(0, mockHandlerSub.spyHandleMessageInvokations.size)
         assertEquals(MockMessageOne(mockToken = "token1"), mockHandlerOne.spyHandleMessageInvokations[0])
-        assertEquals(mapOf<String, String?>("tag1" to null, "tag2" to "2"), mockHandlerOne.spyHandleTagsInvokations[0])
+        assertEquals(mapOf("tag1" to null, "tag2" to "2"), mockHandlerOne.spyHandleTagsInvokations[0])
+    }
+
+    @Test fun test_subcommand_firesTestHandler_NoTags_ExpectNoTagsPassedToHandler() {
+        kale.process("TEST * SUB :token1")
+
+        assertEquals(1, mockHandlerSub.spyHandleMessageInvokations.size)
+        assertEquals(0, mockHandlerOne.spyHandleMessageInvokations.size)
+        assertEquals(MockSubcommandMessage(mockToken = "token1"), mockHandlerSub.spyHandleMessageInvokations[0])
+        assertEquals(mapOf<String, String?>(), mockHandlerSub.spyHandleTagsInvokations[0])
+    }
+
+
+    @Test fun test_subcommand_firesTestHandler_HasTags_ExpectTagsPassedToHandler() {
+        kale.process("@tag3;tag4=4 TEST * SUB :token1")
+
+        assertEquals(1, mockHandlerSub.spyHandleMessageInvokations.size)
+        assertEquals(0, mockHandlerOne.spyHandleMessageInvokations.size)
+        assertEquals(MockSubcommandMessage(mockToken = "token1"), mockHandlerSub.spyHandleMessageInvokations[0])
+        assertEquals(mapOf("tag3" to null, "tag4" to "4"), mockHandlerSub.spyHandleTagsInvokations[0])
     }
 
 
@@ -128,12 +147,14 @@ class KaleTests {
     }
 
     class MockHandlerSubcommand : IKaleHandler<MockSubcommandMessage> {
-        var spyHandleInvokations: List<MockSubcommandMessage> = mutableListOf()
+        var spyHandleMessageInvokations: List<MockSubcommandMessage> = mutableListOf()
+        var spyHandleTagsInvokations: List<Map<String, String?>> = mutableListOf()
 
         override val messageType = MockSubcommandMessage::class.java
 
         override fun handle(message: MockSubcommandMessage, tags: Map<String, String?>) {
-            spyHandleInvokations += message
+            spyHandleMessageInvokations += message
+            spyHandleTagsInvokations += tags
         }
     }
 
