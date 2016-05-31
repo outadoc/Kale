@@ -1,13 +1,13 @@
 package engineer.carrot.warren.kale.irc.message.rpl
 
-import engineer.carrot.warren.kale.irc.message.IMessageFactory
 import engineer.carrot.warren.kale.irc.message.IrcMessage
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Test
-import org.junit.Assert.*
 
 class Rpl471MessageTests {
-    lateinit var factory: IMessageFactory<Rpl471Message>
+    lateinit var factory: Rpl471Message.Factory
 
     @Before fun setUp() {
         factory = Rpl471Message.Factory

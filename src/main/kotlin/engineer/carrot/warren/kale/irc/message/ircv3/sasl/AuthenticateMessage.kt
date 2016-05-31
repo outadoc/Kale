@@ -2,14 +2,14 @@ package engineer.carrot.warren.kale.irc.message.ircv3.sasl
 
 import engineer.carrot.warren.kale.irc.CharacterCodes
 import engineer.carrot.warren.kale.irc.message.IMessage
-import engineer.carrot.warren.kale.irc.message.IMessageFactory
+import engineer.carrot.warren.kale.irc.message.IMessageParser
+import engineer.carrot.warren.kale.irc.message.IMessageSerialiser
 import engineer.carrot.warren.kale.irc.message.IrcMessage
 
 data class AuthenticateMessage(val payload: String, val isEmpty: Boolean): IMessage {
+    override val command: String = "AUTHENTICATE"
 
-    companion object Factory: IMessageFactory<AuthenticateMessage> {
-        override val messageType = AuthenticateMessage::class.java
-        override val key = "AUTHENTICATE"
+    companion object Factory: IMessageParser<AuthenticateMessage>, IMessageSerialiser<AuthenticateMessage> {
 
         override fun serialise(message: AuthenticateMessage): IrcMessage? {
             if (message.isEmpty) {

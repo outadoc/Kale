@@ -4,10 +4,9 @@ import engineer.carrot.warren.kale.irc.CharacterCodes
 import engineer.carrot.warren.kale.irc.message.*
 
 data class CapLsMessage(val target: String? = null, val version: String = "302", val caps: Map<String, String?>, val isMultiline: Boolean = false): IMessage {
+    override val command: String = "CAP"
 
-    companion object Factory: IMessageFactory<CapLsMessage> {
-        override val messageType = CapLsMessage::class.java
-        override val key = "CAPLS"
+    companion object Factory: IMessageParser<CapLsMessage>, IMessageSerialiser<CapLsMessage> {
 
         override fun serialise(message: CapLsMessage): IrcMessage? {
             val caps = SerialiserHelper.serialiseKeysAndOptionalValues(message.caps, CharacterCodes.EQUALS, CharacterCodes.SPACE)
@@ -28,8 +27,8 @@ data class CapLsMessage(val target: String? = null, val version: String = "302",
             val subCommand = message.parameters[1]
             val asteriskOrCaps = message.parameters[2]
 
-            var rawCaps: String
-            var isMultiline: Boolean
+            val rawCaps: String
+            val isMultiline: Boolean
 
             if (asteriskOrCaps == "*") {
                 rawCaps = message.parameters.getOrNull(3) ?: ""

@@ -1,13 +1,13 @@
 package engineer.carrot.warren.kale.irc.message.ircv3
 
-import engineer.carrot.warren.kale.irc.message.IMessageFactory
 import engineer.carrot.warren.kale.irc.message.IrcMessage
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Test
-import org.junit.Assert.*
 
 class CapEndMessageTests {
-    lateinit var factory: IMessageFactory<CapEndMessage>
+    lateinit var factory: CapEndMessage.Factory
 
     @Before fun setUp() {
         factory = CapEndMessage.Factory

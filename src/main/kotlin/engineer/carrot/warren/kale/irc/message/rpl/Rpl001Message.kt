@@ -1,17 +1,17 @@
 package engineer.carrot.warren.kale.irc.message.rpl
 
 import engineer.carrot.warren.kale.irc.message.IMessage
-import engineer.carrot.warren.kale.irc.message.IMessageFactory
+import engineer.carrot.warren.kale.irc.message.IMessageParser
+import engineer.carrot.warren.kale.irc.message.IMessageSerialiser
 import engineer.carrot.warren.kale.irc.message.IrcMessage
 
 data class Rpl001Message(val source: String, val target: String, val contents: String): IMessage {
+    override val command: String = "001"
 
-    companion object Factory: IMessageFactory<Rpl001Message> {
-        override val messageType = Rpl001Message::class.java
-        override val key = "001"
+    companion object Factory: IMessageParser<Rpl001Message>, IMessageSerialiser<Rpl001Message> {
 
         override fun serialise(message: Rpl001Message): IrcMessage? {
-            return IrcMessage(command = key, prefix = message.source, parameters = listOf(message.target, message.contents))
+            return IrcMessage(command = message.command, prefix = message.source, parameters = listOf(message.target, message.contents))
         }
 
         override fun parse(message: IrcMessage): Rpl001Message? {

@@ -1,13 +1,12 @@
 package engineer.carrot.warren.kale
 
 import engineer.carrot.warren.kale.irc.message.IMessage
-import engineer.carrot.warren.kale.irc.message.IMessageFactory
+import engineer.carrot.warren.kale.irc.message.IMessageParser
+import engineer.carrot.warren.kale.irc.message.IMessageSerialiser
 import engineer.carrot.warren.kale.irc.message.IrcMessage
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
-import org.junit.runner.RunWith
-import org.junit.Assert.*
-import org.mockito.runners.MockitoJUnitRunner
 
 class KaleTests {
     lateinit var kale: Kale
@@ -20,8 +19,10 @@ class KaleTests {
 
         kale = Kale()
 
-        kale.addMessageFromFactory(MockMessageOne.Factory)
-        kale.addMessageFromFactory(MockSubcommandMessage.Factory)
+        kale.routeCommandToParser("TEST1", MockMessageOne.Factory)
+        kale.routeMessageToSerialiser(MockMessageOne::class.java, MockMessageOne.Factory)
+
+        kale.routeCommandToParser("TEST", MockSubcommandMessage.Factory)
 
         kale.register(mockHandlerOne)
         kale.register(mockHandlerSub)
@@ -39,7 +40,7 @@ class KaleTests {
         assertEquals(0, mockHandlerSub.spyHandleMessageInvokations.size)
         assertEquals(MockMessageOne(mockToken = "token1"), mockHandlerOne.spyHandleMessageInvokations[0])
     }
-    
+
     @Test fun test_subcommand_firesTestHandler() {
         kale.process("TEST * SUB :token1")
 
@@ -132,16 +133,15 @@ class KaleTests {
     }
 
     data class MockMessageOne(val mockToken: String): IMessage {
-        companion object Factory: IMessageFactory<MockMessageOne> {
-            override val messageType = MockMessageOne::class.java
-            override val key = "TEST1"
+        override val command: String = "TEST1"
 
+        companion object Factory: IMessageParser<MockMessageOne>, IMessageSerialiser<MockMessageOne> {
             override fun parse(message: IrcMessage): MockMessageOne? {
                 return MockMessageOne(message.parameters[0])
             }
 
             override fun serialise(message: MockMessageOne): IrcMessage? {
-                return IrcMessage(command = key, parameters = listOf(message.mockToken))
+                return IrcMessage(command = message.command, parameters = listOf(message.mockToken))
             }
         }
     }
@@ -159,19 +159,20 @@ class KaleTests {
     }
 
     data class MockSubcommandMessage(val mockToken: String): IMessage {
-        companion object Factory: IMessageFactory<MockSubcommandMessage> {
-            override val messageType = MockSubcommandMessage::class.java
-            override val key = "TESTSUB"
+        override val command: String = "TEST"
 
+        companion object Factory: IMessageParser<MockSubcommandMessage>, IMessageSerialiser<MockSubcommandMessage> {
             override fun parse(message: IrcMessage): MockSubcommandMessage? {
                 return MockSubcommandMessage(message.parameters[2])
             }
 
             override fun serialise(message: MockSubcommandMessage): IrcMessage? {
-                return IrcMessage(command = key, parameters = listOf("*", "SUB", message.mockToken))
+                return IrcMessage(command = message.command, parameters = listOf("*", "SUB", message.mockToken))
             }
         }
     }
 
-    data class MockUnknownMessage(val unknownParameter: String): IMessage { }
+    data class MockUnknownMessage(val unknownParameter: String): IMessage {
+        override val command: String = "UNKNOWN"
+    }
 }

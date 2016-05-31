@@ -3,6 +3,10 @@ package engineer.carrot.warren.kale.irc.message
 import engineer.carrot.warren.kale.irc.CharacterCodes
 import engineer.carrot.warren.kale.loggerFor
 
+interface IIrcMessageSerialiser {
+    fun serialise(message: IrcMessage): String?
+}
+
 object IrcMessageSerialiser : IIrcMessageSerialiser {
     private val LOGGER = loggerFor<IrcMessageSerialiser>()
 

@@ -1,17 +1,17 @@
 package engineer.carrot.warren.kale.irc.message.rfc1459
 
 import engineer.carrot.warren.kale.irc.message.IMessage
-import engineer.carrot.warren.kale.irc.message.IMessageFactory
+import engineer.carrot.warren.kale.irc.message.IMessageParser
+import engineer.carrot.warren.kale.irc.message.IMessageSerialiser
 import engineer.carrot.warren.kale.irc.message.IrcMessage
 import engineer.carrot.warren.kale.irc.prefix.Prefix
 import engineer.carrot.warren.kale.irc.prefix.PrefixParser
 import engineer.carrot.warren.kale.irc.prefix.PrefixSerialiser
 
 data class NickMessage(val source: Prefix? = null, val nickname: String, val hopcount: Int? = null): IMessage {
+    override val command: String = "NICK"
 
-    companion object Factory: IMessageFactory<NickMessage> {
-        override val messageType = NickMessage::class.java
-        override val key = "NICK"
+    companion object Factory: IMessageParser<NickMessage>, IMessageSerialiser<NickMessage> {
 
         override fun serialise(message: NickMessage): IrcMessage? {
             val prefix = if (message.source != null) { PrefixSerialiser.serialise(message.source) } else { null }
@@ -22,7 +22,7 @@ data class NickMessage(val source: Prefix? = null, val nickname: String, val hop
                 parameters += message.hopcount.toString()
             }
 
-            return IrcMessage(command = key, prefix = prefix, parameters = parameters)
+            return IrcMessage(command = message.command, prefix = prefix, parameters = parameters)
         }
 
         override fun parse(message: IrcMessage): NickMessage? {

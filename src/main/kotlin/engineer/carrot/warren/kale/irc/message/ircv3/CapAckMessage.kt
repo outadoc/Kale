@@ -2,22 +2,22 @@ package engineer.carrot.warren.kale.irc.message.ircv3
 
 import engineer.carrot.warren.kale.irc.CharacterCodes
 import engineer.carrot.warren.kale.irc.message.IMessage
-import engineer.carrot.warren.kale.irc.message.IMessageFactory
+import engineer.carrot.warren.kale.irc.message.IMessageParser
+import engineer.carrot.warren.kale.irc.message.IMessageSerialiser
 import engineer.carrot.warren.kale.irc.message.IrcMessage
 
 data class CapAckMessage(val target: String? = null, val caps: List<String>): IMessage {
+    override val command: String = "CAP"
 
-    companion object Factory: IMessageFactory<CapAckMessage> {
-        override val messageType = CapAckMessage::class.java
-        override val key = "CAPACK"
+    companion object Factory: IMessageParser<CapAckMessage>, IMessageSerialiser<CapAckMessage> {
 
         override fun serialise(message: CapAckMessage): IrcMessage? {
             val caps = message.caps.joinToString(separator = " ")
 
             if (message.target != null) {
-                return IrcMessage(command = "CAP", parameters = listOf(message.target, "ACK", caps))
+                return IrcMessage(command = message.command, parameters = listOf(message.target, "ACK", caps))
             } else {
-                return IrcMessage(command = "CAP", parameters = listOf("ACK", caps))
+                return IrcMessage(command = message.command, parameters = listOf("ACK", caps))
             }
         }
 

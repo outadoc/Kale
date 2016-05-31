@@ -2,14 +2,14 @@ package engineer.carrot.warren.kale.irc.message.ircv3
 
 import engineer.carrot.warren.kale.irc.CharacterCodes
 import engineer.carrot.warren.kale.irc.message.IMessage
-import engineer.carrot.warren.kale.irc.message.IMessageFactory
+import engineer.carrot.warren.kale.irc.message.IMessageParser
+import engineer.carrot.warren.kale.irc.message.IMessageSerialiser
 import engineer.carrot.warren.kale.irc.message.IrcMessage
 
 data class CapNakMessage(val target: String? = null, val caps: List<String>): IMessage {
+    override val command: String = "CAP"
 
-    companion object Factory: IMessageFactory<CapNakMessage> {
-        override val messageType = CapNakMessage::class.java
-        override val key = "CAPNAK"
+    companion object Factory: IMessageParser<CapNakMessage>, IMessageSerialiser<CapNakMessage> {
 
         override fun serialise(message: CapNakMessage): IrcMessage? {
             val caps = message.caps.joinToString(separator = CharacterCodes.SPACE.toString())

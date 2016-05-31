@@ -2,6 +2,10 @@ package engineer.carrot.warren.kale.irc.message
 
 import engineer.carrot.warren.kale.irc.CharacterCodes
 
+interface IIrcMessageParser {
+    fun parse(line: String): IrcMessage?
+}
+
 object IrcMessageParser: IIrcMessageParser {
 
     private val CRLF_LENGTH = 2

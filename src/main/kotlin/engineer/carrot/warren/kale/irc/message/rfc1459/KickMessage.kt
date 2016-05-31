@@ -2,17 +2,17 @@ package engineer.carrot.warren.kale.irc.message.rfc1459
 
 import engineer.carrot.warren.kale.irc.CharacterCodes
 import engineer.carrot.warren.kale.irc.message.IMessage
-import engineer.carrot.warren.kale.irc.message.IMessageFactory
+import engineer.carrot.warren.kale.irc.message.IMessageParser
+import engineer.carrot.warren.kale.irc.message.IMessageSerialiser
 import engineer.carrot.warren.kale.irc.message.IrcMessage
 import engineer.carrot.warren.kale.irc.prefix.Prefix
 import engineer.carrot.warren.kale.irc.prefix.PrefixParser
 import engineer.carrot.warren.kale.irc.prefix.PrefixSerialiser
 
 data class KickMessage(val source: Prefix? = null, val users: List<String>, val channels: List<String>, val comment: String? = null): IMessage {
+    override val command: String = "KICK"
 
-    companion object Factory: IMessageFactory<KickMessage> {
-        override val messageType = KickMessage::class.java
-        override val key = "KICK"
+    companion object Factory: IMessageParser<KickMessage>, IMessageSerialiser<KickMessage> {
 
         override fun serialise(message: KickMessage): IrcMessage? {
             val prefix = if (message.source != null) { PrefixSerialiser.serialise(message.source) } else { null }
@@ -21,9 +21,9 @@ data class KickMessage(val source: Prefix? = null, val users: List<String>, val 
             val comment = message.comment
 
             if (comment != null) {
-                return IrcMessage(prefix = prefix, command = key, parameters = listOf(channels, users, comment))
+                return IrcMessage(prefix = prefix, command = message.command, parameters = listOf(channels, users, comment))
             } else {
-                return IrcMessage(prefix = prefix, command = key, parameters = listOf(channels, users))
+                return IrcMessage(prefix = prefix, command = message.command, parameters = listOf(channels, users))
             }
         }
 

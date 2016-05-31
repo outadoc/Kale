@@ -1,17 +1,17 @@
 package engineer.carrot.warren.kale.irc.message.rfc1459
 
 import engineer.carrot.warren.kale.irc.message.IMessage
-import engineer.carrot.warren.kale.irc.message.IMessageFactory
+import engineer.carrot.warren.kale.irc.message.IMessageParser
+import engineer.carrot.warren.kale.irc.message.IMessageSerialiser
 import engineer.carrot.warren.kale.irc.message.IrcMessage
 
 data class UserMessage(val username: String, val mode: String, val realname: String): IMessage {
+    override val command: String = "USER"
 
-    companion object Factory: IMessageFactory<UserMessage> {
-        override val messageType = UserMessage::class.java
-        override val key = "USER"
+    companion object Factory: IMessageParser<UserMessage>, IMessageSerialiser<UserMessage> {
 
         override fun serialise(message: UserMessage): IrcMessage? {
-            return IrcMessage(command = key, parameters = listOf(message.username, message.mode, "*", message.realname))
+            return IrcMessage(command = message.command, parameters = listOf(message.username, message.mode, "*", message.realname))
         }
 
         override fun parse(message: IrcMessage): UserMessage? {

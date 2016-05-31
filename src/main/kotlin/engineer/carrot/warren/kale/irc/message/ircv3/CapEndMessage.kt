@@ -1,14 +1,14 @@
 package engineer.carrot.warren.kale.irc.message.ircv3
 
 import engineer.carrot.warren.kale.irc.message.IMessage
-import engineer.carrot.warren.kale.irc.message.IMessageFactory
+import engineer.carrot.warren.kale.irc.message.IMessageParser
+import engineer.carrot.warren.kale.irc.message.IMessageSerialiser
 import engineer.carrot.warren.kale.irc.message.IrcMessage
 
 data class CapEndMessage(val target: String? = null): IMessage {
+    override val command: String = "CAP"
 
-    companion object Factory: IMessageFactory<CapEndMessage> {
-        override val messageType = CapEndMessage::class.java
-        override val key = "CAPEND"
+    companion object Factory: IMessageParser<CapEndMessage>, IMessageSerialiser<CapEndMessage> {
 
         override fun serialise(message: CapEndMessage): IrcMessage? {
             if (message.target != null) {

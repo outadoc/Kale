@@ -3,7 +3,8 @@ package engineer.carrot.warren.kale.irc.message.rfc1459
 import engineer.carrot.warren.kale.IKaleParsingStateDelegate
 import engineer.carrot.warren.kale.irc.CharacterCodes
 import engineer.carrot.warren.kale.irc.message.IMessage
-import engineer.carrot.warren.kale.irc.message.IMessageFactory
+import engineer.carrot.warren.kale.irc.message.IMessageParser
+import engineer.carrot.warren.kale.irc.message.IMessageSerialiser
 import engineer.carrot.warren.kale.irc.message.IrcMessage
 import engineer.carrot.warren.kale.irc.prefix.Prefix
 import engineer.carrot.warren.kale.irc.prefix.PrefixParser
@@ -12,6 +13,7 @@ import engineer.carrot.warren.kale.loggerFor
 import java.util.*
 
 data class ModeMessage(val source: Prefix? = null, val target: String, val modifiers: List<ModeModifier>): IMessage {
+    override val command: String = "MODE"
 
     data class ModeModifier(val type: Char? = null, val mode: Char, var parameter: String? = null) {
         val isAdding: Boolean
@@ -24,20 +26,17 @@ data class ModeMessage(val source: Prefix? = null, val target: String, val modif
             get() = this.type == null
     }
 
-    companion object Factory: IMessageFactory<ModeMessage> {
+    companion object Factory: IMessageParser<ModeMessage>, IMessageSerialiser<ModeMessage> {
         val LOGGER = loggerFor<Factory>()
 
         var parsingStateDelegate: IKaleParsingStateDelegate? = null
-
-        override val messageType = ModeMessage::class.java
-        override val key = "MODE"
 
         override fun serialise(message: ModeMessage): IrcMessage? {
             val prefix = if (message.source != null) { PrefixSerialiser.serialise(message.source) } else { null }
             val parameters = serialise(message.modifiers).toMutableList()
             parameters.add(0, message.target)
 
-            return IrcMessage(command = key, prefix = prefix, parameters = parameters)
+            return IrcMessage(command = message.command, prefix = prefix, parameters = parameters)
         }
 
         private fun serialise(modifiers: List<ModeModifier>): List<String> {

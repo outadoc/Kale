@@ -1,21 +1,21 @@
 package engineer.carrot.warren.kale.irc.message.rfc1459
 
 import engineer.carrot.warren.kale.irc.message.IMessage
-import engineer.carrot.warren.kale.irc.message.IMessageFactory
+import engineer.carrot.warren.kale.irc.message.IMessageParser
+import engineer.carrot.warren.kale.irc.message.IMessageSerialiser
 import engineer.carrot.warren.kale.irc.message.IrcMessage
 import engineer.carrot.warren.kale.irc.prefix.Prefix
 import engineer.carrot.warren.kale.irc.prefix.PrefixParser
 import engineer.carrot.warren.kale.irc.prefix.PrefixSerialiser
 
 data class PrivMsgMessage(val source: Prefix? = null, val time: String? = null, val target: String, val message: String): IMessage {
+    override val command: String = "PRIVMSG"
 
-    companion object Factory: IMessageFactory<PrivMsgMessage> {
-        override val messageType = PrivMsgMessage::class.java
-        override val key = "PRIVMSG"
+    companion object Factory: IMessageParser<PrivMsgMessage>, IMessageSerialiser<PrivMsgMessage> {
 
         override fun serialise(message: PrivMsgMessage): IrcMessage? {
             val prefix = if (message.source != null) { PrefixSerialiser.serialise(message.source) } else { null }
-            return IrcMessage(command = key, prefix = prefix, parameters = listOf(message.target, message.message))
+            return IrcMessage(command = message.command, prefix = prefix, parameters = listOf(message.target, message.message))
         }
 
         override fun parse(message: IrcMessage): PrivMsgMessage? {

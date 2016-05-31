@@ -1,13 +1,13 @@
 package engineer.carrot.warren.kale.irc.message.rfc1459
 
-import engineer.carrot.warren.kale.irc.message.IMessageFactory
 import engineer.carrot.warren.kale.irc.message.IrcMessage
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Test
-import org.junit.Assert.*
 
 class PingMessageTests {
-    lateinit var factory: IMessageFactory<PingMessage>
+    lateinit var factory: PingMessage.Factory
 
     @Before fun setUp() {
         factory = PingMessage.Factory

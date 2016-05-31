@@ -1,6 +1,7 @@
 package engineer.carrot.warren.kale.irc.message
 
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Test
 
 class IrcMessageParserTests {

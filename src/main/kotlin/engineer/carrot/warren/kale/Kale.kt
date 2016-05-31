@@ -1,9 +1,6 @@
 package engineer.carrot.warren.kale
 
-import engineer.carrot.warren.kale.irc.message.IMessage
-import engineer.carrot.warren.kale.irc.message.IMessageFactory
-import engineer.carrot.warren.kale.irc.message.IrcMessage
-import engineer.carrot.warren.kale.irc.message.IrcMessageParser
+import engineer.carrot.warren.kale.irc.message.*
 import engineer.carrot.warren.kale.irc.message.ircv3.*
 import engineer.carrot.warren.kale.irc.message.ircv3.sasl.AuthenticateMessage
 import engineer.carrot.warren.kale.irc.message.ircv3.sasl.Rpl903Message
@@ -13,9 +10,13 @@ import engineer.carrot.warren.kale.irc.message.rfc1459.*
 import engineer.carrot.warren.kale.irc.message.rpl.*
 import engineer.carrot.warren.kale.irc.message.utility.RawMessage
 
-interface IMessageHashingStrategy {
+interface IKale {
 
-    fun hash(message: IrcMessage): String?
+    fun <T: IMessage> register(handler: IKaleHandler<T>)
+    fun process(line: String)
+    fun serialise(message: Any): IrcMessage?
+
+    var parsingStateDelegate: IKaleParsingStateDelegate?
 
 }
 
@@ -25,15 +26,13 @@ interface IKaleParsingStateDelegate {
 
 }
 
-interface IKale {
 
-    fun <T: IMessage> register(handler: IKaleHandler<T>)
-    fun process(line: String)
-    fun <T: IMessage> serialise(message: T): IrcMessage?
+interface IParserRouter {
 
-    var parsingStateDelegate: IKaleParsingStateDelegate?
+    fun parserFor(message: IrcMessage): IMessageParser<*>?
 
 }
+
 
 class Kale : IKale {
     private val LOGGER = loggerFor<Kale>()
@@ -43,101 +42,98 @@ class Kale : IKale {
             ModeMessage.Factory.parsingStateDelegate = value
         }
 
-    private var messageFactories: MutableMap<String, IMessageFactory<*>> = hashMapOf()
-    private var messageToFactory: MutableMap<Class<*>, IMessageFactory<*>> = hashMapOf()
+    private var commandRouters = hashMapOf<String, IParserRouter>()
+    private var messageSerialisers = hashMapOf<Class<*>, IMessageSerialiser<*>>()
 
-    private var messageHashingStrategies: List<IMessageHashingStrategy> = listOf()
-
-    val commandOnlyHashingStrategy = object : IMessageHashingStrategy {
-        override fun hash(message: IrcMessage): String? {
-            return message.command
-        }
-    }
-
-    val commandWithSubcommandHashingStrategy = object : IMessageHashingStrategy {
-        override fun hash(message: IrcMessage): String? {
-            if (message.parameters.size >= 2) {
-                return message.command + message.parameters[1]
-            }
-
-            return null
-        }
-    }
-
-    init {
-        messageHashingStrategies += commandOnlyHashingStrategy
-        messageHashingStrategies += commandWithSubcommandHashingStrategy
-    }
-
-    var handlers: MutableMap<String, IKaleHandler<*>> = hashMapOf()
+    var handlers: MutableMap<Class<*>, IKaleHandler<*>> = hashMapOf()
 
     fun addDefaultMessages(): Kale {
-        addMessageFromFactory(RawMessage.Factory)
+        routeMessageToSerialiser(RawMessage::class.java, RawMessage.Factory)
 
-        addMessageFromFactory(PingMessage.Factory)
-        addMessageFromFactory(PongMessage.Factory)
-        addMessageFromFactory(NickMessage.Factory)
-        addMessageFromFactory(UserMessage.Factory)
-        addMessageFromFactory(QuitMessage.Factory)
-        addMessageFromFactory(JoinMessage.Factory)
-        addMessageFromFactory(PartMessage.Factory)
-        addMessageFromFactory(ModeMessage.Factory)
-        addMessageFromFactory(PrivMsgMessage.Factory)
-        addMessageFromFactory(NoticeMessage.Factory)
-        addMessageFromFactory(InviteMessage.Factory)
-        addMessageFromFactory(TopicMessage.Factory)
-        addMessageFromFactory(KickMessage.Factory)
-        addMessageFromFactory(CapAckMessage.Factory)
-        addMessageFromFactory(CapEndMessage.Factory)
-        addMessageFromFactory(CapLsMessage.Factory)
-        addMessageFromFactory(CapNakMessage.Factory)
-        addMessageFromFactory(CapReqMessage.Factory)
-        addMessageFromFactory(AuthenticateMessage.Factory)
-        addMessageFromFactory(Rpl903Message.Factory)
-        addMessageFromFactory(Rpl904Message.Factory)
-        addMessageFromFactory(Rpl905Message.Factory)
+        routeCommandAndMessageToFactory("PING", PingMessage::class.java, PingMessage.Factory, PingMessage.Factory)
+        routeCommandAndMessageToFactory("PONG", PongMessage::class.java, PongMessage.Factory, PongMessage.Factory)
+        routeCommandAndMessageToFactory("JOIN", JoinMessage::class.java, JoinMessage.Factory, JoinMessage.Factory)
+        routeCommandAndMessageToFactory("NICK", NickMessage::class.java, NickMessage.Factory, NickMessage.Factory)
+        routeCommandAndMessageToFactory("USER", UserMessage::class.java, UserMessage.Factory, UserMessage.Factory)
+        routeCommandAndMessageToFactory("QUIT", QuitMessage::class.java, QuitMessage.Factory, QuitMessage.Factory)
+        routeCommandAndMessageToFactory("PART", PartMessage::class.java, PartMessage.Factory, PartMessage.Factory)
+        routeCommandAndMessageToFactory("MODE", ModeMessage::class.java, ModeMessage.Factory, ModeMessage.Factory)
+        routeCommandAndMessageToFactory("PRIVMSG", PrivMsgMessage::class.java, PrivMsgMessage.Factory, PrivMsgMessage.Factory)
+        routeCommandAndMessageToFactory("NOTICE", NoticeMessage::class.java, NoticeMessage.Factory, NoticeMessage.Factory)
+        routeCommandAndMessageToFactory("INVITE", InviteMessage::class.java, InviteMessage.Factory, InviteMessage.Factory)
+        routeCommandAndMessageToFactory("TOPIC", TopicMessage::class.java, TopicMessage.Factory, TopicMessage.Factory)
+        routeCommandAndMessageToFactory("KICK", KickMessage::class.java, KickMessage.Factory, KickMessage.Factory)
 
-        addMessageFromFactory(Rpl001Message.Factory)
-        addMessageFromFactory(Rpl002Message.Factory)
-        addMessageFromFactory(Rpl003Message.Factory)
-        addMessageFromFactory(Rpl005Message.Factory)
-        addMessageFromFactory(Rpl331Message.Factory)
-        addMessageFromFactory(Rpl332Message.Factory)
-        addMessageFromFactory(Rpl353Message.Factory)
-        addMessageFromFactory(Rpl372Message.Factory)
-        addMessageFromFactory(Rpl375Message.Factory)
-        addMessageFromFactory(Rpl376Message.Factory)
-        addMessageFromFactory(Rpl422Message.Factory)
-        addMessageFromFactory(Rpl471Message.Factory)
-        addMessageFromFactory(Rpl473Message.Factory)
-        addMessageFromFactory(Rpl474Message.Factory)
-        addMessageFromFactory(Rpl475Message.Factory)
+        routeCommandToParsers("CAP") { message ->
+            val subcommand = message.parameters.getOrNull(1)
+            when (subcommand) {
+                "ACK" -> CapAckMessage.Factory
+                "END" -> CapEndMessage.Factory
+                "LS" -> CapLsMessage.Factory
+                "NAK" -> CapNakMessage.Factory
+                "REQ" -> CapReqMessage.Factory
+                else -> null
+            }
+        }
+        routeMessageToSerialiser(CapAckMessage::class.java, CapAckMessage.Factory)
+        routeMessageToSerialiser(CapEndMessage::class.java, CapEndMessage.Factory)
+        routeMessageToSerialiser(CapLsMessage::class.java, CapLsMessage.Factory)
+        routeMessageToSerialiser(CapNakMessage::class.java, CapNakMessage.Factory)
+        routeMessageToSerialiser(CapReqMessage::class.java, CapReqMessage.Factory)
+
+        routeCommandAndMessageToFactory("AUTHENTICATE", AuthenticateMessage::class.java, AuthenticateMessage.Factory, AuthenticateMessage.Factory)
+
+        routeCommandAndMessageToFactory("903", Rpl903Message::class.java, Rpl903Message.Factory, Rpl903Message.Factory)
+        routeCommandAndMessageToFactory("904", Rpl904Message::class.java, Rpl904Message.Factory, Rpl904Message.Factory)
+        routeCommandAndMessageToFactory("905", Rpl905Message::class.java, Rpl905Message.Factory, Rpl905Message.Factory)
+        routeCommandAndMessageToFactory("001", Rpl001Message::class.java, Rpl001Message.Factory, Rpl001Message.Factory)
+        routeCommandAndMessageToFactory("002", Rpl002Message::class.java, Rpl002Message.Factory, Rpl002Message.Factory)
+        routeCommandAndMessageToFactory("003", Rpl003Message::class.java, Rpl003Message.Factory, Rpl003Message.Factory)
+        routeCommandAndMessageToFactory("005", Rpl005Message::class.java, Rpl005Message.Factory, Rpl005Message.Factory)
+        routeCommandAndMessageToFactory("331", Rpl331Message::class.java, Rpl331Message.Factory, Rpl331Message.Factory)
+        routeCommandAndMessageToFactory("332", Rpl332Message::class.java, Rpl332Message.Factory, Rpl332Message.Factory)
+        routeCommandAndMessageToFactory("353", Rpl353Message::class.java, Rpl353Message.Factory, Rpl353Message.Factory)
+        routeCommandAndMessageToFactory("372", Rpl372Message::class.java, Rpl372Message.Factory, Rpl372Message.Factory)
+        routeCommandAndMessageToFactory("375", Rpl375Message::class.java, Rpl375Message.Factory, Rpl375Message.Factory)
+        routeCommandAndMessageToFactory("376", Rpl376Message::class.java, Rpl376Message.Factory, Rpl376Message.Factory)
+        routeCommandAndMessageToFactory("422", Rpl422Message::class.java, Rpl422Message.Factory, Rpl422Message.Factory)
+        routeCommandAndMessageToFactory("471", Rpl471Message::class.java, Rpl471Message.Factory, Rpl471Message.Factory)
+        routeCommandAndMessageToFactory("473", Rpl473Message::class.java, Rpl473Message.Factory, Rpl473Message.Factory)
+        routeCommandAndMessageToFactory("474", Rpl474Message::class.java, Rpl474Message.Factory, Rpl474Message.Factory)
+        routeCommandAndMessageToFactory("475", Rpl475Message::class.java, Rpl475Message.Factory, Rpl475Message.Factory)
 
         return this
     }
 
-    fun <T: IMessage> addMessageFromFactory(factory: IMessageFactory<T>) {
-        if (messageFactories.containsKey(factory.key)) {
-            throw RuntimeException("Tried to add message factory for ${factory.key}, but one already exists!")
+    fun <T: IMessage> routeCommandToParser(command: String, parser: IMessageParser<T>) {
+        val parserRouter = object : IParserRouter {
+            override fun parserFor(message: IrcMessage): IMessageParser<*>? {
+                return parser
+            }
         }
 
-        messageFactories.put(factory.key, factory)
-        messageToFactory.put(factory.messageType, factory)
+        commandRouters[command] = parserRouter
     }
 
-    private fun factoryFromMessage(message: Class<*>): IMessageFactory<*>? {
-        return messageToFactory[message]
-    }
-
-
-    override fun <T: IMessage> register(handler: IKaleHandler<T>) {
-        val command = factoryFromMessage(handler.messageType)?.key ?: throw RuntimeException("couldn't look up factory for handler: $handler")
-
-        if (handlers.containsKey(command)) {
-            throw RuntimeException("tried to register a handler when one already exists for $command: $handler")
+    fun routeCommandToParsers(command: String, matcher: (IrcMessage) -> (IMessageParser<*>?)) {
+        commandRouters[command] = object : IParserRouter {
+            override fun parserFor(message: IrcMessage): IMessageParser<*>? {
+                return matcher(message)
+            }
         }
+    }
 
-        handlers.put(command, handler)
+    fun <M> routeMessageToSerialiser(messageClass: Class<M>, serialiser: IMessageSerialiser<M>) {
+        messageSerialisers[messageClass] = serialiser
+    }
+
+    fun <M: IMessage> routeCommandAndMessageToFactory(command: String, messageClass: Class<M>, parser: IMessageParser<M>, serialiser: IMessageSerialiser<M>) {
+        routeCommandToParser(command, parser)
+        routeMessageToSerialiser(messageClass, serialiser)
+    }
+
+    override fun <M: IMessage> register(handler: IKaleHandler<M>) {
+        handlers.put(handler.messageType, handler)
     }
 
     override fun process(line: String) {
@@ -147,7 +143,7 @@ class Kale : IKale {
             return
         }
 
-        val factory = findFactoryFor(ircMessage)
+        val factory = findParserFor(ircMessage)
         if (factory == null) {
             LOGGER.debug("no factory for: $ircMessage")
             return
@@ -159,39 +155,32 @@ class Kale : IKale {
             return
         }
 
-        val handler = handlers[factory.key]
+        val handler = findHandlerFor(message)
         if (handler == null) {
             LOGGER.debug("no handler for: $message")
             return
         }
 
-        @Suppress("UNCHECKED_CAST")
-        val typedHandler = handler as? IKaleHandler<IMessage> ?: return
-        if (!typedHandler.messageType.isInstance(message)) {
-            LOGGER.warn("tried to pass wrong type to handler: ${message.javaClass} to ${handler.messageType}")
-            return
-        }
-
-        typedHandler.handle(message, ircMessage.tags)
+        handler.handle(message, ircMessage.tags)
     }
 
-    private fun findFactoryFor(ircMessage: IrcMessage): IMessageFactory<*>? {
-        for (strategy in messageHashingStrategies) {
-            val hash = strategy.hash(ircMessage)
-            if (hash != null) {
-                val factory = messageFactories[hash]
-                if (factory != null) {
-                    return factory
-                }
-            }
-        }
-
-        return null
+    private fun findParserFor(ircMessage: IrcMessage): IMessageParser<*>? {
+        return commandRouters[ircMessage.command]?.parserFor(ircMessage)
     }
 
-    override fun <T: IMessage> serialise(message: T): IrcMessage? {
+    private fun <M> findSerialiserFor(messageClass: Class<M>): IMessageSerialiser<M>? {
         @Suppress("UNCHECKED_CAST")
-        val factory = factoryFromMessage(message.javaClass) as? IMessageFactory<IMessage>
+        return messageSerialisers[messageClass] as? IMessageSerialiser<M>
+    }
+
+
+    private fun <M: IMessage> findHandlerFor(message: M): IKaleHandler<M>? {
+        @Suppress("UNCHECKED_CAST")
+        return handlers[message.javaClass] as? IKaleHandler<M>
+    }
+
+    override fun serialise(message: Any): IrcMessage? {
+        val factory = findSerialiserFor(message.javaClass)
         if (factory == null) {
             LOGGER.warn("failed to find factory for message serialisation: $message")
             return null

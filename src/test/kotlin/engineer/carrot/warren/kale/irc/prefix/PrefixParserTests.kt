@@ -1,9 +1,9 @@
 package engineer.carrot.warren.kale.irc.prefix
 
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Test
-
-import org.junit.Assert.*
 
 class PrefixParserTests {
     lateinit var prefixParser: IPrefixParser

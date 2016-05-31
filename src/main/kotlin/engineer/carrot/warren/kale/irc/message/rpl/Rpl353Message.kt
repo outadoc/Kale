@@ -2,19 +2,19 @@ package engineer.carrot.warren.kale.irc.message.rpl
 
 import engineer.carrot.warren.kale.irc.CharacterCodes
 import engineer.carrot.warren.kale.irc.message.IMessage
-import engineer.carrot.warren.kale.irc.message.IMessageFactory
+import engineer.carrot.warren.kale.irc.message.IMessageParser
+import engineer.carrot.warren.kale.irc.message.IMessageSerialiser
 import engineer.carrot.warren.kale.irc.message.IrcMessage
 
 data class Rpl353Message(val source: String, val target: String, val visibility: String, val channel: String, val names: List<String>): IMessage {
+    override val command: String = "353"
 
-    companion object Factory: IMessageFactory<Rpl353Message> {
-        override val messageType = Rpl353Message::class.java
-        override val key = "353"
+    companion object Factory: IMessageParser<Rpl353Message>, IMessageSerialiser<Rpl353Message> {
 
         override fun serialise(message: Rpl353Message): IrcMessage? {
             val names = message.names.joinToString(separator = CharacterCodes.SPACE.toString())
 
-            return IrcMessage(command = key, prefix = message.source, parameters = listOf(message.target, message.visibility, message.channel, names))
+            return IrcMessage(command = message.command, prefix = message.source, parameters = listOf(message.target, message.visibility, message.channel, names))
         }
 
         override fun parse(message: IrcMessage): Rpl353Message? {

@@ -1,17 +1,17 @@
 package engineer.carrot.warren.kale.irc.message.rfc1459
 
 import engineer.carrot.warren.kale.irc.message.IMessage
-import engineer.carrot.warren.kale.irc.message.IMessageFactory
+import engineer.carrot.warren.kale.irc.message.IMessageParser
+import engineer.carrot.warren.kale.irc.message.IMessageSerialiser
 import engineer.carrot.warren.kale.irc.message.IrcMessage
 
 data class PingMessage(val token: String): IMessage {
+    override val command: String = "PING"
 
-    companion object Factory: IMessageFactory<PingMessage> {
-        override val messageType = PingMessage::class.java
-        override val key = "PING"
+    companion object Factory: IMessageParser<PingMessage>, IMessageSerialiser<PingMessage> {
 
         override fun serialise(message: PingMessage): IrcMessage? {
-            return IrcMessage(command = key, parameters = listOf(message.token))
+            return IrcMessage(command = message.command, parameters = listOf(message.token))
         }
 
         override fun parse(message: IrcMessage): PingMessage? {

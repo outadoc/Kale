@@ -1,17 +1,17 @@
 package engineer.carrot.warren.kale.irc.message.ircv3.sasl
 
 import engineer.carrot.warren.kale.irc.message.IMessage
-import engineer.carrot.warren.kale.irc.message.IMessageFactory
+import engineer.carrot.warren.kale.irc.message.IMessageParser
+import engineer.carrot.warren.kale.irc.message.IMessageSerialiser
 import engineer.carrot.warren.kale.irc.message.IrcMessage
 
 data class Rpl905Message(val source: String, val target: String, val contents: String): IMessage {
+    override val command: String = "905"
 
-    companion object Factory: IMessageFactory<Rpl905Message> {
-        override val messageType = Rpl905Message::class.java
-        override val key = "905"
+    companion object Factory: IMessageParser<Rpl905Message>, IMessageSerialiser<Rpl905Message> {
 
         override fun serialise(message: Rpl905Message): IrcMessage? {
-            return IrcMessage(command = key, prefix = message.source, parameters = listOf(message.target, message.contents))
+            return IrcMessage(command = message.command, prefix = message.source, parameters = listOf(message.target, message.contents))
         }
 
         override fun parse(message: IrcMessage): Rpl905Message? {

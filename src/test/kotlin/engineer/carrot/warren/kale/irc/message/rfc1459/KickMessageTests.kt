@@ -1,14 +1,14 @@
 package engineer.carrot.warren.kale.irc.message.rfc1459
 
-import engineer.carrot.warren.kale.irc.message.IMessageFactory
 import engineer.carrot.warren.kale.irc.message.IrcMessage
 import engineer.carrot.warren.kale.irc.prefix.Prefix
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Test
-import org.junit.Assert.*
 
 class KickMessageTests {
-    lateinit var factory: IMessageFactory<KickMessage>
+    lateinit var factory: KickMessage.Factory
 
     @Before fun setUp() {
         factory = KickMessage.Factory
