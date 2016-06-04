@@ -13,7 +13,7 @@ Warren and Kale have a few advantages over other IRC frameworks:
 * Both parsing and state management are verified by hundreds of unit tests
 * Messages, and state handlers, are individually encapsulated
 
-Note that this project is still pretty new. Planned features are tracked in [Issues](https://github.com/CarrotCodes/Warren/issues).
+Note that this project is still pretty new. Planned features are tracked in [Issues](https://github.com/CarrotCodes/Kale/issues).
 
 ## TODO
 * [RFC 1459](https://tools.ietf.org/html/rfc1459)
