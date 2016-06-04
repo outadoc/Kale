@@ -5,21 +5,22 @@ Kotlin IRC message parsing, serialising and notifying. Provides useful abstracti
 
 [Thump](https://github.com/CarrotCodes/Thump) is the primary upstream project - a bridge that lets people chat between Minecraft and IRC whilst they play.
 
-## Why is this better than other IRC frameworks?
+## Why should you use this framework?
 
 Warren and Kale have a few advantages over other IRC frameworks:
 
 * The responsibilities of parsing and state management are separated
 * Both parsing and state management are verified by hundreds of unit tests
 * Messages, and state handlers, are individually encapsulated
- * Dependencies are clear, and there are no enormous, unverifiable disaster zones
+
+Note that this project is still pretty new. Planned features are tracked in [Issues](https://github.com/CarrotCodes/Warren/issues).
 
 ## TODO
-* [Tags parsing](http://ircv3.net/specs/core/message-tags-3.2.html)
-  * 512 bytes for tags, 512 for main message
-  * Escape values
 * [RFC 1459](https://tools.ietf.org/html/rfc1459)
-* [IRC v3](http://ircv3.net/irc/) (including BATCH extension)
+ * Pretty much done for majority of usage - consider being more complete
+* [IRC v3](http://ircv3.net/irc/)
+ * Conditionally register messages enabled by capabilities
+ * BATCH
 
 ## Code License
 The source code of this project is licensed under the terms of the ISC license, listed in the [LICENSE](LICENSE.md) file. A concise summary of the ISC license is available at [choosealicense.org](http://choosealicense.com/licenses/isc/).
