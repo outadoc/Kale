@@ -66,10 +66,6 @@ shadowJar().relocate("kotlin", "engineer.carrot.warren.kale.repack.kotlin")
 shadowJar().exclude("META-INF/*.DSA")
 shadowJar().exclude("META-INF/*.RSA")
 
-jar {
-    manifest.attributes += "Main-Class" to "io.bunnies.baas.BaasApplication"
-}
-
 val sourcesTask = task<Jar>("sourcesJar") {
     dependsOn("classes")
 
@@ -89,6 +85,7 @@ if (project.hasProperty("DEPLOY_DIR")) {
                 from(components.getByName("java"))
 
                 artifact(shadowJar())
+                artifact(sourcesTask)
             }
         }
     }
