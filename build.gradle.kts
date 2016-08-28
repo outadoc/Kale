@@ -6,6 +6,7 @@ import org.gradle.api.artifacts.dsl.RepositoryHandler
 import org.gradle.api.artifacts.repositories.MavenArtifactRepository
 import org.gradle.api.publish.PublishingExtension
 import org.gradle.api.publish.maven.MavenPublication
+import org.gradle.api.tasks.SourceSetContainer
 import org.gradle.api.tasks.compile.JavaCompile
 import org.gradle.api.tasks.testing.Test
 import java.io.File
@@ -69,6 +70,14 @@ jar {
     manifest.attributes += "Main-Class" to "io.bunnies.baas.BaasApplication"
 }
 
+val sourcesTask = task<Jar>("sourcesJar") {
+    dependsOn("classes")
+
+    from(sourceSets("main").allSource)
+    classifier = "sources"
+}
+
+project.artifacts.add("archives", sourcesTask)
 project.artifacts.add("archives", project.tasks.getByName("shadowJar") as ShadowJar)
 
 if (project.hasProperty("DEPLOY_DIR")) {
@@ -91,3 +100,4 @@ fun Project.compileJava(setup: JavaCompile.() -> Unit) = (project.tasks.getByNam
 fun shadowJar() = (project.tasks.findByName("shadowJar") as ShadowJar)
 fun mavenDeploy(repositoryHandler: RepositoryHandler, configuration: MavenArtifactRepository.() -> Unit) =
         repositoryHandler.maven({ it.configuration() })
+fun sourceSets(name: String) = (project.property("sourceSets") as SourceSetContainer).getByName(name)
