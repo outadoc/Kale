@@ -61,10 +61,12 @@ val buildNumberAddition = if(project.hasProperty("BUILD_NUMBER")) { ".${project.
 version = "$kaleVersion$buildNumberAddition"
 group = "engineer.carrot.warren.kale"
 
-shadowJar().mergeServiceFiles()
-shadowJar().relocate("kotlin", "engineer.carrot.warren.kale.repack.kotlin")
-shadowJar().exclude("META-INF/*.DSA")
-shadowJar().exclude("META-INF/*.RSA")
+shadowJar {
+    mergeServiceFiles()
+    relocate("kotlin", "engineer.carrot.warren.kale.repack.kotlin")
+    exclude("META-INF/*.DSA")
+    exclude("META-INF/*.RSA")
+}
 
 val sourcesTask = task<Jar>("sourcesJar") {
     dependsOn("classes")
@@ -74,7 +76,7 @@ val sourcesTask = task<Jar>("sourcesJar") {
 }
 
 project.artifacts.add("archives", sourcesTask)
-project.artifacts.add("archives", project.tasks.getByName("shadowJar") as ShadowJar)
+project.artifacts.add("archives", shadowJarTask())
 
 if (project.hasProperty("DEPLOY_DIR")) {
     configure<PublishingExtension> {
@@ -84,7 +86,7 @@ if (project.hasProperty("DEPLOY_DIR")) {
             it.create<MavenPublication>("mavenJava") {
                 from(components.getByName("java"))
 
-                artifact(shadowJar())
+                artifact(shadowJarTask())
                 artifact(sourcesTask)
             }
         }
@@ -92,9 +94,10 @@ if (project.hasProperty("DEPLOY_DIR")) {
 }
 
 fun Project.jar(setup: Jar.() -> Unit) = (project.tasks.getByName("jar") as Jar).setup()
+fun shadowJar(setup: ShadowJar.() -> Unit) = shadowJarTask().setup()
 fun Project.test(setup: Test.() -> Unit) = (project.tasks.getByName("test") as Test).setup()
 fun Project.compileJava(setup: JavaCompile.() -> Unit) = (project.tasks.getByName("compileJava") as JavaCompile).setup()
-fun shadowJar() = (project.tasks.findByName("shadowJar") as ShadowJar)
+fun shadowJarTask() = (project.tasks.findByName("shadowJar") as ShadowJar)
 fun mavenDeploy(repositoryHandler: RepositoryHandler, configuration: MavenArtifactRepository.() -> Unit) =
         repositoryHandler.maven({ it.configuration() })
 fun sourceSets(name: String) = (project.property("sourceSets") as SourceSetContainer).getByName(name)
