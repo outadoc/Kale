@@ -120,6 +120,16 @@ class KaleTests {
         assertEquals(message, null)
     }
 
+    @Test fun test_unregister_RemovesCorrectHandler() {
+        kale.unregister(mockHandlerOne)
+
+        kale.process("TEST1 :token")
+        kale.process("TEST * SUB :token")
+
+        assertEquals(0, mockHandlerOne.spyHandleMessageInvokations.size)
+        assertEquals(1, mockHandlerSub.spyHandleMessageInvokations.size)
+    }
+
     class MockHandlerOne : IKaleHandler<MockMessageOne> {
         var spyHandleMessageInvokations: List<MockMessageOne> = mutableListOf()
         var spyHandleTagsInvokations: List<Map<String, String?>> = mutableListOf()

@@ -13,6 +13,7 @@ import engineer.carrot.warren.kale.irc.message.utility.RawMessage
 interface IKale {
 
     fun <T: IMessage> register(handler: IKaleHandler<T>)
+    fun <T: IMessage> unregister(handler: IKaleHandler<T>)
     fun process(line: String)
     fun serialise(message: Any): IrcMessage?
 
@@ -134,6 +135,10 @@ class Kale : IKale {
 
     override fun <M: IMessage> register(handler: IKaleHandler<M>) {
         handlers.put(handler.messageType, handler)
+    }
+
+    override fun <M: IMessage> unregister(handler: IKaleHandler<M>) {
+        handlers.remove(handler.messageType)
     }
 
     override fun process(line: String) {
