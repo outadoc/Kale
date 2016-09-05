@@ -9,6 +9,7 @@ import engineer.carrot.warren.kale.irc.prefix.PrefixParser
 import engineer.carrot.warren.kale.irc.prefix.PrefixSerialiser
 
 data class AccountMessage(val source: Prefix, val account: String): IMessage {
+
     override val command: String = "ACCOUNT"
 
     companion object Factory: IMessageParser<AccountMessage>, IMessageSerialiser<AccountMessage> {
