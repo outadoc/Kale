@@ -83,6 +83,8 @@ class Kale : IKale {
         routeMessageToSerialiser(CapReqMessage::class.java, CapReqMessage.Factory)
 
         routeCommandAndMessageToFactory("AUTHENTICATE", AuthenticateMessage::class.java, AuthenticateMessage.Factory, AuthenticateMessage.Factory)
+        routeCommandAndMessageToFactory("ACCOUNT", AccountMessage::class.java, AccountMessage.Factory, AccountMessage.Factory)
+        routeCommandAndMessageToFactory("AWAY", AwayMessage::class.java, AwayMessage.Factory, AwayMessage.Factory)
 
         routeCommandAndMessageToFactory("903", Rpl903Message::class.java, Rpl903Message.Factory, Rpl903Message.Factory)
         routeCommandAndMessageToFactory("904", Rpl904Message::class.java, Rpl904Message.Factory, Rpl904Message.Factory)
