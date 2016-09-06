@@ -53,7 +53,6 @@ class Kale : IKale {
 
         routeCommandAndMessageToFactory("PING", PingMessage::class.java, PingMessage.Factory, PingMessage.Factory)
         routeCommandAndMessageToFactory("PONG", PongMessage::class.java, PongMessage.Factory, PongMessage.Factory)
-        routeCommandAndMessageToFactory("JOIN", JoinMessage::class.java, JoinMessage.Factory, JoinMessage.Factory)
         routeCommandAndMessageToFactory("NICK", NickMessage::class.java, NickMessage.Factory, NickMessage.Factory)
         routeCommandAndMessageToFactory("USER", UserMessage::class.java, UserMessage.Factory, UserMessage.Factory)
         routeCommandAndMessageToFactory("QUIT", QuitMessage::class.java, QuitMessage.Factory, QuitMessage.Factory)
@@ -64,6 +63,16 @@ class Kale : IKale {
         routeCommandAndMessageToFactory("INVITE", InviteMessage::class.java, InviteMessage.Factory, InviteMessage.Factory)
         routeCommandAndMessageToFactory("TOPIC", TopicMessage::class.java, TopicMessage.Factory, TopicMessage.Factory)
         routeCommandAndMessageToFactory("KICK", KickMessage::class.java, KickMessage.Factory, KickMessage.Factory)
+
+        routeCommandToParsers("JOIN") { message ->
+            when (message.parameters.size) {
+                2 -> JoinMessage.Factory
+                3 -> ExtendedJoinMessage.Factory
+                else -> null
+            }
+        }
+        routeMessageToSerialiser(JoinMessage::class.java, JoinMessage.Factory)
+        routeMessageToSerialiser(ExtendedJoinMessage::class.java, ExtendedJoinMessage.Factory)
 
         routeCommandToParsers("CAP") { message ->
             val subcommand = message.parameters.getOrNull(1)

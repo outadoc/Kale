@@ -1,5 +1,6 @@
 package engineer.carrot.warren.kale
 
+import engineer.carrot.warren.kale.irc.message.ircv3.ExtendedJoinMessage
 import engineer.carrot.warren.kale.irc.message.rfc1459.*
 import engineer.carrot.warren.kale.irc.message.rpl.*
 import engineer.carrot.warren.kale.irc.prefix.Prefix
@@ -22,6 +23,7 @@ object KaleRunner {
         kale.process("USER username mode * realname")
         kale.process("QUIT :")
         kale.process("JOIN #channel,#channel2 key1")
+        kale.process(":nick JOIN channel account :real name")
         kale.process("PART #channel,#channel2")
         kale.process("MODE &oulu +b *!*@*.edu -e *!*@*.bu.edu")
         kale.process("PRIVMSG #mychannel :this is a message! ")
@@ -47,6 +49,7 @@ object KaleRunner {
         println(kale.serialise(UserMessage(username = "username", mode = "mode", realname = "realname")))
         println(kale.serialise(QuitMessage(message = "")))
         println(kale.serialise(JoinMessage(channels = listOf("#channel", "#channel2"), keys = listOf("key1"))))
+        println(kale.serialise(ExtendedJoinMessage(source = Prefix("nickname"), channel = "#channel", account = "account", realName = "Real Name")))
         println(kale.serialise(PartMessage(channels = listOf("#channel", "#channel2"))))
         println(kale.serialise(ModeMessage(target = "#channel", modifiers = listOf(ModeMessage.ModeModifier(type = '+', mode = 'b', parameter = "somebody")))))
         println(kale.serialise(PrivMsgMessage(source = Prefix(nick = "somebody", host = "somewhere"), target = "person", message = "hello")))
