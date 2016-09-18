@@ -14,6 +14,7 @@ interface IKale {
 
     fun <T: IMessage> register(handler: IKaleHandler<T>)
     fun <T: IMessage> unregister(handler: IKaleHandler<T>)
+    fun <M: IMessage> handlerFor(messageClass: Class<M>): IKaleHandler<M>?
     fun process(line: String)
     fun serialise(message: Any): IrcMessage?
 
@@ -189,10 +190,14 @@ class Kale : IKale {
         return messageSerialisers[messageClass] as? IMessageSerialiser<M>
     }
 
-
     private fun <M: IMessage> findHandlerFor(message: M): IKaleHandler<M>? {
         @Suppress("UNCHECKED_CAST")
         return handlers[message.javaClass] as? IKaleHandler<M>
+    }
+
+    override fun <M: IMessage> handlerFor(messageClass: Class<M>): IKaleHandler<M>? {
+        @Suppress("UNCHECKED_CAST")
+        return handlers[messageClass] as? IKaleHandler<M>
     }
 
     override fun serialise(message: Any): IrcMessage? {
