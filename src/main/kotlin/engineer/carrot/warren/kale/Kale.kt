@@ -67,7 +67,7 @@ class Kale : IKale {
 
         routeCommandToParsers("JOIN") { message ->
             when (message.parameters.size) {
-                2 -> JoinMessage.Factory
+                1,2 -> JoinMessage.Factory
                 3 -> ExtendedJoinMessage.Factory
                 else -> null
             }
