@@ -1,13 +1,16 @@
 package engineer.carrot.warren.kale
 
 import engineer.carrot.warren.kale.irc.message.*
-import engineer.carrot.warren.kale.irc.message.ircv3.*
-import engineer.carrot.warren.kale.irc.message.ircv3.sasl.AuthenticateMessage
-import engineer.carrot.warren.kale.irc.message.ircv3.sasl.Rpl903Message
-import engineer.carrot.warren.kale.irc.message.ircv3.sasl.Rpl904Message
-import engineer.carrot.warren.kale.irc.message.ircv3.sasl.Rpl905Message
+import engineer.carrot.warren.kale.irc.message.extension.account_notify.AccountMessage
+import engineer.carrot.warren.kale.irc.message.extension.away_notify.AwayMessage
+import engineer.carrot.warren.kale.irc.message.extension.cap.*
+import engineer.carrot.warren.kale.irc.message.extension.extended_join.ExtendedJoinMessage
+import engineer.carrot.warren.kale.irc.message.extension.sasl.AuthenticateMessage
+import engineer.carrot.warren.kale.irc.message.extension.sasl.Rpl903Message
+import engineer.carrot.warren.kale.irc.message.extension.sasl.Rpl904Message
+import engineer.carrot.warren.kale.irc.message.extension.sasl.Rpl905Message
 import engineer.carrot.warren.kale.irc.message.rfc1459.*
-import engineer.carrot.warren.kale.irc.message.rpl.*
+import engineer.carrot.warren.kale.irc.message.rfc1459.rpl.*
 import engineer.carrot.warren.kale.irc.message.utility.RawMessage
 
 interface IKale {

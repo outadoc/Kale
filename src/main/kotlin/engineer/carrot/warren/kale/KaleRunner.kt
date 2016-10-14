@@ -1,8 +1,8 @@
 package engineer.carrot.warren.kale
 
-import engineer.carrot.warren.kale.irc.message.ircv3.ExtendedJoinMessage
+import engineer.carrot.warren.kale.irc.message.extension.extended_join.ExtendedJoinMessage
 import engineer.carrot.warren.kale.irc.message.rfc1459.*
-import engineer.carrot.warren.kale.irc.message.rpl.*
+import engineer.carrot.warren.kale.irc.message.rfc1459.rpl.*
 import engineer.carrot.warren.kale.irc.prefix.Prefix
 
 object KaleRunner {
