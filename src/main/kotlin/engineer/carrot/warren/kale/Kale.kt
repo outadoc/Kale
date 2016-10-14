@@ -1,8 +1,11 @@
 package engineer.carrot.warren.kale
 
+import engineer.carrot.warren.kale.irc.CharacterCodes
 import engineer.carrot.warren.kale.irc.message.*
 import engineer.carrot.warren.kale.irc.message.extension.account_notify.AccountMessage
 import engineer.carrot.warren.kale.irc.message.extension.away_notify.AwayMessage
+import engineer.carrot.warren.kale.irc.message.extension.batch.BatchEndMessage
+import engineer.carrot.warren.kale.irc.message.extension.batch.BatchStartMessage
 import engineer.carrot.warren.kale.irc.message.extension.cap.*
 import engineer.carrot.warren.kale.irc.message.extension.extended_join.ExtendedJoinMessage
 import engineer.carrot.warren.kale.irc.message.extension.sasl.AuthenticateMessage
@@ -94,6 +97,17 @@ class Kale : IKale {
         routeMessageToSerialiser(CapLsMessage::class.java, CapLsMessage.Factory)
         routeMessageToSerialiser(CapNakMessage::class.java, CapNakMessage.Factory)
         routeMessageToSerialiser(CapReqMessage::class.java, CapReqMessage.Factory)
+
+        routeCommandToParsers("BATCH") { message ->
+            val firstCharacterOfFirstParameter = message.parameters.getOrNull(0)?.getOrNull(0)
+            when (firstCharacterOfFirstParameter) {
+                CharacterCodes.PLUS -> BatchStartMessage.Factory
+                CharacterCodes.MINUS -> BatchEndMessage.Factory
+                else -> null
+            }
+        }
+        routeMessageToSerialiser(BatchStartMessage::class.java, BatchStartMessage.Factory)
+        routeMessageToSerialiser(BatchEndMessage::class.java, BatchEndMessage.Factory)
 
         routeCommandAndMessageToFactory("AUTHENTICATE", AuthenticateMessage::class.java, AuthenticateMessage.Factory, AuthenticateMessage.Factory)
         routeCommandAndMessageToFactory("ACCOUNT", AccountMessage::class.java, AccountMessage.Factory, AccountMessage.Factory)

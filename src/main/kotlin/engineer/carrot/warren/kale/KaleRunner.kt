@@ -1,5 +1,7 @@
 package engineer.carrot.warren.kale
 
+import engineer.carrot.warren.kale.irc.message.extension.batch.BatchEndMessage
+import engineer.carrot.warren.kale.irc.message.extension.batch.BatchStartMessage
 import engineer.carrot.warren.kale.irc.message.extension.extended_join.ExtendedJoinMessage
 import engineer.carrot.warren.kale.irc.message.rfc1459.*
 import engineer.carrot.warren.kale.irc.message.rfc1459.rpl.*
@@ -42,6 +44,8 @@ object KaleRunner {
         kale.process(":test.server 375 testnickname :- test.server Message of the day - ")
         kale.process(":test.server 376 testnickname :End of MOTD command")
         kale.process(":test.server 422 testnickname :MOTD File is missing")
+        kale.process("BATCH +reference type param1")
+        kale.process("BATCH -reference")
 
         println(kale.serialise(PingMessage(token = "token")))
         println(kale.serialise(PongMessage(token = "token2")))
@@ -68,6 +72,8 @@ object KaleRunner {
         println(kale.serialise(Rpl375Message(source = "test.server", target = "testnickname", contents = "- test.server Message of the day - ")))
         println(kale.serialise(Rpl376Message(source = "test.server", target = "testnickname", contents = "End of MOTD command")))
         println(kale.serialise(Rpl422Message(source = "test.server", target = "testnickname", contents = "MOTD File is missing")))
+        println(kale.serialise(BatchStartMessage(reference = "reference", type = "type", parameters = listOf("parameter1", "parameter2"))))
+        println(kale.serialise(BatchEndMessage(reference = "reference")))
     }
 
     class PingHandler: IKaleHandler<PingMessage> {
