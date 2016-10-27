@@ -1,7 +1,6 @@
 package engineer.carrot.warren.kale.irc.message.extension.extended_join
 
 import engineer.carrot.warren.kale.irc.message.IrcMessage
-import engineer.carrot.warren.kale.irc.message.extension.extended_join.ExtendedJoinMessage
 import engineer.carrot.warren.kale.irc.prefix.Prefix
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull

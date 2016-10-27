@@ -1,7 +1,6 @@
 package engineer.carrot.warren.kale.irc.message.extension.cap
 
 import engineer.carrot.warren.kale.irc.message.IrcMessage
-import engineer.carrot.warren.kale.irc.message.extension.cap.CapNakMessage
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Before
