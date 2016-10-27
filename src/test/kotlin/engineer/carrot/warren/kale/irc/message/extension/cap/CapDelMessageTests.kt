@@ -26,6 +26,12 @@ class CapDelMessageTests {
         assertEquals(CapDelMessage(target = "test-nick", caps = listOf("cap1", "cap2", "cap3")), message)
     }
 
+    @Test fun test_parse_CapsWithValues_ValuesDiscarded() {
+        val message = factory.parse(IrcMessage(command = "CAP", parameters = listOf("test-nick", "DEL", "cap1 cap2=value cap3=")))
+
+        assertEquals(CapDelMessage(target = "test-nick", caps = listOf("cap1", "cap2", "cap3")), message)
+    }
+
     @Test fun test_parse_TooFewParameters() {
         val messageOne = factory.parse(IrcMessage(command = "CAP", parameters = listOf()))
         val messageTwo = factory.parse(IrcMessage(command = "CAP", parameters = listOf("test-nick")))
