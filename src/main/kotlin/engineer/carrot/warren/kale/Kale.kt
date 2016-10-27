@@ -89,6 +89,8 @@ class Kale : IKale {
                 "LS" -> CapLsMessage.Factory
                 "NAK" -> CapNakMessage.Factory
                 "REQ" -> CapReqMessage.Factory
+                "NEW" -> CapNewMessage.Factory
+                "DEL" -> CapDelMessage.Factory
                 else -> null
             }
         }
@@ -97,6 +99,8 @@ class Kale : IKale {
         routeMessageToSerialiser(CapLsMessage::class.java, CapLsMessage.Factory)
         routeMessageToSerialiser(CapNakMessage::class.java, CapNakMessage.Factory)
         routeMessageToSerialiser(CapReqMessage::class.java, CapReqMessage.Factory)
+        routeMessageToSerialiser(CapNewMessage::class.java, CapNewMessage.Factory)
+        routeMessageToSerialiser(CapDelMessage::class.java, CapDelMessage.Factory)
 
         routeCommandToParsers("BATCH") { message ->
             val firstCharacterOfFirstParameter = message.parameters.getOrNull(0)?.getOrNull(0)
