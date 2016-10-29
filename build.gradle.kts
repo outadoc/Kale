@@ -11,6 +11,7 @@ import org.gradle.testing.jacoco.plugins.JacocoPluginExtension
 import org.gradle.testing.jacoco.tasks.JacocoReport
 
 val kaleVersion by project
+val kotlinVersion by project
 
 buildscript {
     repositories {
@@ -19,7 +20,7 @@ buildscript {
     }
 
     dependencies {
-        classpath(kotlinModule("gradle-plugin"))
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.1-M02")
         classpath("com.github.jengelman.gradle.plugins:shadow:1.2.3")
     }
 }
@@ -62,7 +63,7 @@ repositories {
 }
 
 dependencies {
-    compile(kotlinModule("stdlib"))
+    compile(kotlin("stdlib"))
     compile("org.slf4j:slf4j-api:1.7.21")
 
     testCompile("junit:junit:4.12")
@@ -120,3 +121,4 @@ fun Project.test(setup: Test.() -> Unit) = (project.tasks.getByName("test") as T
 fun Project.compileJava(setup: JavaCompile.() -> Unit) = (project.tasks.getByName("compileJava") as JavaCompile).setup()
 fun shadowJarTask() = (project.tasks.findByName("shadowJar") as ShadowJar)
 fun sourceSets(name: String) = (project.property("sourceSets") as SourceSetContainer).getByName(name)
+fun kotlin(module: String) = "org.jetbrains.kotlin:kotlin-$module:$kotlinVersion"
