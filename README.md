@@ -5,6 +5,8 @@ Kotlin/JVM IRC message parsing, serialising and notifying. Provides useful abstr
 
 [Thump](https://github.com/CarrotCodes/Thump) is the primary upstream project - a bridge that lets people chat between Minecraft and IRC whilst they play.
 
+[![codecov](https://codecov.io/gh/CarrotCodes/Kale/branch/develop/graph/badge.svg)](https://codecov.io/gh/CarrotCodes/Kale)
+
 ## Why another IRC framework?
 
 Warren and Kale have a few interesting features:
