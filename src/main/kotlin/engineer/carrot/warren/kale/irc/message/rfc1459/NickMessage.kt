@@ -26,7 +26,7 @@ data class NickMessage(val source: Prefix? = null, val nickname: String, val hop
         }
 
         override fun parse(message: IrcMessage): NickMessage? {
-            if (message.parameters.size < 1) {
+            if (message.parameters.isEmpty()) {
                 return null
             }
 

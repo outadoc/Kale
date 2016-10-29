@@ -15,7 +15,7 @@ data class PongMessage(val token: String): IMessage {
         }
 
         override fun parse(message: IrcMessage): PongMessage? {
-            if (message.parameters.size < 1) {
+            if (message.parameters.isEmpty()) {
                 return null
             }
 

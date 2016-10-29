@@ -6,8 +6,8 @@ object CharacterCodes {
     val AT: Char = 0x40.toChar()
     val SPACE: Char = 0x20.toChar()
     val EXCLAM: Char = 0x21.toChar()
-    val LEFT_ROUNDED_BRACKET: Char = 0x28.toChar()
-    val RIGHT_ROUNDED_BRACKET: Char = 0x29.toChar()
+    @Suppress("UNUSED") val LEFT_ROUNDED_BRACKET: Char = 0x28.toChar()
+    @Suppress("UNUSED") val RIGHT_ROUNDED_BRACKET: Char = 0x29.toChar()
     val PLUS: Char = 0x2B.toChar()
     val COMMA: Char = 0x2C.toChar()
     val MINUS: Char = 0x2D.toChar()
@@ -22,5 +22,5 @@ object CharacterCodes {
     val RIGHT_CURLY_BRACKET: Char = 0x7D.toChar()
     val TILDE: Char = 0x7E.toChar()
 
-    val CTCP = '\u0001'
+    @Suppress("UNUSED") val CTCP = '\u0001'
 }

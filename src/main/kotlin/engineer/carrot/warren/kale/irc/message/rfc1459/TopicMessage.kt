@@ -24,7 +24,7 @@ data class TopicMessage(val source: Prefix? = null, val channel: String, val top
         }
 
         override fun parse(message: IrcMessage): TopicMessage? {
-            if (message.parameters.size < 1) {
+            if (message.parameters.isEmpty()) {
                 return null
             }
 

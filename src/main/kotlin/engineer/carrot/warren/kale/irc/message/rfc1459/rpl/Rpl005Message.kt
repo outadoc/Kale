@@ -14,11 +14,11 @@ data class Rpl005Message(val source: String, val target: String, val tokens: Map
         override fun serialise(message: Rpl005Message): IrcMessage? {
             val tokens = mutableListOf<String>()
 
-            for (token in message.tokens) {
-                if (token.value.isNullOrEmpty()) {
-                    tokens.add(token.key)
+            for ((key, value) in message.tokens) {
+                if (value.isNullOrEmpty()) {
+                    tokens.add(key)
                 } else {
-                    tokens.add("${token.key}${CharacterCodes.EQUALS}${token.value}")
+                    tokens.add("$key${CharacterCodes.EQUALS}$value")
                 }
             }
 
@@ -40,7 +40,7 @@ data class Rpl005Message(val source: String, val target: String, val tokens: Map
             for (i in 1..message.parameters.size - 1) {
                 val token = message.parameters[i].split(delimiters = CharacterCodes.EQUALS, limit = 2)
 
-                if (token.size <= 0 || token[0].isNullOrEmpty()) {
+                if (token.isEmpty() || token[0].isNullOrEmpty()) {
                     continue
                 }
 

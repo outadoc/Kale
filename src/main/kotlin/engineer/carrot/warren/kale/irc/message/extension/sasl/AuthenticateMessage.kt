@@ -20,12 +20,12 @@ data class AuthenticateMessage(val payload: String, val isEmpty: Boolean): IMess
         }
 
         override fun parse(message: IrcMessage): AuthenticateMessage? {
-            if (message.parameters.size < 1) {
+            if (message.parameters.isEmpty()) {
                 return null
             }
 
             val payload = message.parameters[0]
-            var isEmpty = payload == "${CharacterCodes.PLUS}"
+            val isEmpty = payload == "${CharacterCodes.PLUS}"
 
             return AuthenticateMessage(payload = payload, isEmpty = isEmpty)
         }

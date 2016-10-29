@@ -1,6 +1,6 @@
 package engineer.carrot.warren.kale.irc.message
 
-interface IMessageSerialiser<M> {
+interface IMessageSerialiser<in M> {
     fun serialise(message: M): IrcMessage?
 }
 

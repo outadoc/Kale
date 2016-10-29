@@ -28,19 +28,19 @@ data class JoinMessage(val source: Prefix? = null, val channels: List<String>, v
         }
 
         override fun parse(message: IrcMessage): JoinMessage? {
-            if (message.parameters.size < 1) {
+            if (message.parameters.isEmpty()) {
                 return null
             }
 
             val source = PrefixParser.parse(message.prefix ?: "")
             val unsplitChannels = message.parameters[0]
-            val channels = unsplitChannels.split(delimiters = CharacterCodes.COMMA).filterNot { it.isEmpty() }
+            val channels = unsplitChannels.split(delimiters = CharacterCodes.COMMA).filterNot(String::isEmpty)
 
             if (message.parameters.size < 2) {
                 return JoinMessage(source = source, channels = channels)
             } else {
                 val unsplitKeys = message.parameters[1]
-                val keys = unsplitKeys.split(delimiters = CharacterCodes.COMMA).filterNot { it.isEmpty() }
+                val keys = unsplitKeys.split(delimiters = CharacterCodes.COMMA).filterNot(String::isEmpty)
 
                 return JoinMessage(source = source, channels = channels, keys = keys)
             }

@@ -71,8 +71,8 @@ class Kale : IKale {
         routeCommandAndMessageToFactory("TOPIC", TopicMessage::class.java, TopicMessage.Factory, TopicMessage.Factory)
         routeCommandAndMessageToFactory("KICK", KickMessage::class.java, KickMessage.Factory, KickMessage.Factory)
 
-        routeCommandToParsers("JOIN") { message ->
-            when (message.parameters.size) {
+        routeCommandToParsers("JOIN") { (tags, prefix, command, parameters) ->
+            when (parameters.size) {
                 1,2 -> JoinMessage.Factory
                 3 -> ExtendedJoinMessage.Factory
                 else -> null
@@ -81,8 +81,8 @@ class Kale : IKale {
         routeMessageToSerialiser(JoinMessage::class.java, JoinMessage.Factory)
         routeMessageToSerialiser(ExtendedJoinMessage::class.java, ExtendedJoinMessage.Factory)
 
-        routeCommandToParsers("CAP") { message ->
-            val subcommand = message.parameters.getOrNull(1)
+        routeCommandToParsers("CAP") { (tags, prefix, command, parameters) ->
+            val subcommand = parameters.getOrNull(1)
             when (subcommand) {
                 "ACK" -> CapAckMessage.Factory
                 "END" -> CapEndMessage.Factory
@@ -102,8 +102,8 @@ class Kale : IKale {
         routeMessageToSerialiser(CapNewMessage::class.java, CapNewMessage.Factory)
         routeMessageToSerialiser(CapDelMessage::class.java, CapDelMessage.Factory)
 
-        routeCommandToParsers("BATCH") { message ->
-            val firstCharacterOfFirstParameter = message.parameters.getOrNull(0)?.getOrNull(0)
+        routeCommandToParsers("BATCH") { (tags, prefix, command, parameters) ->
+            val firstCharacterOfFirstParameter = parameters.getOrNull(0)?.getOrNull(0)
             when (firstCharacterOfFirstParameter) {
                 CharacterCodes.PLUS -> BatchStartMessage.Factory
                 CharacterCodes.MINUS -> BatchEndMessage.Factory

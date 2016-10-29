@@ -26,7 +26,7 @@ data class Rpl353Message(val source: String, val target: String, val visibility:
             val target = message.parameters[0]
             val visibility = message.parameters[1]
             val channel = message.parameters[2]
-            val names = message.parameters[3].split(delimiters = CharacterCodes.SPACE).filterNot { it.isEmpty() }
+            val names = message.parameters[3].split(delimiters = CharacterCodes.SPACE).filterNot(String::isEmpty)
 
             return Rpl353Message(source = source, target = target, visibility = visibility, channel = channel, names = names)
         }

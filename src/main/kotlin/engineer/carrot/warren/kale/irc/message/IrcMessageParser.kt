@@ -105,7 +105,7 @@ object IrcMessageParser: IIrcMessageParser {
 
         if (nextSpace == null) {
             command = line.substring(position)
-            if (command.length <= 0) {
+            if (command.isEmpty()) {
                 return null
             }
 
@@ -164,7 +164,7 @@ object ParseHelper {
     fun parseToKeysAndOptionalValues(string: String, chunkSeparator: Char, keyValueSeparator: Char, valueTransform: ((String) -> (String))? = null): Map<String, String?> {
         val keyValues = mutableMapOf<String, String?>()
 
-        val unparsedChunks = string.split(delimiters = chunkSeparator).filterNot { it.isEmpty() }
+        val unparsedChunks = string.split(delimiters = chunkSeparator).filterNot(String::isEmpty)
         for (chunk in unparsedChunks) {
             val nextEquals = ParseHelper.findNext(chunk, 0, keyValueSeparator)
             if (nextEquals != null) {

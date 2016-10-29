@@ -22,7 +22,7 @@ data class AccountMessage(val source: Prefix, val account: String): IMessage {
         override fun parse(message: IrcMessage): AccountMessage? {
             val prefix = message.prefix ?: return null
 
-            if (message.parameters.size < 1) {
+            if (message.parameters.isEmpty()) {
                 return null
             }
 

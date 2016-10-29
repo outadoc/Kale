@@ -15,7 +15,7 @@ data class PingMessage(val token: String): IMessage {
         }
 
         override fun parse(message: IrcMessage): PingMessage? {
-            if (message.parameters.size < 1) {
+            if (message.parameters.isEmpty()) {
                 return null
             }
 

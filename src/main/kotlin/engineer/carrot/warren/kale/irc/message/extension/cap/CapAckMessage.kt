@@ -30,7 +30,7 @@ data class CapAckMessage(val target: String? = null, val caps: List<String>): IM
             @Suppress("UNUSED_VARIABLE") val subCommand = message.parameters[1]
             val rawCaps = message.parameters[2]
 
-            val caps = rawCaps.split(delimiters = CharacterCodes.SPACE).filterNot { it.isEmpty() }
+            val caps = rawCaps.split(delimiters = CharacterCodes.SPACE).filterNot(String::isEmpty)
 
             return CapAckMessage(target = target, caps = caps)
         }

@@ -21,7 +21,7 @@ data class UserMessage(val username: String, val mode: String, val realname: Str
 
             val username = message.parameters[0]
             val mode = message.parameters[1]
-            val unused = message.parameters[2]
+            @Suppress("UNUSED_VARIABLE") val unused = message.parameters[2]
             val realname = message.parameters[3]
 
             return UserMessage(username = username, mode = mode, realname = realname)

@@ -17,7 +17,7 @@ data class BatchEndMessage(val reference: String): IMessage {
         }
 
         override fun parse(message: IrcMessage): BatchEndMessage? {
-            if (message.parameters.size < 1) {
+            if (message.parameters.isEmpty()) {
                 return null
             }
 

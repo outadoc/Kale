@@ -22,7 +22,7 @@ data class PartMessage(val source: Prefix? = null, val channels: List<String>): 
         }
 
         override fun parse(message: IrcMessage): PartMessage? {
-            if (message.parameters.size < 1) {
+            if (message.parameters.isEmpty()) {
                 return null
             }
 

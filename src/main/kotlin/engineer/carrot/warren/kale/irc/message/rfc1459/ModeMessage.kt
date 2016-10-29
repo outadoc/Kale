@@ -16,13 +16,13 @@ data class ModeMessage(val source: Prefix? = null, val target: String, val modif
     override val command: String = "MODE"
 
     data class ModeModifier(val type: Char? = null, val mode: Char, var parameter: String? = null) {
-        val isAdding: Boolean
+        @Suppress("UNUSED") val isAdding: Boolean
             get() = this.type == CharacterCodes.PLUS
 
-        val isRemoving: Boolean
+        @Suppress("UNUSED") val isRemoving: Boolean
             get() = this.type == CharacterCodes.MINUS
 
-        val isListing: Boolean
+        @Suppress("UNUSED") val isListing: Boolean
             get() = this.type == null
     }
 
@@ -42,14 +42,13 @@ data class ModeMessage(val source: Prefix? = null, val target: String, val modif
         private fun serialise(modifiers: List<ModeModifier>): List<String> {
             val parameters = mutableListOf<String>()
 
-            for (modifier in modifiers) {
-                if (modifier.type != null) {
-                    parameters.add("${modifier.type}${modifier.mode}")
+            for ((type, mode, parameter) in modifiers) {
+                if (type != null) {
+                    parameters.add("$type$mode")
                 } else {
-                    parameters.add("${modifier.mode}")
+                    parameters.add("$mode")
                 }
 
-                val parameter = modifier.parameter
                 if (parameter != null) {
                     parameters.add(parameter)
                 }
@@ -59,7 +58,7 @@ data class ModeMessage(val source: Prefix? = null, val target: String, val modif
         }
 
         override fun parse(message: IrcMessage): ModeMessage? {
-            if (message.parameters.size < 1) {
+            if (message.parameters.isEmpty()) {
                 return null
             }
 
@@ -87,7 +86,7 @@ data class ModeMessage(val source: Prefix? = null, val target: String, val modif
             }
         }
 
-        private data class ModeChunk(val modes: String, val parameters: Queue<String> = LinkedList()) { }
+        private data class ModeChunk(val modes: String, val parameters: Queue<String> = LinkedList())
 
         private fun parseIrcParameters(parameters: List<String>): List<ModeModifier> {
             val chunks = this.parseParametersToModeChunks(parameters)
@@ -182,11 +181,7 @@ data class ModeMessage(val source: Prefix? = null, val target: String, val modif
         }
 
         private fun parseModes(token: String): List<Char> {
-            val modes = mutableListOf<Char>()
-
-            for (i in 0..token.length - 1) {
-                modes.add(token[i])
-            }
+            val modes = (0..token.length - 1).map { token[it] }
 
             return modes
         }
