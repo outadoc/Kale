@@ -62,6 +62,7 @@ class Kale : IKale {
         routeCommandAndMessageToFactory("PONG", PongMessage::class.java, PongMessage.Factory, PongMessage.Factory)
         routeCommandAndMessageToFactory("NICK", NickMessage::class.java, NickMessage.Factory, NickMessage.Factory)
         routeCommandAndMessageToFactory("USER", UserMessage::class.java, UserMessage.Factory, UserMessage.Factory)
+        routeCommandAndMessageToFactory("PASS", PassMessage::class.java, PassMessage.Factory, PassMessage.Factory)
         routeCommandAndMessageToFactory("QUIT", QuitMessage::class.java, QuitMessage.Factory, QuitMessage.Factory)
         routeCommandAndMessageToFactory("PART", PartMessage::class.java, PartMessage.Factory, PartMessage.Factory)
         routeCommandAndMessageToFactory("MODE", ModeMessage::class.java, ModeMessage.Factory, ModeMessage.Factory)
