@@ -81,6 +81,7 @@ val buildNumberAddition = if(project.hasProperty("BUILD_NUMBER")) { ".${project.
 
 version = "$kaleVersion$buildNumberAddition"
 group = "engineer.carrot.warren.kale"
+project.setProperty("archivesBaseName", "Kale")
 
 shadowJar {
     mergeServiceFiles()
