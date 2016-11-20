@@ -7,7 +7,7 @@ Kotlin/JVM IRC message parsing, serialising and notifying. Provides useful abstr
 
 [![codecov](https://codecov.io/gh/CarrotCodes/Kale/branch/develop/graph/badge.svg)](https://codecov.io/gh/CarrotCodes/Kale)
 
-## Why another IRC framework?
+## Features
 
 Warren and Kale have a few interesting features:
 
