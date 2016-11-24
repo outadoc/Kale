@@ -13,6 +13,8 @@ import org.gradle.testing.jacoco.tasks.JacocoReport
 val kaleVersion by project
 val kotlinVersion by project
 
+val projectTitle = "Kale"
+
 buildscript {
     repositories {
         gradleScriptKotlin()
@@ -63,7 +65,7 @@ repositories {
 }
 
 dependencies {
-    compile(kotlin("stdlib"))
+    compile(kotlinModule("stdlib"))
     compile("org.slf4j:slf4j-api:1.7.21")
 
     testCompile("junit:junit:4.12")
@@ -110,6 +112,8 @@ if (project.hasProperty("DEPLOY_DIR")) {
 
                 artifact(shadowJarTask())
                 artifact(sourcesTask)
+
+                artifactId = projectTitle
             }
         }
     }
