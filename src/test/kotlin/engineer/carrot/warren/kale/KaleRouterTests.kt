@@ -185,7 +185,6 @@ class KaleRouterTests {
     }
 
     @Test fun test_useDefaults_Kick() {
-
         sut.useDefaults()
 
         assertParserAndSerialiserExist("KICK", KickMessage::class.java)
@@ -197,6 +196,8 @@ class KaleRouterTests {
         val parserJoinOne = sut.parserFor(IrcMessage(command = "JOIN", parameters = listOf("")))
         val parserJoinTwo = sut.parserFor(IrcMessage(command = "JOIN", parameters = listOf("", "")))
         val parserExtendedJoin = sut.parserFor(IrcMessage(command = "JOIN", parameters = listOf("", "", "")))
+        val parserTooManyParameters = sut.parserFor(IrcMessage(command = "JOIN", parameters = listOf("", "", "", "")))
+        val parserTooFewParameters = sut.parserFor(IrcMessage(command = "JOIN", parameters = listOf()))
 
         val serialiserJoin = sut.serialiserFor(JoinMessage::class.java)
         val serialiserExtendedJoin = sut.serialiserFor(ExtendedJoinMessage::class.java)
@@ -204,6 +205,8 @@ class KaleRouterTests {
         assertNotNull(parserJoinOne)
         assertNotNull(parserJoinTwo)
         assertNotNull(parserExtendedJoin)
+        assertNull(parserTooManyParameters)
+        assertNull(parserTooFewParameters)
 
         assertNotNull(serialiserJoin)
         assertNotNull(serialiserExtendedJoin)
@@ -219,7 +222,8 @@ class KaleRouterTests {
         val parserReq = sut.parserFor(IrcMessage(command = "CAP", parameters = listOf("*", "REQ")))
         val parserNew = sut.parserFor(IrcMessage(command = "CAP", parameters = listOf("*", "NEW")))
         val parserDel = sut.parserFor(IrcMessage(command = "CAP", parameters = listOf("*", "DEL")))
-        
+        val parserUnknown = sut.parserFor(IrcMessage(command = "CAP", parameters = listOf("*", "UNK")))
+
         val serialiserAck = sut.serialiserFor(CapAckMessage::class.java)
         val serialiserEnd = sut.serialiserFor(CapEndMessage::class.java)
         val serialiserLs = sut.serialiserFor(CapLsMessage::class.java)
@@ -235,6 +239,7 @@ class KaleRouterTests {
         assertNotNull(parserReq)
         assertNotNull(parserNew)
         assertNotNull(parserDel)
+        assertNull(parserUnknown)
 
         assertNotNull(serialiserAck)
         assertNotNull(serialiserEnd)
@@ -250,13 +255,15 @@ class KaleRouterTests {
 
         val parserStart = sut.parserFor(IrcMessage(command = "BATCH", parameters = listOf("+")))
         val parserEnd = sut.parserFor(IrcMessage(command = "BATCH", parameters = listOf("-")))
+        val parserUnknown = sut.parserFor(IrcMessage(command = "BATCH", parameters = listOf("*")))
 
         val serialiserStart = sut.serialiserFor(BatchStartMessage::class.java)
         val serialiserEnd = sut.serialiserFor(BatchEndMessage::class.java)
         
         assertNotNull(parserStart)
         assertNotNull(parserEnd)
-        
+        assertNull(parserUnknown)
+
         assertNotNull(serialiserStart)
         assertNotNull(serialiserEnd)
     }
