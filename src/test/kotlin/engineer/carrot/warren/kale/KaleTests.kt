@@ -10,19 +10,23 @@ import org.junit.Test
 
 class KaleTests {
     lateinit var kale: Kale
+    lateinit var kaleRouter: IKaleRouter
     lateinit var mockHandlerOne: MockHandlerOne
     lateinit var mockHandlerSub: MockHandlerSubcommand
 
     @Before fun setUp() {
+        // FIXME: use mock router instead
+        kaleRouter = KaleRouter()
+
         mockHandlerOne = MockHandlerOne()
         mockHandlerSub = MockHandlerSubcommand()
 
-        kale = Kale()
+        kale = Kale(kaleRouter)
 
-        kale.routeCommandToParser("TEST1", MockMessageOne.Factory)
-        kale.routeMessageToSerialiser(MockMessageOne::class.java, MockMessageOne.Factory)
+        kaleRouter.routeCommandToParser("TEST1", MockMessageOne.Factory)
+        kaleRouter.routeMessageToSerialiser(MockMessageOne::class, MockMessageOne.Factory)
 
-        kale.routeCommandToParser("TEST", MockSubcommandMessage.Factory)
+        kaleRouter.routeCommandToParser("TEST", MockSubcommandMessage.Factory)
 
         kale.register(mockHandlerOne)
         kale.register(mockHandlerSub)
