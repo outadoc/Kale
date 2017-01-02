@@ -34,15 +34,7 @@ interface IKaleParsingStateDelegate {
 
 }
 
-
-interface IParserRouter {
-
-    fun parserFor(message: IrcMessage): IMessageParser<*>?
-
-}
-
-
-class Kale : IKale {
+class Kale(private val router: IKaleRouter) : IKale {
     private val LOGGER = loggerFor<Kale>()
 
     override var parsingStateDelegate: IKaleParsingStateDelegate? = null
@@ -50,39 +42,61 @@ class Kale : IKale {
             ModeMessage.Factory.parsingStateDelegate = value
         }
 
-    private var commandRouters = hashMapOf<String, IParserRouter>()
-    private var messageSerialisers = hashMapOf<Class<*>, IMessageSerialiser<*>>()
+    private val handlers = hashMapOf<Class<*>, IKaleHandler<*>>()
 
-    var handlers: MutableMap<Class<*>, IKaleHandler<*>> = hashMapOf()
+    fun addDefaultParsersAndSerialisers(): Kale {
+        router.routeMessageToSerialiser(RawMessage::class, RawMessage.Factory)
 
-    fun addDefaultMessages(): Kale {
-        routeMessageToSerialiser(RawMessage::class.java, RawMessage.Factory)
+        router.routeCommandToParser("PING", PingMessage.Factory)
+        router.routeMessageToSerialiser(PingMessage::class, PingMessage.Factory)
 
-        routeCommandAndMessageToFactory("PING", PingMessage::class.java, PingMessage.Factory, PingMessage.Factory)
-        routeCommandAndMessageToFactory("PONG", PongMessage::class.java, PongMessage.Factory, PongMessage.Factory)
-        routeCommandAndMessageToFactory("NICK", NickMessage::class.java, NickMessage.Factory, NickMessage.Factory)
-        routeCommandAndMessageToFactory("USER", UserMessage::class.java, UserMessage.Factory, UserMessage.Factory)
-        routeCommandAndMessageToFactory("PASS", PassMessage::class.java, PassMessage.Factory, PassMessage.Factory)
-        routeCommandAndMessageToFactory("QUIT", QuitMessage::class.java, QuitMessage.Factory, QuitMessage.Factory)
-        routeCommandAndMessageToFactory("PART", PartMessage::class.java, PartMessage.Factory, PartMessage.Factory)
-        routeCommandAndMessageToFactory("MODE", ModeMessage::class.java, ModeMessage.Factory, ModeMessage.Factory)
-        routeCommandAndMessageToFactory("PRIVMSG", PrivMsgMessage::class.java, PrivMsgMessage.Factory, PrivMsgMessage.Factory)
-        routeCommandAndMessageToFactory("NOTICE", NoticeMessage::class.java, NoticeMessage.Factory, NoticeMessage.Factory)
-        routeCommandAndMessageToFactory("INVITE", InviteMessage::class.java, InviteMessage.Factory, InviteMessage.Factory)
-        routeCommandAndMessageToFactory("TOPIC", TopicMessage::class.java, TopicMessage.Factory, TopicMessage.Factory)
-        routeCommandAndMessageToFactory("KICK", KickMessage::class.java, KickMessage.Factory, KickMessage.Factory)
+        router.routeCommandToParser("PONG", PongMessage.Factory)
+        router.routeMessageToSerialiser(PongMessage::class, PongMessage.Factory)
 
-        routeCommandToParsers("JOIN") { (tags, prefix, command, parameters) ->
+        router.routeCommandToParser("NICK", NickMessage.Factory)
+        router.routeMessageToSerialiser(NickMessage::class, NickMessage.Factory)
+
+        router.routeCommandToParser("USER", UserMessage.Factory)
+        router.routeMessageToSerialiser(UserMessage::class, UserMessage.Factory)
+
+        router.routeCommandToParser("PASS", PassMessage.Factory)
+        router.routeMessageToSerialiser(PassMessage::class, PassMessage.Factory)
+
+        router.routeCommandToParser("QUIT", QuitMessage.Factory)
+        router.routeMessageToSerialiser(QuitMessage::class, QuitMessage.Factory)
+
+        router.routeCommandToParser("PART", PartMessage.Factory)
+        router.routeMessageToSerialiser(PartMessage::class, PartMessage.Factory)
+
+        router.routeCommandToParser("MODE", ModeMessage.Factory)
+        router.routeMessageToSerialiser(ModeMessage::class, ModeMessage.Factory)
+
+        router.routeCommandToParser("PRIVMSG", PrivMsgMessage.Factory)
+        router.routeMessageToSerialiser(PrivMsgMessage::class, PrivMsgMessage.Factory)
+
+        router.routeCommandToParser("NOTICE", NoticeMessage.Factory)
+        router.routeMessageToSerialiser(NoticeMessage::class, NoticeMessage.Factory)
+
+        router.routeCommandToParser("INVITE", InviteMessage.Factory)
+        router.routeMessageToSerialiser(InviteMessage::class, InviteMessage.Factory)
+
+        router.routeCommandToParser("TOPIC", TopicMessage.Factory)
+        router.routeMessageToSerialiser(TopicMessage::class, TopicMessage.Factory)
+
+        router.routeCommandToParser("KICK", KickMessage.Factory)
+        router.routeMessageToSerialiser(KickMessage::class, KickMessage.Factory)
+
+        router.routeCommandToParserMatcher("JOIN") { (_, _, _, parameters) ->
             when (parameters.size) {
                 1,2 -> JoinMessage.Factory
                 3 -> ExtendedJoinMessage.Factory
                 else -> null
             }
         }
-        routeMessageToSerialiser(JoinMessage::class.java, JoinMessage.Factory)
-        routeMessageToSerialiser(ExtendedJoinMessage::class.java, ExtendedJoinMessage.Factory)
+        router.routeMessageToSerialiser(JoinMessage::class, JoinMessage.Factory)
+        router.routeMessageToSerialiser(ExtendedJoinMessage::class, ExtendedJoinMessage.Factory)
 
-        routeCommandToParsers("CAP") { (tags, prefix, command, parameters) ->
+        router.routeCommandToParserMatcher("CAP") { (_, _, _, parameters) ->
             val subcommand = parameters.getOrNull(1)
             when (subcommand) {
                 "ACK" -> CapAckMessage.Factory
@@ -95,15 +109,15 @@ class Kale : IKale {
                 else -> null
             }
         }
-        routeMessageToSerialiser(CapAckMessage::class.java, CapAckMessage.Factory)
-        routeMessageToSerialiser(CapEndMessage::class.java, CapEndMessage.Factory)
-        routeMessageToSerialiser(CapLsMessage::class.java, CapLsMessage.Factory)
-        routeMessageToSerialiser(CapNakMessage::class.java, CapNakMessage.Factory)
-        routeMessageToSerialiser(CapReqMessage::class.java, CapReqMessage.Factory)
-        routeMessageToSerialiser(CapNewMessage::class.java, CapNewMessage.Factory)
-        routeMessageToSerialiser(CapDelMessage::class.java, CapDelMessage.Factory)
+        router.routeMessageToSerialiser(CapAckMessage::class, CapAckMessage.Factory)
+        router.routeMessageToSerialiser(CapEndMessage::class, CapEndMessage.Factory)
+        router.routeMessageToSerialiser(CapLsMessage::class, CapLsMessage.Factory)
+        router.routeMessageToSerialiser(CapNakMessage::class, CapNakMessage.Factory)
+        router.routeMessageToSerialiser(CapReqMessage::class, CapReqMessage.Factory)
+        router.routeMessageToSerialiser(CapNewMessage::class, CapNewMessage.Factory)
+        router.routeMessageToSerialiser(CapDelMessage::class, CapDelMessage.Factory)
 
-        routeCommandToParsers("BATCH") { (tags, prefix, command, parameters) ->
+        router.routeCommandToParserMatcher("BATCH") { (_, _, _, parameters) ->
             val firstCharacterOfFirstParameter = parameters.getOrNull(0)?.getOrNull(0)
             when (firstCharacterOfFirstParameter) {
                 CharacterCodes.PLUS -> BatchStartMessage.Factory
@@ -111,60 +125,73 @@ class Kale : IKale {
                 else -> null
             }
         }
-        routeMessageToSerialiser(BatchStartMessage::class.java, BatchStartMessage.Factory)
-        routeMessageToSerialiser(BatchEndMessage::class.java, BatchEndMessage.Factory)
+        router.routeMessageToSerialiser(BatchStartMessage::class, BatchStartMessage.Factory)
+        router.routeMessageToSerialiser(BatchEndMessage::class, BatchEndMessage.Factory)
 
-        routeCommandAndMessageToFactory("AUTHENTICATE", AuthenticateMessage::class.java, AuthenticateMessage.Factory, AuthenticateMessage.Factory)
-        routeCommandAndMessageToFactory("ACCOUNT", AccountMessage::class.java, AccountMessage.Factory, AccountMessage.Factory)
-        routeCommandAndMessageToFactory("AWAY", AwayMessage::class.java, AwayMessage.Factory, AwayMessage.Factory)
+        router.routeCommandToParser("AUTHENTICATE", AuthenticateMessage.Factory)
+        router.routeMessageToSerialiser(AuthenticateMessage::class, AuthenticateMessage.Factory)
 
-        routeCommandAndMessageToFactory("903", Rpl903Message::class.java, Rpl903Message.Factory, Rpl903Message.Factory)
-        routeCommandAndMessageToFactory("904", Rpl904Message::class.java, Rpl904Message.Factory, Rpl904Message.Factory)
-        routeCommandAndMessageToFactory("905", Rpl905Message::class.java, Rpl905Message.Factory, Rpl905Message.Factory)
-        routeCommandAndMessageToFactory("001", Rpl001Message::class.java, Rpl001Message.Factory, Rpl001Message.Factory)
-        routeCommandAndMessageToFactory("002", Rpl002Message::class.java, Rpl002Message.Factory, Rpl002Message.Factory)
-        routeCommandAndMessageToFactory("003", Rpl003Message::class.java, Rpl003Message.Factory, Rpl003Message.Factory)
-        routeCommandAndMessageToFactory("005", Rpl005Message::class.java, Rpl005Message.Factory, Rpl005Message.Factory)
-        routeCommandAndMessageToFactory("331", Rpl331Message::class.java, Rpl331Message.Factory, Rpl331Message.Factory)
-        routeCommandAndMessageToFactory("332", Rpl332Message::class.java, Rpl332Message.Factory, Rpl332Message.Factory)
-        routeCommandAndMessageToFactory("353", Rpl353Message::class.java, Rpl353Message.Factory, Rpl353Message.Factory)
-        routeCommandAndMessageToFactory("372", Rpl372Message::class.java, Rpl372Message.Factory, Rpl372Message.Factory)
-        routeCommandAndMessageToFactory("375", Rpl375Message::class.java, Rpl375Message.Factory, Rpl375Message.Factory)
-        routeCommandAndMessageToFactory("376", Rpl376Message::class.java, Rpl376Message.Factory, Rpl376Message.Factory)
-        routeCommandAndMessageToFactory("422", Rpl422Message::class.java, Rpl422Message.Factory, Rpl422Message.Factory)
-        routeCommandAndMessageToFactory("471", Rpl471Message::class.java, Rpl471Message.Factory, Rpl471Message.Factory)
-        routeCommandAndMessageToFactory("473", Rpl473Message::class.java, Rpl473Message.Factory, Rpl473Message.Factory)
-        routeCommandAndMessageToFactory("474", Rpl474Message::class.java, Rpl474Message.Factory, Rpl474Message.Factory)
-        routeCommandAndMessageToFactory("475", Rpl475Message::class.java, Rpl475Message.Factory, Rpl475Message.Factory)
+        router.routeCommandToParser("ACCOUNT", AccountMessage.Factory)
+        router.routeMessageToSerialiser(AccountMessage::class, AccountMessage.Factory)
+
+        router.routeCommandToParser("AWAY", AwayMessage.Factory)
+        router.routeMessageToSerialiser(AwayMessage::class, AwayMessage.Factory)
+
+        router.routeCommandToParser("903", Rpl903Message.Factory)
+        router.routeMessageToSerialiser(Rpl903Message::class, Rpl903Message.Factory)
+
+        router.routeCommandToParser("904", QuitMessage.Factory)
+        router.routeMessageToSerialiser(QuitMessage::class, QuitMessage.Factory)
+
+        router.routeCommandToParser("905", Rpl905Message.Factory)
+        router.routeMessageToSerialiser(Rpl905Message::class, Rpl905Message.Factory)
+
+        router.routeCommandToParser("001", Rpl001Message.Factory)
+        router.routeMessageToSerialiser(Rpl001Message::class, Rpl001Message.Factory)
+
+        router.routeCommandToParser("002", Rpl002Message.Factory)
+        router.routeMessageToSerialiser(Rpl002Message::class, Rpl002Message.Factory)
+
+        router.routeCommandToParser("003", Rpl003Message.Factory)
+        router.routeMessageToSerialiser(Rpl003Message::class, Rpl003Message.Factory)
+
+        router.routeCommandToParser("005", Rpl005Message.Factory)
+        router.routeMessageToSerialiser(Rpl005Message::class, Rpl005Message.Factory)
+
+        router.routeCommandToParser("331", Rpl331Message.Factory)
+        router.routeMessageToSerialiser(Rpl331Message::class, Rpl331Message.Factory)
+
+        router.routeCommandToParser("332", Rpl332Message.Factory)
+        router.routeMessageToSerialiser(Rpl332Message::class, Rpl332Message.Factory)
+
+        router.routeCommandToParser("353", Rpl353Message.Factory)
+        router.routeMessageToSerialiser(Rpl353Message::class, Rpl353Message.Factory)
+
+        router.routeCommandToParser("372", Rpl372Message.Factory)
+        router.routeMessageToSerialiser(Rpl372Message::class, Rpl372Message.Factory)
+
+        router.routeCommandToParser("375", Rpl375Message.Factory)
+        router.routeMessageToSerialiser(Rpl375Message::class, Rpl375Message.Factory)
+
+        router.routeCommandToParser("376", Rpl376Message.Factory)
+        router.routeMessageToSerialiser(Rpl376Message::class, Rpl376Message.Factory)
+
+        router.routeCommandToParser("422", Rpl422Message.Factory)
+        router.routeMessageToSerialiser(Rpl422Message::class, Rpl422Message.Factory)
+
+        router.routeCommandToParser("471", Rpl471Message.Factory)
+        router.routeMessageToSerialiser(Rpl471Message::class, Rpl471Message.Factory)
+
+        router.routeCommandToParser("473", Rpl473Message.Factory)
+        router.routeMessageToSerialiser(Rpl473Message::class, Rpl473Message.Factory)
+
+        router.routeCommandToParser("474", Rpl474Message.Factory)
+        router.routeMessageToSerialiser(Rpl474Message::class, Rpl474Message.Factory)
+
+        router.routeCommandToParser("475", Rpl475Message.Factory)
+        router.routeMessageToSerialiser(Rpl475Message::class, Rpl475Message.Factory)
 
         return this
-    }
-
-    fun <T: IMessage> routeCommandToParser(command: String, parser: IMessageParser<T>) {
-        val parserRouter = object : IParserRouter {
-            override fun parserFor(message: IrcMessage): IMessageParser<*>? {
-                return parser
-            }
-        }
-
-        commandRouters[command] = parserRouter
-    }
-
-    fun routeCommandToParsers(command: String, matcher: (IrcMessage) -> (IMessageParser<*>?)) {
-        commandRouters[command] = object : IParserRouter {
-            override fun parserFor(message: IrcMessage): IMessageParser<*>? {
-                return matcher(message)
-            }
-        }
-    }
-
-    fun <M> routeMessageToSerialiser(messageClass: Class<M>, serialiser: IMessageSerialiser<M>) {
-        messageSerialisers[messageClass] = serialiser
-    }
-
-    fun <M: IMessage> routeCommandAndMessageToFactory(command: String, messageClass: Class<M>, parser: IMessageParser<M>, serialiser: IMessageSerialiser<M>) {
-        routeCommandToParser(command, parser)
-        routeMessageToSerialiser(messageClass, serialiser)
     }
 
     override fun <M: IMessage> register(handler: IKaleHandler<M>) {
@@ -182,7 +209,7 @@ class Kale : IKale {
             return
         }
 
-        val factory = findParserFor(ircMessage)
+        val factory = router.parserFor(ircMessage)
         if (factory == null) {
             LOGGER.debug("no factory for: $ircMessage")
             return
@@ -203,15 +230,6 @@ class Kale : IKale {
         handler.handle(message, ircMessage.tags)
     }
 
-    private fun findParserFor(ircMessage: IrcMessage): IMessageParser<*>? {
-        return commandRouters[ircMessage.command]?.parserFor(ircMessage)
-    }
-
-    private fun <M> findSerialiserFor(messageClass: Class<M>): IMessageSerialiser<M>? {
-        @Suppress("UNCHECKED_CAST")
-        return messageSerialisers[messageClass] as? IMessageSerialiser<M>
-    }
-
     private fun <M: IMessage> findHandlerFor(message: M): IKaleHandler<M>? {
         @Suppress("UNCHECKED_CAST")
         return handlers[message.javaClass] as? IKaleHandler<M>
@@ -223,7 +241,7 @@ class Kale : IKale {
     }
 
     override fun serialise(message: Any): IrcMessage? {
-        val factory = findSerialiserFor(message.javaClass)
+        val factory = router.serialiserFor(message.javaClass)
         if (factory == null) {
             LOGGER.warn("failed to find factory for message serialisation: $message")
             return null

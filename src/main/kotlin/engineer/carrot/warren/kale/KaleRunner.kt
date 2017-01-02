@@ -11,7 +11,7 @@ object KaleRunner {
     @JvmStatic fun main(args: Array<String>) {
         println("Hello, Kale!")
 
-        val kale = Kale().addDefaultMessages()
+        val kale = Kale(KaleRouter()).addDefaultParsersAndSerialisers()
         val pingHandler = PingHandler()
         val pongHandler = PongHandler()
 
