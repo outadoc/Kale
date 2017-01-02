@@ -13,6 +13,7 @@ import engineer.carrot.warren.kale.irc.message.extension.cap.*
 import engineer.carrot.warren.kale.irc.message.extension.extended_join.ExtendedJoinMessage
 import engineer.carrot.warren.kale.irc.message.extension.sasl.AuthenticateMessage
 import engineer.carrot.warren.kale.irc.message.extension.sasl.Rpl903Message
+import engineer.carrot.warren.kale.irc.message.extension.sasl.Rpl904Message
 import engineer.carrot.warren.kale.irc.message.extension.sasl.Rpl905Message
 import engineer.carrot.warren.kale.irc.message.rfc1459.*
 import engineer.carrot.warren.kale.irc.message.rfc1459.rpl.*
@@ -170,8 +171,8 @@ class KaleRouter : IKaleRouter {
         routeCommandToParser("903", Rpl903Message.Factory)
         routeMessageToSerialiser(Rpl903Message::class, Rpl903Message.Factory)
 
-        routeCommandToParser("904", QuitMessage.Factory)
-        routeMessageToSerialiser(QuitMessage::class, QuitMessage.Factory)
+        routeCommandToParser("904", Rpl904Message.Factory)
+        routeMessageToSerialiser(Rpl904Message::class, Rpl904Message.Factory)
 
         routeCommandToParser("905", Rpl905Message.Factory)
         routeMessageToSerialiser(Rpl905Message::class, Rpl905Message.Factory)
