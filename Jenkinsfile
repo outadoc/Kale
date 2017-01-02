@@ -34,7 +34,7 @@ pipeline {
                 sh "./gradlew jacocoTestReport --no-daemon"
 
                 withCredentials([[$class: 'StringBinding', credentialsId: 'engineer.carrot.warren.kale.codecov', variable: 'CODECOV_TOKEN']]) {
-                    sh "./codecov.sh"
+                    sh "./codecov.sh -B ${env.BRANCH_NAME}"
                 }
 
                 step([$class: 'JacocoPublisher'])
