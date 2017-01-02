@@ -91,4 +91,13 @@ class KaleRouterTests {
         assertNull(returnedSerialiser)
     }
 
+    // Default message tests
+
+    @Test fun test_useDefaults_Ping() {
+
+    }
+
+    @Test fun test_useDefaults_Pong() {
+    }
+
 }

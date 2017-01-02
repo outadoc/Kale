@@ -16,13 +16,16 @@ val kotlinVersion by project
 val projectTitle = "Kale"
 
 buildscript {
+    val buildscriptKotlinVersion = "1.1-M04"
+
     repositories {
+        maven { setUrl("http://dl.bintray.com/kotlin/kotlin-eap-1.1") }
         gradleScriptKotlin()
         jcenter()
     }
 
     dependencies {
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.1-M02")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$buildscriptKotlinVersion")
         classpath("com.github.jengelman.gradle.plugins:shadow:1.2.3")
     }
 }
@@ -66,7 +69,7 @@ repositories {
 }
 
 dependencies {
-    compile(kotlinModule("stdlib"))
+    compile(kotlinModule("stdlib", kotlinVersion as String))
     compile("org.slf4j:slf4j-api:1.7.21")
 
     testCompile("junit:junit:4.12")
