@@ -1,11 +1,11 @@
 # Kale
 Kotlin/JVM IRC message parsing, serialising and notifying. Provides useful abstractions with the intention of splitting message parsing and IRC state management.
 
-[Warren](https://github.com/CarrotCodes/Warren) is the state tracking counterpart. If you're interested in making something for IRC, you probably want it instead. Kale by itself does not track any IRC state.
+[Warren](https://github.com/WillowChat/Warren) is the state tracking counterpart. If you're interested in making something for IRC, you probably want it instead. Kale by itself does not track any IRC state.
 
-[Thump](https://github.com/CarrotCodes/Thump) is the primary upstream project - a bridge that lets people chat between Minecraft and IRC whilst they play.
+[Thump](https://github.com/WillowChat/Thump) is the primary upstream project - a bridge that lets people chat between Minecraft and IRC whilst they play.
 
-[![codecov](https://codecov.io/gh/CarrotCodes/Kale/branch/develop/graph/badge.svg)](https://codecov.io/gh/CarrotCodes/Kale)
+[![codecov](https://codecov.io/gh/WillowChat/Kale/branch/develop/graph/badge.svg)](https://codecov.io/gh/WillowChat/Kale)
 
 ## Features
 
@@ -15,7 +15,7 @@ Warren and Kale have a few interesting features:
 * Both parsing and state management are verified by hundreds of unit tests
 * Messages, and state handlers, are individually encapsulated
 
-Planned releases (and their features) are tracked in [Projects](https://github.com/CarrotCodes/Kale/projects).
+Planned releases (and their features) are tracked in [Projects](https://github.com/WillowChat/Kale/projects).
 
 ## TODO
 * [RFC 1459](https://tools.ietf.org/html/rfc1459)
