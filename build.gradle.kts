@@ -86,12 +86,12 @@ test {
 val buildNumberAddition = if(project.hasProperty("BUILD_NUMBER")) { ".${project.property("BUILD_NUMBER")}" } else { "" }
 
 version = "$kaleVersion$buildNumberAddition"
-group = "engineer.carrot.warren.kale"
+group = "chat.willow.kale"
 project.setProperty("archivesBaseName", "Kale")
 
 shadowJar {
     mergeServiceFiles()
-    relocate("kotlin", "engineer.carrot.warren.kale.repack.kotlin")
+    relocate("kotlin", "chat.willow.kale.repack.kotlin")
     exclude("META-INF/*.DSA")
     exclude("META-INF/*.RSA")
 }
