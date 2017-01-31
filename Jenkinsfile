@@ -4,6 +4,10 @@ pipeline {
     agent any
 
     post {
+        always {
+            junit allowEmptyResults: true, testResults: 'build/test-results/**/*.xml'
+        }
+
         success {
             ircSendSuccess()
         }
@@ -26,37 +30,31 @@ pipeline {
         stage('Build & Test') {
             steps {
                 parallel(
-                    build: {
-                        checkout scm
-                        sh "rm -Rv build || true"
+                        build: {
+                            checkout scm
+                            sh "rm -Rv build || true"
 
-                        sh "./gradlew clean build -x test -PBUILD_NUMBER=${env.BUILD_NUMBER} -PBRANCH=\"${env.BRANCH_NAME}\" --no-daemon"
+                            sh "./gradlew clean build -x test -PBUILD_NUMBER=${env.BUILD_NUMBER} -PBRANCH=\"${env.BRANCH_NAME}\" --no-daemon"
+                            sh "./gradlew generatePomFileForMavenJavaPublication -PBUILD_NUMBER=${env.BUILD_NUMBER} -PBRANCH=\"${env.BRANCH_NAME}\" --no-daemon"
 
-                        stash includes: 'build/libs/**/*.jar', name: 'build_libs', useDefaultExcludes: false
-                    },
-                    test: {
-                        checkout scm
-                        sh "rm -Rv build || true"
+                            stash includes: 'build/libs/**/*.jar', name: 'build_libs', useDefaultExcludes: false
+                            stash includes: 'build/publications/mavenJava/pom-default.xml', name: 'maven_artifacts', useDefaultExcludes: false
+                        },
+                        test: {
+                            checkout scm
+                            sh "rm -Rv build || true"
 
-                        sh "./gradlew test -PBUILD_NUMBER=${env.BUILD_NUMBER} -PBRANCH=\"${env.BRANCH_NAME}\" --no-daemon"
-                        stash includes: 'build/test-results/**/*', name: 'test_results', useDefaultExcludes: false
+                            sh "./gradlew test -PBUILD_NUMBER=${env.BUILD_NUMBER} -PBRANCH=\"${env.BRANCH_NAME}\" --no-daemon"
+                            stash includes: 'build/test-results/**/*', name: 'test_results', useDefaultExcludes: false
 
-                        sh "./gradlew jacocoTestReport --no-daemon"
+                            sh "./gradlew jacocoTestReport --no-daemon"
 
-                        withCredentials([[$class: 'StringBinding', credentialsId: 'engineer.carrot.warren.kale.codecov', variable: 'CODECOV_TOKEN']]) {
-                            sh "./codecov.sh -B ${env.BRANCH_NAME}"
+                            withCredentials([[$class: 'StringBinding', credentialsId: 'engineer.carrot.warren.kale.codecov', variable: 'CODECOV_TOKEN']]) {
+                                sh "./codecov.sh -B ${env.BRANCH_NAME}"
+                            }
+
+                            step([$class: 'JacocoPublisher'])
                         }
-
-                        step([$class: 'JacocoPublisher'])
-                    },
-                    pom: {
-                        checkout scm
-                        sh "rm -Rv build || true"
-
-                        sh "./gradlew generatePomFileForMavenJavaPublication -PBUILD_NUMBER=${env.BUILD_NUMBER} --no-daemon"
-
-                        stash includes: 'build/publications/mavenJava/pom-default.xml,build/libs/*.jar', name: 'maven_artifacts', useDefaultExcludes: false
-                    }
                 )
             }
         }
@@ -95,10 +93,12 @@ pipeline {
                 sh "rm -Rv build || true"
 
                 unstash 'maven_artifacts'
+                unstash 'build_libs'
 
                 sh "ls -lR build"
 
                 sh "find build/libs -name Kale\\*${env.BUILD_NUMBER}.jar | head -n 1 | xargs -I '{}' mvn install:install-file -Dfile={} -DpomFile=build/publications/mavenJava/pom-default.xml -DlocalRepositoryPath=/var/www/maven.hopper.bunnies.io"
             }
         }
+    }
 }
