@@ -11,6 +11,8 @@ import chat.willow.kale.irc.message.extension.batch.BatchEndMessage
 import chat.willow.kale.irc.message.extension.batch.BatchStartMessage
 import chat.willow.kale.irc.message.extension.cap.*
 import chat.willow.kale.irc.message.extension.extended_join.ExtendedJoinMessage
+import chat.willow.kale.irc.message.extension.monitor.*
+import chat.willow.kale.irc.message.extension.monitor.rpl.*
 import chat.willow.kale.irc.message.extension.sasl.AuthenticateMessage
 import chat.willow.kale.irc.message.extension.sasl.Rpl903Message
 import chat.willow.kale.irc.message.extension.sasl.Rpl904Message
@@ -158,6 +160,38 @@ class KaleRouter : IKaleRouter {
         }
         routeMessageToSerialiser(BatchStartMessage::class, BatchStartMessage)
         routeMessageToSerialiser(BatchEndMessage::class, BatchEndMessage)
+
+        routeCommandToParserMatcher("MONITOR") { (_, _, _, parameters) ->
+            val subCommand = parameters.getOrNull(0)?.getOrNull(0)
+            when (subCommand) {
+                CharacterCodes.PLUS -> MonitorAddMessage
+                CharacterCodes.MINUS -> MonitorRemoveMessage
+                'C' -> MonitorClearMessage
+                'L' -> MonitorListMessage
+                'S' -> MonitorStatusMessage
+                else -> null
+            }
+        }
+        routeMessageToSerialiser(MonitorAddMessage::class, MonitorAddMessage)
+        routeMessageToSerialiser(MonitorRemoveMessage::class, MonitorRemoveMessage)
+        routeMessageToSerialiser(MonitorClearMessage::class, MonitorClearMessage)
+        routeMessageToSerialiser(MonitorListMessage::class, MonitorListMessage)
+        routeMessageToSerialiser(MonitorStatusMessage::class, MonitorStatusMessage)
+
+        routeCommandToParser("733", RplEndOfMonListMessage)
+        routeMessageToSerialiser(RplEndOfMonListMessage::class, RplEndOfMonListMessage)
+
+        routeCommandToParser("732", RplMonListMessage)
+        routeMessageToSerialiser(RplMonListMessage::class, RplMonListMessage)
+
+        routeCommandToParser("734", RplMonListIsFullMessage)
+        routeMessageToSerialiser(RplMonListIsFullMessage::class, RplMonListIsFullMessage)
+
+        routeCommandToParser("731", RplMonOfflineMessage)
+        routeMessageToSerialiser(RplMonOfflineMessage::class, RplMonOfflineMessage)
+
+        routeCommandToParser("730", RplMonOnlineMessage)
+        routeMessageToSerialiser(RplMonOnlineMessage::class, RplMonOnlineMessage)
 
         routeCommandToParser("AUTHENTICATE", AuthenticateMessage)
         routeMessageToSerialiser(AuthenticateMessage::class, AuthenticateMessage)
