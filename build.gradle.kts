@@ -17,7 +17,7 @@ val kotlinVersion by project
 val projectTitle = "Kale"
 
 buildscript {
-    val buildscriptKotlinVersion = "1.1-M04"
+    val buildscriptKotlinVersion = "1.1.0-beta-38"
 
     repositories {
         maven { setUrl("http://dl.bintray.com/kotlin/kotlin-eap-1.1") }
@@ -71,6 +71,8 @@ repositories {
 
 dependencies {
     compile(kotlinModule("stdlib", kotlinVersion as String))
+    compile(kotlinModule("reflect", kotlinVersion as String))
+
     compile("org.slf4j:slf4j-api:1.7.21")
 
     testCompile("junit:junit:4.12")

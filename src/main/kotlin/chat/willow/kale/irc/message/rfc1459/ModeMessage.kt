@@ -94,7 +94,7 @@ data class ModeMessage(val source: Prefix? = null, val target: String, val modif
         }
 
         private fun isTokenStartOfModifier(token: Char?): Boolean {
-            return token === CharacterCodes.PLUS || token === CharacterCodes.MINUS
+            return token != null && (token == CharacterCodes.PLUS || token == CharacterCodes.MINUS)
 
         }
 
@@ -154,7 +154,7 @@ data class ModeMessage(val source: Prefix? = null, val target: String, val modif
 
                     val modifier = ModeModifier(type = currentType, mode = token)
 
-                    val isAdding = currentType === CharacterCodes.PLUS
+                    val isAdding = currentType == CharacterCodes.PLUS
                     val takesAParameter = this.takesAParameter(isAdding, token)
 
                     if (takesAParameter) {

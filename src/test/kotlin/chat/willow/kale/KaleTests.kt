@@ -4,6 +4,8 @@ import chat.willow.kale.irc.message.IMessage
 import chat.willow.kale.irc.message.IMessageParser
 import chat.willow.kale.irc.message.IMessageSerialiser
 import chat.willow.kale.irc.message.IrcMessage
+import chat.willow.kale.irc.metadata.IMetadataStore
+import chat.willow.kale.irc.metadata.RawTagsMetadata
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
@@ -80,7 +82,7 @@ class KaleTests {
         assertEquals(1, mockHandlerOne.spyHandleMessageInvokations.size)
         assertEquals(0, mockHandlerSub.spyHandleMessageInvokations.size)
         assertEquals(MockMessageOne(mockToken = "token1"), mockHandlerOne.spyHandleMessageInvokations[0])
-        assertEquals(mapOf<String, String?>(), mockHandlerOne.spyHandleTagsInvokations[0])
+        assertEquals(RawTagsMetadata(mapOf<String, String?>()), mockHandlerOne.spyHandleMetadataInvokations[0][RawTagsMetadata::class])
     }
 
     @Test fun test_command_firesTestHandler_HasTags_ExpectTagsPassedToHandler() {
@@ -89,7 +91,7 @@ class KaleTests {
         assertEquals(1, mockHandlerOne.spyHandleMessageInvokations.size)
         assertEquals(0, mockHandlerSub.spyHandleMessageInvokations.size)
         assertEquals(MockMessageOne(mockToken = "token1"), mockHandlerOne.spyHandleMessageInvokations[0])
-        assertEquals(mapOf("tag1" to null, "tag2" to "2"), mockHandlerOne.spyHandleTagsInvokations[0])
+        assertEquals(RawTagsMetadata(mapOf("tag1" to null, "tag2" to "2")), mockHandlerOne.spyHandleMetadataInvokations[0][RawTagsMetadata::class])
     }
 
     @Test fun test_subcommand_firesTestHandler_NoTags_ExpectNoTagsPassedToHandler() {
@@ -98,7 +100,7 @@ class KaleTests {
         assertEquals(1, mockHandlerSub.spyHandleMessageInvokations.size)
         assertEquals(0, mockHandlerOne.spyHandleMessageInvokations.size)
         assertEquals(MockSubcommandMessage(mockToken = "token1"), mockHandlerSub.spyHandleMessageInvokations[0])
-        assertEquals(mapOf<String, String?>(), mockHandlerSub.spyHandleTagsInvokations[0])
+        assertEquals(RawTagsMetadata(mapOf<String, String?>()), mockHandlerSub.spyHandleMetadataInvokations[0][RawTagsMetadata::class])
     }
 
 
@@ -108,7 +110,7 @@ class KaleTests {
         assertEquals(1, mockHandlerSub.spyHandleMessageInvokations.size)
         assertEquals(0, mockHandlerOne.spyHandleMessageInvokations.size)
         assertEquals(MockSubcommandMessage(mockToken = "token1"), mockHandlerSub.spyHandleMessageInvokations[0])
-        assertEquals(mapOf("tag3" to null, "tag4" to "4"), mockHandlerSub.spyHandleTagsInvokations[0])
+        assertEquals(RawTagsMetadata(mapOf("tag3" to null, "tag4" to "4")), mockHandlerSub.spyHandleMetadataInvokations[0][RawTagsMetadata::class])
     }
 
 
@@ -135,14 +137,14 @@ class KaleTests {
     }
 
     class MockHandlerOne : IKaleHandler<MockMessageOne> {
-        var spyHandleMessageInvokations: List<MockMessageOne> = mutableListOf()
-        var spyHandleTagsInvokations: List<Map<String, String?>> = mutableListOf()
+        val spyHandleMessageInvokations = mutableListOf<MockMessageOne>()
+        val spyHandleMetadataInvokations = mutableListOf<IMetadataStore>()
 
         override val messageType = MockMessageOne::class.java
 
-        override fun handle(message: MockMessageOne, tags: Map<String, String?>) {
+        override fun handle(message: MockMessageOne, metadata: IMetadataStore) {
             spyHandleMessageInvokations += message
-            spyHandleTagsInvokations += tags
+            spyHandleMetadataInvokations += metadata
         }
     }
 
@@ -161,14 +163,14 @@ class KaleTests {
     }
 
     class MockHandlerSubcommand : IKaleHandler<MockSubcommandMessage> {
-        var spyHandleMessageInvokations: List<MockSubcommandMessage> = mutableListOf()
-        var spyHandleTagsInvokations: List<Map<String, String?>> = mutableListOf()
+        val spyHandleMessageInvokations = mutableListOf<MockSubcommandMessage>()
+        val spyHandleMetadataInvokations = mutableListOf<IMetadataStore>()
 
         override val messageType = MockSubcommandMessage::class.java
 
-        override fun handle(message: MockSubcommandMessage, tags: Map<String, String?>) {
+        override fun handle(message: MockSubcommandMessage, metadata: IMetadataStore) {
             spyHandleMessageInvokations += message
-            spyHandleTagsInvokations += tags
+            spyHandleMetadataInvokations += metadata
         }
     }
 

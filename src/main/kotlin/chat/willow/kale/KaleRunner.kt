@@ -5,6 +5,7 @@ import chat.willow.kale.irc.message.extension.batch.BatchStartMessage
 import chat.willow.kale.irc.message.extension.extended_join.ExtendedJoinMessage
 import chat.willow.kale.irc.message.rfc1459.*
 import chat.willow.kale.irc.message.rfc1459.rpl.*
+import chat.willow.kale.irc.metadata.IMetadataStore
 import chat.willow.kale.irc.prefix.Prefix
 
 object KaleRunner {
@@ -81,7 +82,7 @@ object KaleRunner {
     class PingHandler: IKaleHandler<PingMessage> {
         override val messageType = PingMessage::class.java
 
-        override fun handle(message: PingMessage, tags: Map<String, String?>) {
+        override fun handle(message: PingMessage, metadata: IMetadataStore) {
             println("handling ping message: $message")
         }
 
@@ -90,7 +91,7 @@ object KaleRunner {
     class PongHandler: IKaleHandler<PongMessage> {
         override val messageType = PongMessage::class.java
 
-        override fun handle(message: PongMessage, tags: Map<String, String?>) {
+        override fun handle(message: PongMessage, metadata: IMetadataStore) {
             println("handling pong message: $message")
         }
 

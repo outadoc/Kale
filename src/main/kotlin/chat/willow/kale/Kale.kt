@@ -4,6 +4,8 @@ import chat.willow.kale.irc.message.IMessage
 import chat.willow.kale.irc.message.IrcMessage
 import chat.willow.kale.irc.message.IrcMessageParser
 import chat.willow.kale.irc.message.rfc1459.ModeMessage
+import chat.willow.kale.irc.metadata.MetadataStore
+import chat.willow.kale.irc.metadata.RawTagsMetadata
 
 interface IKale {
 
@@ -66,7 +68,17 @@ class Kale(private val router: IKaleRouter) : IKale {
             return
         }
 
-        handler.handle(message, ircMessage.tags)
+        val metadata = constructMetadataStore(ircMessage)
+
+        handler.handle(message, metadata)
+    }
+
+    private fun constructMetadataStore(message: IrcMessage): MetadataStore {
+        val metadata = MetadataStore()
+
+        metadata.store(RawTagsMetadata(tags = message.tags))
+
+        return metadata
     }
 
     private fun <M: IMessage> findHandlerFor(message: M): IKaleHandler<M>? {
