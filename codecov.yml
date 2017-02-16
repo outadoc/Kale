@@ -5,3 +5,6 @@ coverage:
   - **/*State.kt
   - **/*Configuration.kt
   - **/*Runner.kt
+  status:
+    project: off
+    patch: off
