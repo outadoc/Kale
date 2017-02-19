@@ -79,8 +79,6 @@ dependencies {
     testCompile("org.mockito:mockito-core:2.2.9")
     testCompile("com.nhaarman:mockito-kotlin:0.10.0")
     testCompile("ch.qos.logback:logback-classic:1.1.2")
-
-    runtime("ch.qos.logback:logback-classic:1.1.2")
 }
 
 test {
