@@ -4,8 +4,9 @@ import chat.willow.kale.irc.message.IMessage
 import chat.willow.kale.irc.message.IrcMessage
 import chat.willow.kale.irc.message.IrcMessageParser
 import chat.willow.kale.irc.message.rfc1459.ModeMessage
-import chat.willow.kale.irc.metadata.MetadataStore
-import chat.willow.kale.irc.metadata.RawTagsMetadata
+import chat.willow.kale.irc.tag.IKaleTagRouter
+import chat.willow.kale.irc.tag.Tag
+import chat.willow.kale.irc.tag.TagStore
 
 interface IKale {
 
@@ -25,7 +26,7 @@ interface IKaleParsingStateDelegate {
 
 }
 
-class Kale(private val router: IKaleRouter) : IKale {
+class Kale(private val messageRouter: IKaleRouter, private val tagRouter: IKaleTagRouter) : IKale {
     private val LOGGER = loggerFor<Kale>()
 
     override var parsingStateDelegate: IKaleParsingStateDelegate? = null
@@ -50,7 +51,7 @@ class Kale(private val router: IKaleRouter) : IKale {
             return
         }
 
-        val factory = router.parserFor(ircMessage)
+        val factory = messageRouter.parserFor(ircMessage)
         if (factory == null) {
             LOGGER.debug("no factory for: $ircMessage")
             return
@@ -73,10 +74,26 @@ class Kale(private val router: IKaleRouter) : IKale {
         handler.handle(message, metadata)
     }
 
-    private fun constructMetadataStore(message: IrcMessage): MetadataStore {
-        val metadata = MetadataStore()
+    private fun constructMetadataStore(message: IrcMessage): TagStore {
+        val metadata = TagStore()
 
-        metadata.store(RawTagsMetadata(tags = message.tags))
+        for ((key, value) in message.tags) {
+            val tag = Tag(key, value)
+
+            val factory = tagRouter.parserFor(tag.name)
+            if (factory == null) {
+                LOGGER.debug("no parser for tag $tag")
+                continue
+            }
+
+            val parsedTag = factory.parse(tag)
+            if (parsedTag == null) {
+                LOGGER.warn("factory failed to parse tag: $factory $tag")
+                continue
+            }
+
+            metadata.store(parsedTag)
+        }
 
         return metadata
     }
@@ -92,7 +109,7 @@ class Kale(private val router: IKaleRouter) : IKale {
     }
 
     override fun serialise(message: Any): IrcMessage? {
-        val factory = router.serialiserFor(message.javaClass)
+        val factory = messageRouter.serialiserFor(message.javaClass)
         if (factory == null) {
             LOGGER.warn("failed to find factory for message serialisation: $message")
             return null

@@ -4,8 +4,8 @@ import chat.willow.kale.irc.message.IMessage
 import chat.willow.kale.irc.message.IMessageParser
 import chat.willow.kale.irc.message.IMessageSerialiser
 import chat.willow.kale.irc.message.IrcMessage
-import chat.willow.kale.irc.metadata.IMetadataStore
-import chat.willow.kale.irc.metadata.RawTagsMetadata
+import chat.willow.kale.irc.tag.*
+import com.nhaarman.mockito_kotlin.mock
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
@@ -13,22 +13,25 @@ import org.junit.Test
 class KaleTests {
     lateinit var kale: Kale
     lateinit var kaleRouter: IKaleRouter
+    lateinit var kaleTagRouter: IKaleTagRouter
     lateinit var mockHandlerOne: MockHandlerOne
     lateinit var mockHandlerSub: MockHandlerSubcommand
 
     @Before fun setUp() {
-        // FIXME: use mock router instead
         kaleRouter = KaleRouter()
+        kaleTagRouter = KaleTagRouter()
 
         mockHandlerOne = MockHandlerOne()
         mockHandlerSub = MockHandlerSubcommand()
 
-        kale = Kale(kaleRouter)
+        kale = Kale(kaleRouter, kaleTagRouter)
 
         kaleRouter.routeCommandToParser("TEST1", MockMessageOne)
         kaleRouter.routeMessageToSerialiser(MockMessageOne::class, MockMessageOne)
 
         kaleRouter.routeCommandToParser("TEST", MockSubcommandMessage)
+
+        kaleTagRouter.routeTagToParser("test", MockTestTag.Factory)
 
         kale.register(mockHandlerOne)
         kale.register(mockHandlerSub)
@@ -76,43 +79,15 @@ class KaleTests {
         assertEquals(MockMessageOne(mockToken = "token3"), mockHandlerOne.spyHandleMessageInvokations[2])
     }
 
-    @Test fun test_command_firesTestHandler_NoTags_ExpectNoTagsPassedToHandler() {
-        kale.process("TEST1 :token1")
-
-        assertEquals(1, mockHandlerOne.spyHandleMessageInvokations.size)
-        assertEquals(0, mockHandlerSub.spyHandleMessageInvokations.size)
-        assertEquals(MockMessageOne(mockToken = "token1"), mockHandlerOne.spyHandleMessageInvokations[0])
-        assertEquals(RawTagsMetadata(mapOf<String, String?>()), mockHandlerOne.spyHandleMetadataInvokations[0][RawTagsMetadata::class])
-    }
-
     @Test fun test_command_firesTestHandler_HasTags_ExpectTagsPassedToHandler() {
-        kale.process("@tag1;tag2=2 TEST1 :token1")
+        kale.process("@tag1;test=1 TEST1 :token1")
 
         assertEquals(1, mockHandlerOne.spyHandleMessageInvokations.size)
         assertEquals(0, mockHandlerSub.spyHandleMessageInvokations.size)
         assertEquals(MockMessageOne(mockToken = "token1"), mockHandlerOne.spyHandleMessageInvokations[0])
-        assertEquals(RawTagsMetadata(mapOf("tag1" to null, "tag2" to "2")), mockHandlerOne.spyHandleMetadataInvokations[0][RawTagsMetadata::class])
+
+        assertEquals(MockTestTag(value = "1"), mockHandlerOne.spyHandleMetadataInvokations[0][MockTestTag::class])
     }
-
-    @Test fun test_subcommand_firesTestHandler_NoTags_ExpectNoTagsPassedToHandler() {
-        kale.process("TEST * SUB :token1")
-
-        assertEquals(1, mockHandlerSub.spyHandleMessageInvokations.size)
-        assertEquals(0, mockHandlerOne.spyHandleMessageInvokations.size)
-        assertEquals(MockSubcommandMessage(mockToken = "token1"), mockHandlerSub.spyHandleMessageInvokations[0])
-        assertEquals(RawTagsMetadata(mapOf<String, String?>()), mockHandlerSub.spyHandleMetadataInvokations[0][RawTagsMetadata::class])
-    }
-
-
-    @Test fun test_subcommand_firesTestHandler_HasTags_ExpectTagsPassedToHandler() {
-        kale.process("@tag3;tag4=4 TEST * SUB :token1")
-
-        assertEquals(1, mockHandlerSub.spyHandleMessageInvokations.size)
-        assertEquals(0, mockHandlerOne.spyHandleMessageInvokations.size)
-        assertEquals(MockSubcommandMessage(mockToken = "token1"), mockHandlerSub.spyHandleMessageInvokations[0])
-        assertEquals(RawTagsMetadata(mapOf("tag3" to null, "tag4" to "4")), mockHandlerSub.spyHandleMetadataInvokations[0][RawTagsMetadata::class])
-    }
-
 
     @Test fun test_serialise_SanityCheck() {
         val message = kale.serialise(MockMessageOne(mockToken = "TestToken1"))
@@ -138,13 +113,13 @@ class KaleTests {
 
     class MockHandlerOne : IKaleHandler<MockMessageOne> {
         val spyHandleMessageInvokations = mutableListOf<MockMessageOne>()
-        val spyHandleMetadataInvokations = mutableListOf<IMetadataStore>()
+        val spyHandleMetadataInvokations = mutableListOf<ITagStore>()
 
         override val messageType = MockMessageOne::class.java
 
-        override fun handle(message: MockMessageOne, metadata: IMetadataStore) {
+        override fun handle(message: MockMessageOne, tags: ITagStore) {
             spyHandleMessageInvokations += message
-            spyHandleMetadataInvokations += metadata
+            spyHandleMetadataInvokations += tags
         }
     }
 
@@ -164,13 +139,13 @@ class KaleTests {
 
     class MockHandlerSubcommand : IKaleHandler<MockSubcommandMessage> {
         val spyHandleMessageInvokations = mutableListOf<MockSubcommandMessage>()
-        val spyHandleMetadataInvokations = mutableListOf<IMetadataStore>()
+        val spyHandleMetadataInvokations = mutableListOf<ITagStore>()
 
         override val messageType = MockSubcommandMessage::class.java
 
-        override fun handle(message: MockSubcommandMessage, metadata: IMetadataStore) {
+        override fun handle(message: MockSubcommandMessage, tags: ITagStore) {
             spyHandleMessageInvokations += message
-            spyHandleMetadataInvokations += metadata
+            spyHandleMetadataInvokations += tags
         }
     }
 
@@ -190,5 +165,15 @@ class KaleTests {
 
     data class MockUnknownMessage(val unknownParameter: String): IMessage {
         override val command: String = "UNKNOWN"
+    }
+
+    data class MockTestTag(val value: String) {
+        companion object Factory: ITagParser<MockTestTag> {
+            override fun parse(tag: Tag): MockTestTag? {
+                val value = tag.value ?: return null
+
+                return MockTestTag(value = value)
+            }
+        }
     }
 }

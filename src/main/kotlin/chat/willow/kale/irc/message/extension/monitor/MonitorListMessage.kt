@@ -1,6 +1,5 @@
 package chat.willow.kale.irc.message.extension.monitor
 
-import chat.willow.kale.irc.CharacterCodes
 import chat.willow.kale.irc.message.IMessage
 import chat.willow.kale.irc.message.IMessageParser
 import chat.willow.kale.irc.message.IMessageSerialiser

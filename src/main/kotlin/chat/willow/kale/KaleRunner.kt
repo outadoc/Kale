@@ -5,19 +5,24 @@ import chat.willow.kale.irc.message.extension.batch.BatchStartMessage
 import chat.willow.kale.irc.message.extension.extended_join.ExtendedJoinMessage
 import chat.willow.kale.irc.message.rfc1459.*
 import chat.willow.kale.irc.message.rfc1459.rpl.*
-import chat.willow.kale.irc.metadata.IMetadataStore
 import chat.willow.kale.irc.prefix.Prefix
+import chat.willow.kale.irc.tag.ITagStore
+import chat.willow.kale.irc.tag.KaleTagRouter
+import chat.willow.kale.irc.tag.extension.AccountTag
+import chat.willow.kale.irc.tag.extension.ServerTimeTag
 
 object KaleRunner {
     @JvmStatic fun main(args: Array<String>) {
         println("Hello, Kale!")
 
-        val kale = Kale(KaleRouter().useDefaults())
+        val kale = Kale(KaleRouter().useDefaults(), KaleTagRouter().useDefaults())
         val pingHandler = PingHandler()
         val pongHandler = PongHandler()
+        val privMsgHandler = PrivMsgHandler()
 
         kale.register(pongHandler)
         kale.register(pingHandler)
+        kale.register(privMsgHandler)
 
         kale.process("@tag;key=value :user!host@server WHATEVER :more stuff")
         kale.process("PING :token")
@@ -48,6 +53,8 @@ object KaleRunner {
         kale.process(":test.server 422 testnickname :MOTD File is missing")
         kale.process("BATCH +reference type param1")
         kale.process("BATCH -reference")
+
+        kale.process("@account=testuser;time=2012-06-30T23:59:60.419Z PRIVMSG #mychannel :this is a message! ")
 
         println(kale.serialise(PingMessage(token = "token")))
         println(kale.serialise(PongMessage(token = "token2")))
@@ -82,19 +89,39 @@ object KaleRunner {
     class PingHandler: IKaleHandler<PingMessage> {
         override val messageType = PingMessage::class.java
 
-        override fun handle(message: PingMessage, metadata: IMetadataStore) {
-            println("handling ping message: $message")
+        override fun handle(message: PingMessage, tags: ITagStore) {
+            println("handling ping: $message")
         }
-
     }
 
     class PongHandler: IKaleHandler<PongMessage> {
         override val messageType = PongMessage::class.java
 
-        override fun handle(message: PongMessage, metadata: IMetadataStore) {
-            println("handling pong message: $message")
+        override fun handle(message: PongMessage, tags: ITagStore) {
+            println("handling pong: $message")
         }
+    }
 
+    class PrivMsgHandler: IKaleHandler<PrivMsgMessage> {
+        override val messageType = PrivMsgMessage::class.java
+
+        override fun handle(message: PrivMsgMessage, tags: ITagStore) {
+            println("handling message: $message")
+
+            val time = tags[ServerTimeTag::class]
+            if (time == null) {
+                println(" no time")
+            } else {
+                println(" time: $time")
+            }
+
+            val account = tags[AccountTag::class]
+            if (account == null) {
+                println(" no account")
+            } else {
+                println(" account: $account")
+            }
+        }
     }
 }
 

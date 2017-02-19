@@ -1,21 +1,19 @@
-package chat.willow.kale.irc.metadata
+package chat.willow.kale.irc.tag
 
 import kotlin.reflect.KClass
 
-interface IMetadataStore {
+interface ITagStore {
     operator fun <T: Any>get(classType: KClass<T>): T?
     operator fun <T: Any>get(classType: Class<T>): T?
 
     fun <T: Any>store(thing: T)
 }
 
-class MetadataStore: IMetadataStore {
-
-    private val metadata = mutableMapOf<Class<*>, Any>()
+data class TagStore(private val store: MutableMap<Class<*>, Any> = mutableMapOf()) : ITagStore {
 
     override fun <T : Any> get(classType: Class<T>): T? {
         @Suppress("UNCHECKED_CAST")
-        return metadata[classType] as? T
+        return store[classType] as? T
     }
 
     override fun <T : Any> get(classType: KClass<T>): T? {
@@ -23,7 +21,7 @@ class MetadataStore: IMetadataStore {
     }
 
     override fun <T : Any> store(thing: T) {
-        metadata[thing::class.java] = thing
+        store[thing::class.java] = thing
     }
 
 }

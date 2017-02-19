@@ -8,7 +8,7 @@ import chat.willow.kale.irc.prefix.Prefix
 import chat.willow.kale.irc.prefix.PrefixParser
 import chat.willow.kale.irc.prefix.PrefixSerialiser
 
-data class PrivMsgMessage(val source: Prefix? = null, val time: String? = null, val target: String, val message: String): IMessage {
+data class PrivMsgMessage(val source: Prefix? = null, val target: String, val message: String): IMessage {
     override val command: String = "PRIVMSG"
 
     companion object Factory: IMessageParser<PrivMsgMessage>, IMessageSerialiser<PrivMsgMessage> {
@@ -27,9 +27,7 @@ data class PrivMsgMessage(val source: Prefix? = null, val time: String? = null, 
             val target = message.parameters[0]
             val privMessage = message.parameters[1]
 
-            val serverTime = message.tags["time"]
-
-            return PrivMsgMessage(source = source, time = serverTime, target = target, message = privMessage)
+            return PrivMsgMessage(source = source, target = target, message = privMessage)
         }
     }
 
