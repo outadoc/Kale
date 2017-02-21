@@ -100,7 +100,7 @@ class Kale(private val messageRouter: IKaleRouter, private val tagRouter: IKaleT
 
     private fun <M: IMessage> findHandlerFor(message: M): IKaleHandler<M>? {
         @Suppress("UNCHECKED_CAST")
-        return handlers[message.javaClass] as? IKaleHandler<M>
+        return handlers[message::class.java] as? IKaleHandler<M>
     }
 
     override fun <M: IMessage> handlerFor(messageClass: Class<M>): IKaleHandler<M>? {
@@ -109,7 +109,7 @@ class Kale(private val messageRouter: IKaleRouter, private val tagRouter: IKaleT
     }
 
     override fun serialise(message: Any): IrcMessage? {
-        val factory = messageRouter.serialiserFor(message.javaClass)
+        val factory = messageRouter.serialiserFor(message::class.java)
         if (factory == null) {
             LOGGER.warn("failed to find factory for message serialisation: $message")
             return null
