@@ -1,6 +1,7 @@
 package chat.willow.kale
 
 import chat.willow.kale.irc.message.IMessage
+import chat.willow.kale.irc.message.IMessageSerialiser
 import chat.willow.kale.irc.message.IrcMessage
 import chat.willow.kale.irc.message.IrcMessageParser
 import chat.willow.kale.irc.message.rfc1459.ModeMessage
@@ -14,7 +15,7 @@ interface IKale {
     fun <T: IMessage> unregister(handler: IKaleHandler<T>)
     fun <M: IMessage> handlerFor(messageClass: Class<M>): IKaleHandler<M>?
     fun process(line: String)
-    fun serialise(message: Any): IrcMessage?
+    fun <M: Any> serialise(message: M): IrcMessage?
 
     var parsingStateDelegate: IKaleParsingStateDelegate?
 
@@ -108,8 +109,9 @@ class Kale(private val messageRouter: IKaleRouter, private val tagRouter: IKaleT
         return handlers[messageClass] as? IKaleHandler<M>
     }
 
-    override fun serialise(message: Any): IrcMessage? {
-        val factory = messageRouter.serialiserFor(message::class.java)
+    override fun <M: Any> serialise(message: M): IrcMessage? {
+        @Suppress("UNCHECKED_CAST")
+        val factory = messageRouter.serialiserFor(message::class.java) as? IMessageSerialiser<M>
         if (factory == null) {
             LOGGER.warn("failed to find factory for message serialisation: $message")
             return null
