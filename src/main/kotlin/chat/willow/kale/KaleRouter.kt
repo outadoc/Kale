@@ -10,6 +10,7 @@ import chat.willow.kale.irc.message.extension.away_notify.AwayMessage
 import chat.willow.kale.irc.message.extension.batch.BatchEndMessage
 import chat.willow.kale.irc.message.extension.batch.BatchStartMessage
 import chat.willow.kale.irc.message.extension.cap.*
+import chat.willow.kale.irc.message.extension.chghost.ChgHostMessage
 import chat.willow.kale.irc.message.extension.extended_join.ExtendedJoinMessage
 import chat.willow.kale.irc.message.extension.monitor.*
 import chat.willow.kale.irc.message.extension.monitor.rpl.*
@@ -201,6 +202,9 @@ class KaleRouter : IKaleRouter {
 
         routeCommandToParser("AWAY", AwayMessage)
         routeMessageToSerialiser(AwayMessage::class, AwayMessage)
+
+        routeCommandToParser("CHGHOST", ChgHostMessage)
+        routeMessageToSerialiser(ChgHostMessage::class, ChgHostMessage)
 
         routeCommandToParser("903", Rpl903Message)
         routeMessageToSerialiser(Rpl903Message::class, Rpl903Message)

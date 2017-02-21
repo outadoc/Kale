@@ -9,6 +9,7 @@ import chat.willow.kale.irc.message.extension.away_notify.AwayMessage
 import chat.willow.kale.irc.message.extension.batch.BatchEndMessage
 import chat.willow.kale.irc.message.extension.batch.BatchStartMessage
 import chat.willow.kale.irc.message.extension.cap.*
+import chat.willow.kale.irc.message.extension.chghost.ChgHostMessage
 import chat.willow.kale.irc.message.extension.extended_join.ExtendedJoinMessage
 import chat.willow.kale.irc.message.extension.sasl.AuthenticateMessage
 import chat.willow.kale.irc.message.extension.sasl.Rpl903Message
@@ -284,6 +285,12 @@ class KaleRouterTests {
         sut.useDefaults()
 
         assertParserAndSerialiserExist("AWAY", AwayMessage::class.java)
+    }
+
+    @Test fun test_useDefaults_ChgHost() {
+        sut.useDefaults()
+
+        assertParserAndSerialiserExist("CHGHOST", ChgHostMessage::class.java)
     }
 
     @Test fun test_useDefaults_903() {
