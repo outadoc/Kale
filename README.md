@@ -17,6 +17,11 @@ Warren and Kale have a few interesting features:
 
 Planned releases (and their features) are tracked in [Projects](https://github.com/WillowChat/Kale/projects).
 
+## Support
+
+<a href="https://patreon.com/carrotcodes"><img src="https://s3.amazonaws.com/patreon_public_assets/toolbox/patreon.png" align="left" width="160" ></a>
+If you use this library and you'd like to support my open-source work, please consider tipping through [Patreon](https://patreon.com/carrotcodes).
+
 ## TODO
 * [RFC 1459](https://tools.ietf.org/html/rfc1459)
  * Pretty much done for majority of usage - consider being more complete
