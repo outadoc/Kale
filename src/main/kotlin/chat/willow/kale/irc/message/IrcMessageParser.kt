@@ -8,12 +8,10 @@ interface IIrcMessageParser {
 
 object IrcMessageParser: IIrcMessageParser {
 
-    private val CRLF_LENGTH = 2
-    val MAX_LINE_LENGTH = 1024 - CRLF_LENGTH
-    val MIN_LINE_LENGTH = 5 - CRLF_LENGTH
+    val MAX_LINE_LENGTH = 8192
 
     override fun parse(line: String): IrcMessage? {
-        if (line.length > MAX_LINE_LENGTH || line.length < MIN_LINE_LENGTH) {
+        if (line.length > MAX_LINE_LENGTH) {
             return null
         }
 
@@ -49,6 +47,10 @@ object IrcMessageParser: IIrcMessageParser {
     private fun parseTags(line: String, fromPosition: Int): Pair<Map<String, String?>, Int>? {
         var position = fromPosition
 
+        if (position >= line.length) {
+            return null
+        }
+
         if (line[position] == CharacterCodes.AT) {
             position++
 
@@ -77,6 +79,10 @@ object IrcMessageParser: IIrcMessageParser {
     private fun parsePrefix(line: String, fromPosition: Int): Pair<String?, Int>? {
         var position = fromPosition
 
+        if (position >= line.length) {
+            return null
+        }
+
         if (line[position] == CharacterCodes.COLON) {
             position++
 
@@ -98,6 +104,10 @@ object IrcMessageParser: IIrcMessageParser {
 
     private fun parseCommand(line: String, fromPosition: Int): Pair<String, Int>? {
         var position = fromPosition
+
+        if (position >= line.length) {
+            return null
+        }
 
         val nextSpace = ParseHelper.findNext(line, position, CharacterCodes.SPACE)
 

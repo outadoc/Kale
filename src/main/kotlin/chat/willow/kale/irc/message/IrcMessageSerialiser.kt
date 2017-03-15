@@ -52,7 +52,7 @@ object IrcMessageSerialiser : IIrcMessageSerialiser {
         }
 
         val output = builder.toString()
-        if (output.length < IrcMessageParser.MIN_LINE_LENGTH || output.length > IrcMessageParser.MAX_LINE_LENGTH) {
+        if (output.length > IrcMessageParser.MAX_LINE_LENGTH) {
             LOGGER.warn("serialised message is too long: $output")
             return null
         }

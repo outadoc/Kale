@@ -1,4 +1,4 @@
-package chat.willow.kale.irc.message.utility
+package chat.willow.kale.helper
 
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue

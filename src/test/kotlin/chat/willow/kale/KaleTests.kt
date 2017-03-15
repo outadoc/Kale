@@ -5,7 +5,6 @@ import chat.willow.kale.irc.message.IMessageParser
 import chat.willow.kale.irc.message.IMessageSerialiser
 import chat.willow.kale.irc.message.IrcMessage
 import chat.willow.kale.irc.tag.*
-import com.nhaarman.mockito_kotlin.mock
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test

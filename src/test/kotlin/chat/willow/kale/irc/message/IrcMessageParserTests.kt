@@ -106,14 +106,8 @@ class IrcMessageParserTests {
         assertNull(message)
     }
 
-    @Test fun test_tooShort() {
-        val message = parseLine("12")
-
-        assertNull(message)
-    }
-
     @Test fun test_tooLong() {
-        val message = parseLine("A".repeat(1023))
+        val message = parseLine("A".repeat(8192 + 1))
 
         assertNull(message)
     }

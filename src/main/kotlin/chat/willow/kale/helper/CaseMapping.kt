@@ -1,6 +1,14 @@
-package chat.willow.kale.irc.message.utility
+package chat.willow.kale.helper
 
 import chat.willow.kale.irc.CharacterCodes
+
+interface ICaseMapper {
+    val current: CaseMapping
+
+    fun toLower(string: String): String
+    override fun toString(): String
+
+}
 
 enum class CaseMapping(val upperToLowerMapping: Map<Char, Char>) {
     ASCII(mapOf()),
