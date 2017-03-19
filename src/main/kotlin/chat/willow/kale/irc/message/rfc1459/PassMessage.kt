@@ -1,28 +1,37 @@
 package chat.willow.kale.irc.message.rfc1459
 
-import chat.willow.kale.irc.message.IMessage
-import chat.willow.kale.irc.message.IMessageParser
-import chat.willow.kale.irc.message.IMessageSerialiser
-import chat.willow.kale.irc.message.IrcMessage
+import chat.willow.kale.ICommand
+import chat.willow.kale.IrcMessageComponents
+import chat.willow.kale.irc.message.MessageParser
+import chat.willow.kale.irc.message.MessageSerialiser
 
-data class PassMessage(val password: String): IMessage {
-    override val command: String = "PASS"
+object PassMessage : ICommand {
 
-    companion object Factory: IMessageParser<PassMessage>, IMessageSerialiser<PassMessage> {
+    override val command = "PASS"
 
-        override fun serialise(message: PassMessage): IrcMessage? {
-            return IrcMessage(command = message.command, parameters = listOf(message.password))
-        }
+    data class Command(val password: String) {
 
-        override fun parse(message: IrcMessage): PassMessage? {
-            if (message.parameters.isEmpty()) {
-                return null
+        object Parser : MessageParser<Command>(command) {
+
+            override fun parseFromComponents(components: IrcMessageComponents): Command? {
+                if (components.parameters.isEmpty()) {
+                    return null
+                }
+
+                val password = components.parameters[0]
+
+                return Command(password)
             }
 
-            val password = message.parameters[0]
-
-            return PassMessage(password = password)
         }
+
+        object Serialiser : MessageSerialiser<Command>(command) {
+
+            override fun serialiseToComponents(message: Command): IrcMessageComponents {
+                return IrcMessageComponents(parameters = listOf(message.password))
+            }
+        }
+
     }
 
 }

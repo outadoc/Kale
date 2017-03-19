@@ -7,28 +7,31 @@ import org.junit.Before
 import org.junit.Test
 
 class CapReqMessageTests {
-    lateinit var factory: CapReqMessage.Factory
+
+    lateinit var messageParser: CapMessage.Req.Command.Parser
+    lateinit var messageSerialiser: CapMessage.Req.Command.Serialiser
 
     @Before fun setUp() {
-        factory = CapReqMessage
+        messageParser = CapMessage.Req.Command.Parser
+        messageSerialiser = CapMessage.Req.Command.Serialiser
     }
 
     @Test fun test_parse_SingleCap() {
-        val message = factory.parse(IrcMessage(command = "CAP", parameters = listOf("test-nick", "REQ", "cap1 ")))
+        val message = messageParser.parse(IrcMessage(command = "CAP", parameters = listOf("REQ", "cap1 ")))
 
-        assertEquals(CapReqMessage(target = "test-nick", caps = listOf("cap1")), message)
+        assertEquals(CapMessage.Req.Command(caps = listOf("cap1")), message)
     }
 
     @Test fun test_parse_MultipleCaps() {
-        val message = factory.parse(IrcMessage(command = "CAP", parameters = listOf("test-nick", "REQ", "cap1 cap2 cap3")))
+        val message = messageParser.parse(IrcMessage(command = "CAP", parameters = listOf("REQ", "cap1 cap2 cap3")))
 
-        assertEquals(CapReqMessage(target = "test-nick", caps = listOf("cap1", "cap2", "cap3")), message)
+        assertEquals(CapMessage.Req.Command(caps = listOf("cap1", "cap2", "cap3")), message)
     }
 
     @Test fun test_parse_TooFewParameters() {
-        val messageOne = factory.parse(IrcMessage(command = "CAP", parameters = listOf()))
-        val messageTwo = factory.parse(IrcMessage(command = "CAP", parameters = listOf("test-nick")))
-        val messageThree = factory.parse(IrcMessage(command = "CAP", parameters = listOf("test-nick", "REQ")))
+        val messageOne = messageParser.parse(IrcMessage(command = "CAP", parameters = listOf()))
+        val messageTwo = messageParser.parse(IrcMessage(command = "CAP", parameters = listOf("test-nick")))
+        val messageThree = messageParser.parse(IrcMessage(command = "CAP", parameters = listOf("test-nick", "REQ")))
 
         assertNull(messageOne)
         assertNull(messageTwo)
@@ -36,13 +39,13 @@ class CapReqMessageTests {
     }
 
     @Test fun test_serialise_SingleCap() {
-        val message = factory.serialise(CapReqMessage(caps = listOf("cap1")))
+        val message = messageSerialiser.serialise(CapMessage.Req.Command(caps = listOf("cap1")))
 
         assertEquals(IrcMessage(command = "CAP", parameters = listOf("REQ", "cap1")), message)
     }
 
     @Test fun test_serialise_MultipleCaps() {
-        val message = factory.serialise(CapReqMessage(caps = listOf("cap1", "cap2", "cap3")))
+        val message = messageSerialiser.serialise(CapMessage.Req.Command(caps = listOf("cap1", "cap2", "cap3")))
 
         assertEquals(IrcMessage(command = "CAP", parameters = listOf("REQ", "cap1 cap2 cap3")), message)
     }

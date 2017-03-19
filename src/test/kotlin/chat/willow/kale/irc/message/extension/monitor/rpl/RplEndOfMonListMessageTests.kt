@@ -8,28 +8,31 @@ import org.junit.Before
 import org.junit.Test
 
 class RplEndOfMonListMessageTests {
-    private lateinit var factory: RplEndOfMonListMessage.Factory
+
+    private lateinit var messageParser: RplEndOfMonList.Message.Parser
+    private lateinit var messageSerialiser: RplEndOfMonList.Message.Serialiser
 
     @Before fun setUp() {
-        factory = RplEndOfMonListMessage
+        messageParser = RplEndOfMonList.Message.Parser
+        messageSerialiser = RplEndOfMonList.Message.Serialiser
     }
 
     @Test fun test_parse_SanityCheck() {
-        val message = factory.parse(IrcMessage(command = "733", prefix = "server", parameters = listOf("nick", "message")))
+        val message = messageParser.parse(IrcMessage(command = "733", prefix = "server", parameters = listOf("nick", "message")))
 
-        assertEquals(RplEndOfMonListMessage(prefix = Prefix(nick = "server"), nick = "nick", message = "message"), message)
+        assertEquals(RplEndOfMonList.Message(prefix = Prefix(nick = "server"), nick = "nick", message = "message"), message)
     }
 
     @Test fun test_parse_TooFewParameters() {
-        val messageOne = factory.parse(IrcMessage(command = "733", prefix = "server", parameters = listOf()))
-        val messageTwo = factory.parse(IrcMessage(command = "733", prefix = "server", parameters = listOf("nick")))
+        val messageOne = messageParser.parse(IrcMessage(command = "733", prefix = "server", parameters = listOf()))
+        val messageTwo = messageParser.parse(IrcMessage(command = "733", prefix = "server", parameters = listOf("nick")))
 
         assertNull(messageOne)
         assertNull(messageTwo)
     }
 
     @Test fun test_serialise_SanityCheck() {
-        val message = factory.serialise(RplEndOfMonListMessage(prefix = Prefix(nick = "server"), nick = "nick", message = "message"))
+        val message = messageSerialiser.serialise(RplEndOfMonList.Message(prefix = Prefix(nick = "server"), nick = "nick", message = "message"))
 
         assertEquals(IrcMessage(command = "733", prefix = "server", parameters = listOf("nick", "message")), message)
     }

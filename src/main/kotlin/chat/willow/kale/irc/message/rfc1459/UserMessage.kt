@@ -1,31 +1,41 @@
 package chat.willow.kale.irc.message.rfc1459
 
-import chat.willow.kale.irc.message.IMessage
-import chat.willow.kale.irc.message.IMessageParser
-import chat.willow.kale.irc.message.IMessageSerialiser
-import chat.willow.kale.irc.message.IrcMessage
+import chat.willow.kale.ICommand
+import chat.willow.kale.IrcMessageComponents
+import chat.willow.kale.irc.message.MessageParser
+import chat.willow.kale.irc.message.MessageSerialiser
 
-data class UserMessage(val username: String, val mode: String, val realname: String): IMessage {
-    override val command: String = "USER"
+object UserMessage : ICommand {
 
-    companion object Factory: IMessageParser<UserMessage>, IMessageSerialiser<UserMessage> {
+    override val command = "USER"
 
-        override fun serialise(message: UserMessage): IrcMessage? {
-            return IrcMessage(command = message.command, parameters = listOf(message.username, message.mode, "*", message.realname))
-        }
+    data class Command(val username: String, val mode: String, val realname: String) {
 
-        override fun parse(message: IrcMessage): UserMessage? {
-            if (message.parameters.size < 4) {
-                return null
+        object Parser : MessageParser<Command>(command) {
+
+            override fun parseFromComponents(components: IrcMessageComponents): Command? {
+                if (components.parameters.size < 4) {
+                    return null
+                }
+
+                val username = components.parameters[0]
+                val mode = components.parameters[1]
+                @Suppress("UNUSED_VARIABLE") val unused = components.parameters[2]
+                val realname = components.parameters[3]
+
+                return Command(username, mode, realname)
             }
 
-            val username = message.parameters[0]
-            val mode = message.parameters[1]
-            @Suppress("UNUSED_VARIABLE") val unused = message.parameters[2]
-            val realname = message.parameters[3]
-
-            return UserMessage(username = username, mode = mode, realname = realname)
         }
+
+        object Serialiser : MessageSerialiser<Command>(command) {
+
+            override fun serialiseToComponents(message: Command): IrcMessageComponents {
+                return IrcMessageComponents(parameters = listOf(message.username, message.mode, "*", message.realname))
+            }
+
+        }
+
     }
 
 }

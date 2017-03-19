@@ -1,26 +1,40 @@
 package chat.willow.kale.irc.message.rfc1459
 
-import chat.willow.kale.irc.message.IMessage
-import chat.willow.kale.irc.message.IMessageParser
-import chat.willow.kale.irc.message.IMessageSerialiser
-import chat.willow.kale.irc.message.IrcMessage
+import chat.willow.kale.ICommand
+import chat.willow.kale.IrcMessageComponents
+import chat.willow.kale.irc.message.MessageParser
+import chat.willow.kale.irc.message.MessageSerialiser
 
-data class PongMessage(val token: String): IMessage {
-    override val command: String = "PONG"
+object PongMessage : ICommand {
 
-    companion object Factory: IMessageParser<PongMessage>, IMessageSerialiser<PongMessage> {
+    override val command = "PONG"
 
-        override fun serialise(message: PongMessage): IrcMessage? {
-            return IrcMessage(command = message.command, parameters = listOf(message.token))
-        }
+    data class Message(val token: String) {
 
-        override fun parse(message: IrcMessage): PongMessage? {
-            if (message.parameters.isEmpty()) {
-                return null
+        object Parser : MessageParser<Message>(command) {
+
+            override fun parseFromComponents(components: IrcMessageComponents): Message? {
+                if (components.parameters.isEmpty()) {
+                    return null
+                }
+
+                val token = components.parameters[0]
+
+                return Message(token)
             }
 
-            return PongMessage(token = message.parameters[0])
         }
+
+        object Serialiser : MessageSerialiser<Message>(command) {
+
+            override fun serialiseToComponents(message: Message): IrcMessageComponents {
+                val parameters = listOf(message.token)
+
+                return IrcMessageComponents(parameters)
+            }
+
+        }
+
     }
 
 }

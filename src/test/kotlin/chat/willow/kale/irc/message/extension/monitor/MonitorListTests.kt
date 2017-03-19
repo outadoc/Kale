@@ -7,26 +7,29 @@ import org.junit.Before
 import org.junit.Test
 
 class MonitorListMessageTests {
-    private lateinit var factory: MonitorListMessage.Factory
+
+    private lateinit var messageParser: MonitorMessage.ListAll.Command.Parser
+    private lateinit var messageSerialiser: MonitorMessage.ListAll.Command.Serialiser
 
     @Before fun setUp() {
-        factory = MonitorListMessage
+        messageParser = MonitorMessage.ListAll.Command.Parser
+        messageSerialiser = MonitorMessage.ListAll.Command.Serialiser
     }
 
     @Test fun test_parse_SanityCheck() {
-        val message = factory.parse(IrcMessage(command = "MONITOR", parameters = listOf("L")))
+        val message = messageParser.parse(IrcMessage(command = "MONITOR", parameters = listOf("L")))
 
-        assertEquals(MonitorListMessage(subCommand = "L"), message)
+        assertEquals(MonitorMessage.ListAll.Command, message)
     }
 
     @Test fun test_parse_TooFewParameters() {
-        val messageOne = factory.parse(IrcMessage(command = "MONITOR", parameters = listOf()))
+        val messageOne = messageParser.parse(IrcMessage(command = "MONITOR", parameters = listOf()))
 
         assertNull(messageOne)
     }
 
     @Test fun test_serialise_SanityCheck() {
-        val message = factory.serialise(MonitorListMessage())
+        val message = messageSerialiser.serialise(MonitorMessage.ListAll.Command)
 
         assertEquals(IrcMessage(command = "MONITOR", parameters = listOf("L")), message)
     }

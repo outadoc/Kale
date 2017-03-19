@@ -1,75 +1,46 @@
 package chat.willow.kale
 
-import chat.willow.kale.irc.CharacterCodes
-import chat.willow.kale.irc.message.IMessage
-import chat.willow.kale.irc.message.IMessageParser
 import chat.willow.kale.irc.message.IMessageSerialiser
-import chat.willow.kale.irc.message.IrcMessage
 import chat.willow.kale.irc.message.extension.account_notify.AccountMessage
 import chat.willow.kale.irc.message.extension.away_notify.AwayMessage
-import chat.willow.kale.irc.message.extension.batch.BatchEndMessage
-import chat.willow.kale.irc.message.extension.batch.BatchStartMessage
-import chat.willow.kale.irc.message.extension.cap.*
+import chat.willow.kale.irc.message.extension.batch.BatchMessage
+import chat.willow.kale.irc.message.extension.cap.CapMessage
 import chat.willow.kale.irc.message.extension.chghost.ChgHostMessage
-import chat.willow.kale.irc.message.extension.extended_join.ExtendedJoinMessage
-import chat.willow.kale.irc.message.extension.monitor.*
+import chat.willow.kale.irc.message.extension.monitor.MonitorMessage
 import chat.willow.kale.irc.message.extension.monitor.rpl.*
 import chat.willow.kale.irc.message.extension.sasl.AuthenticateMessage
-import chat.willow.kale.irc.message.extension.sasl.Rpl903Message
-import chat.willow.kale.irc.message.extension.sasl.Rpl904Message
-import chat.willow.kale.irc.message.extension.sasl.Rpl905Message
+import chat.willow.kale.irc.message.extension.sasl.rpl.Rpl903Message
+import chat.willow.kale.irc.message.extension.sasl.rpl.Rpl904Message
+import chat.willow.kale.irc.message.extension.sasl.rpl.Rpl905Message
 import chat.willow.kale.irc.message.rfc1459.*
 import chat.willow.kale.irc.message.rfc1459.rpl.*
 import chat.willow.kale.irc.message.utility.RawMessage
 import kotlin.reflect.KClass
 
-typealias ParserMatcher = (IrcMessage) -> (IMessageParser<*>?)
-
-interface IParserRouter {
-
-    fun parserFor(message: IrcMessage): IMessageParser<*>?
-
-}
-
 interface IKaleRouter {
 
-    fun <M: IMessage> routeCommandToParser(command: String, parser: IMessageParser<M>)
-    fun routeCommandToParserMatcher(command: String, matcher: ParserMatcher)
-    fun parserFor(ircMessage: IrcMessage): IMessageParser<*>?
+    fun register(command: String, handler: IKaleIrcMessageHandler)
+    fun handlerFor(command: String): IKaleIrcMessageHandler?
 
-    fun <M: Any> routeMessageToSerialiser(messageClass: KClass<M>, serialiser: IMessageSerialiser<M>)
+    fun <M: Any> register(messageClass: KClass<M>, serialiser: IMessageSerialiser<M>)
     fun <M: Any> serialiserFor(messageClass: Class<M>): IMessageSerialiser<M>?
 
 }
 
 class KaleRouter : IKaleRouter {
 
-    private val commandsToParsers = hashMapOf<String, IParserRouter>()
+    private val commandsToParsers = hashMapOf<String, IKaleIrcMessageHandler>()
     private val messagesToSerialisers = hashMapOf<Class<*>, IMessageSerialiser<*>>()
 
-    override fun <T: IMessage> routeCommandToParser(command: String, parser: IMessageParser<T>) {
-        val parserRouter = object : IParserRouter {
-            override fun parserFor(message: IrcMessage): IMessageParser<*>? {
-                return parser
-            }
-        }
-
-        commandsToParsers[command] = parserRouter
+    override fun register(command: String, handler: IKaleIrcMessageHandler) {
+        commandsToParsers[command] = handler
     }
 
-    override fun routeCommandToParserMatcher(command: String, matcher: ParserMatcher) {
-        commandsToParsers[command] = object : IParserRouter {
-            override fun parserFor(message: IrcMessage): IMessageParser<*>? {
-                return matcher(message)
-            }
-        }
+    override fun handlerFor(command: String): IKaleIrcMessageHandler? {
+        return commandsToParsers[command]
     }
 
-    override fun parserFor(ircMessage: IrcMessage): IMessageParser<*>? {
-        return commandsToParsers[ircMessage.command]?.parserFor(ircMessage)
-    }
-
-    override fun <M : Any> routeMessageToSerialiser(messageClass: KClass<M>, serialiser: IMessageSerialiser<M>) {
+    override fun <M : Any> register(messageClass: KClass<M>, serialiser: IMessageSerialiser<M>) {
         messagesToSerialisers[messageClass.java] = serialiser
     }
 
@@ -78,187 +49,123 @@ class KaleRouter : IKaleRouter {
         return messagesToSerialisers[messageClass] as? IMessageSerialiser<M>
     }
 
-    fun useDefaults(): KaleRouter {
-        routeMessageToSerialiser(RawMessage::class, RawMessage)
+    fun useClientDefaults(): KaleRouter {
+        register(RawMessage.Line::class, RawMessage.Line.Serialiser)
 
-        routeCommandToParser("PING", PingMessage)
-        routeMessageToSerialiser(PingMessage::class, PingMessage)
+        commandsToParsers["PING"] = KaleParseOnlyHandler(PingMessage.Command.Parser)
+        register(PingMessage.Command::class, PingMessage.Command.Serialiser)
 
-        routeCommandToParser("PONG", PongMessage)
-        routeMessageToSerialiser(PongMessage::class, PongMessage)
+        commandsToParsers["PONG"] = KaleParseOnlyHandler(PongMessage.Message.Parser)
+        register(PongMessage.Message::class, PongMessage.Message.Serialiser)
 
-        routeCommandToParser("NICK", NickMessage)
-        routeMessageToSerialiser(NickMessage::class, NickMessage)
+        commandsToParsers["NICK"] = KaleParseOnlyHandler(NickMessage.Message.Parser)
+        register(NickMessage.Command::class, NickMessage.Command.Serialiser)
 
-        routeCommandToParser("USER", UserMessage)
-        routeMessageToSerialiser(UserMessage::class, UserMessage)
+        commandsToParsers["QUIT"] = KaleParseOnlyHandler(QuitMessage.Message.Parser)
+        register(QuitMessage.Command::class, QuitMessage.Command.Serialiser)
 
-        routeCommandToParser("PASS", PassMessage)
-        routeMessageToSerialiser(PassMessage::class, PassMessage)
+        commandsToParsers["PART"] = KaleParseOnlyHandler(PartMessage.Message.Parser)
+        register(PartMessage.Command::class, PartMessage.Command.Serialiser)
 
-        routeCommandToParser("QUIT", QuitMessage)
-        routeMessageToSerialiser(QuitMessage::class, QuitMessage)
+        commandsToParsers["MODE"] = KaleParseOnlyHandler(ModeMessage.Message.Parser)
+        register(ModeMessage.Command::class, ModeMessage.Command.Serialiser)
 
-        routeCommandToParser("PART", PartMessage)
-        routeMessageToSerialiser(PartMessage::class, PartMessage)
+        commandsToParsers["PRIVMSG"] = KaleParseOnlyHandler(PrivMsgMessage.Message.Parser)
+        register(PrivMsgMessage.Command::class, PrivMsgMessage.Command.Serialiser)
 
-        routeCommandToParser("MODE", ModeMessage)
-        routeMessageToSerialiser(ModeMessage::class, ModeMessage)
+        commandsToParsers["NOTICE"] = KaleParseOnlyHandler(NoticeMessage.Message.Parser)
+        register(NoticeMessage.Message::class, NoticeMessage.Message.Serialiser)
 
-        routeCommandToParser("PRIVMSG", PrivMsgMessage)
-        routeMessageToSerialiser(PrivMsgMessage::class, PrivMsgMessage)
+        commandsToParsers["INVITE"] = KaleParseOnlyHandler(InviteMessage.Message.Parser)
+        register(InviteMessage.Command::class, InviteMessage.Command.Serialiser)
 
-        routeCommandToParser("NOTICE", NoticeMessage)
-        routeMessageToSerialiser(NoticeMessage::class, NoticeMessage)
+        commandsToParsers["TOPIC"] = KaleParseOnlyHandler(TopicMessage.Message.Parser)
+        register(TopicMessage.Command::class, TopicMessage.Command.Serialiser)
 
-        routeCommandToParser("INVITE", InviteMessage)
-        routeMessageToSerialiser(InviteMessage::class, InviteMessage)
+        commandsToParsers["KICK"] = KaleParseOnlyHandler(KickMessage.Message.Parser)
+        register(KickMessage.Command::class, KickMessage.Command.Serialiser)
 
-        routeCommandToParser("TOPIC", TopicMessage)
-        routeMessageToSerialiser(TopicMessage::class, TopicMessage)
+        commandsToParsers["JOIN"] = KaleParseOnlyHandler(JoinMessage.Message.Parser)
+        register(JoinMessage.Command::class, JoinMessage.Command.Serialiser)
 
-        routeCommandToParser("KICK", KickMessage)
-        routeMessageToSerialiser(KickMessage::class, KickMessage)
+        val capHandlers = mapOf(
+                CapMessage.Ls.subcommand to KaleParseOnlyHandler(CapMessage.Ls.Message.Parser),
+                CapMessage.Ack.subcommand to KaleParseOnlyHandler(CapMessage.Ack.Message.Parser),
+                CapMessage.Del.subcommand to KaleParseOnlyHandler(CapMessage.Del.Message.Parser),
+                CapMessage.Nak.subcommand to KaleParseOnlyHandler(CapMessage.Nak.Message.Parser),
+                CapMessage.New.subcommand to KaleParseOnlyHandler(CapMessage.New.Message.Parser))
+        register(CapMessage.command, KaleSubcommandHandler(capHandlers, subcommandPosition = 1))
+        register(CapMessage.Ls.Command::class, CapMessage.Ls.Command.Serialiser)
+        register(CapMessage.Ack.Command::class, CapMessage.Ack.Command.Serialiser)
+        register(CapMessage.End.Command::class, CapMessage.End.Command.Serialiser)
+        register(CapMessage.Req.Command::class, CapMessage.Req.Command.Serialiser)
 
-        routeCommandToParserMatcher("JOIN") { (_, _, _, parameters) ->
-            when (parameters.size) {
-                1,2 -> JoinMessage
-                3 -> ExtendedJoinMessage
-                else -> null
-            }
-        }
-        routeMessageToSerialiser(JoinMessage::class, JoinMessage)
-        routeMessageToSerialiser(ExtendedJoinMessage::class, ExtendedJoinMessage)
+        // TODO: use special subcommand handler for +-
+        val batchHandlers = mapOf(
+                BatchMessage.Start.subcommand to KaleParseOnlyHandler(BatchMessage.Start.Message.Parser),
+                BatchMessage.End.subcommand to KaleParseOnlyHandler(BatchMessage.End.Message.Parser))
+        register(BatchMessage.command, KaleSubcommandHandler(batchHandlers))
 
-        routeCommandToParserMatcher("CAP") { (_, _, _, parameters) ->
-            val subcommand = parameters.getOrNull(1)
-            when (subcommand) {
-                "ACK" -> CapAckMessage
-                "END" -> CapEndMessage
-                "LS" -> CapLsMessage
-                "NAK" -> CapNakMessage
-                "REQ" -> CapReqMessage
-                "NEW" -> CapNewMessage
-                "DEL" -> CapDelMessage
-                else -> null
-            }
-        }
-        routeMessageToSerialiser(CapAckMessage::class, CapAckMessage)
-        routeMessageToSerialiser(CapEndMessage::class, CapEndMessage)
-        routeMessageToSerialiser(CapLsMessage::class, CapLsMessage)
-        routeMessageToSerialiser(CapNakMessage::class, CapNakMessage)
-        routeMessageToSerialiser(CapReqMessage::class, CapReqMessage)
-        routeMessageToSerialiser(CapNewMessage::class, CapNewMessage)
-        routeMessageToSerialiser(CapDelMessage::class, CapDelMessage)
+        register(MonitorMessage.Add.Command::class, MonitorMessage.Add.Command.Serialiser)
+        register(MonitorMessage.Remove.Command::class, MonitorMessage.Remove.Command.Serialiser)
+        register(MonitorMessage.Status.Command::class, MonitorMessage.Status.Command.Serialiser)
+        register(MonitorMessage.ListAll.Command::class, MonitorMessage.ListAll.Command.Serialiser)
+        register(MonitorMessage.Clear.Command::class, MonitorMessage.Clear.Command.Serialiser)
 
-        routeCommandToParserMatcher("BATCH") { (_, _, _, parameters) ->
-            val firstCharacterOfFirstParameter = parameters.getOrNull(0)?.getOrNull(0)
-            when (firstCharacterOfFirstParameter) {
-                CharacterCodes.PLUS -> BatchStartMessage
-                CharacterCodes.MINUS -> BatchEndMessage
-                else -> null
-            }
-        }
-        routeMessageToSerialiser(BatchStartMessage::class, BatchStartMessage)
-        routeMessageToSerialiser(BatchEndMessage::class, BatchEndMessage)
+        commandsToParsers[RplEndOfMonList.command] = KaleParseOnlyHandler(RplEndOfMonList.Message.Parser)
 
-        routeCommandToParserMatcher("MONITOR") { (_, _, _, parameters) ->
-            val subCommand = parameters.getOrNull(0)?.getOrNull(0)
-            when (subCommand) {
-                CharacterCodes.PLUS -> MonitorAddMessage
-                CharacterCodes.MINUS -> MonitorRemoveMessage
-                'C' -> MonitorClearMessage
-                'L' -> MonitorListMessage
-                'S' -> MonitorStatusMessage
-                else -> null
-            }
-        }
-        routeMessageToSerialiser(MonitorAddMessage::class, MonitorAddMessage)
-        routeMessageToSerialiser(MonitorRemoveMessage::class, MonitorRemoveMessage)
-        routeMessageToSerialiser(MonitorClearMessage::class, MonitorClearMessage)
-        routeMessageToSerialiser(MonitorListMessage::class, MonitorListMessage)
-        routeMessageToSerialiser(MonitorStatusMessage::class, MonitorStatusMessage)
+        commandsToParsers[RplMonList.command] = KaleParseOnlyHandler(RplMonList.Message.Parser)
 
-        routeCommandToParser("733", RplEndOfMonListMessage)
-        routeMessageToSerialiser(RplEndOfMonListMessage::class, RplEndOfMonListMessage)
+        commandsToParsers[RplMonListIsFull.command] = KaleParseOnlyHandler(RplMonListIsFull.Message.Parser)
 
-        routeCommandToParser("732", RplMonListMessage)
-        routeMessageToSerialiser(RplMonListMessage::class, RplMonListMessage)
+        commandsToParsers[RplMonOffline.command] = KaleParseOnlyHandler(RplMonOffline.Message.Parser)
 
-        routeCommandToParser("734", RplMonListIsFullMessage)
-        routeMessageToSerialiser(RplMonListIsFullMessage::class, RplMonListIsFullMessage)
+        commandsToParsers[RplMonOnline.command] = KaleParseOnlyHandler(RplMonOnline.Message.Parser)
 
-        routeCommandToParser("731", RplMonOfflineMessage)
-        routeMessageToSerialiser(RplMonOfflineMessage::class, RplMonOfflineMessage)
+        commandsToParsers[AuthenticateMessage.command] = KaleParseOnlyHandler(AuthenticateMessage.Message.Parser)
+        register(AuthenticateMessage.Command::class, AuthenticateMessage.Command.Serialiser)
 
-        routeCommandToParser("730", RplMonOnlineMessage)
-        routeMessageToSerialiser(RplMonOnlineMessage::class, RplMonOnlineMessage)
+        commandsToParsers[AccountMessage.command] = KaleParseOnlyHandler(AccountMessage.Message.Parser)
 
-        routeCommandToParser("AUTHENTICATE", AuthenticateMessage)
-        routeMessageToSerialiser(AuthenticateMessage::class, AuthenticateMessage)
+        commandsToParsers[AwayMessage.command] = KaleParseOnlyHandler(AwayMessage.Message.Parser)
 
-        routeCommandToParser("ACCOUNT", AccountMessage)
-        routeMessageToSerialiser(AccountMessage::class, AccountMessage)
+        commandsToParsers[ChgHostMessage.command] = KaleParseOnlyHandler(ChgHostMessage.Message.Parser)
 
-        routeCommandToParser("AWAY", AwayMessage)
-        routeMessageToSerialiser(AwayMessage::class, AwayMessage)
+        commandsToParsers[Rpl903Message.command] = KaleParseOnlyHandler(Rpl903Message.Parser)
 
-        routeCommandToParser("CHGHOST", ChgHostMessage)
-        routeMessageToSerialiser(ChgHostMessage::class, ChgHostMessage)
+        commandsToParsers[Rpl904Message.command] = KaleParseOnlyHandler(Rpl904Message.Parser)
 
-        routeCommandToParser("903", Rpl903Message)
-        routeMessageToSerialiser(Rpl903Message::class, Rpl903Message)
+        commandsToParsers[Rpl905Message.command] = KaleParseOnlyHandler(Rpl905Message.Parser)
 
-        routeCommandToParser("904", Rpl904Message)
-        routeMessageToSerialiser(Rpl904Message::class, Rpl904Message)
+        commandsToParsers[Rpl001Message.command] = KaleParseOnlyHandler(Rpl001Message.Parser)
 
-        routeCommandToParser("905", Rpl905Message)
-        routeMessageToSerialiser(Rpl905Message::class, Rpl905Message)
+        commandsToParsers[Rpl002Message.command] = KaleParseOnlyHandler(Rpl002Message.Parser)
 
-        routeCommandToParser("001", Rpl001Message)
-        routeMessageToSerialiser(Rpl001Message::class, Rpl001Message)
+        commandsToParsers[Rpl003Message.command] = KaleParseOnlyHandler(Rpl003Message.Parser)
 
-        routeCommandToParser("002", Rpl002Message)
-        routeMessageToSerialiser(Rpl002Message::class, Rpl002Message)
+        commandsToParsers[Rpl005Message.command] = KaleParseOnlyHandler(Rpl005Message.Message.Parser)
 
-        routeCommandToParser("003", Rpl003Message)
-        routeMessageToSerialiser(Rpl003Message::class, Rpl003Message)
+        commandsToParsers[Rpl331Message.command] = KaleParseOnlyHandler(Rpl331Message.Parser)
 
-        routeCommandToParser("005", Rpl005Message)
-        routeMessageToSerialiser(Rpl005Message::class, Rpl005Message)
+        commandsToParsers[Rpl332Message.command] = KaleParseOnlyHandler(Rpl332Message.Parser)
 
-        routeCommandToParser("331", Rpl331Message)
-        routeMessageToSerialiser(Rpl331Message::class, Rpl331Message)
+        commandsToParsers[Rpl353Message.command] = KaleParseOnlyHandler(Rpl353Message.Message.Parser)
 
-        routeCommandToParser("332", Rpl332Message)
-        routeMessageToSerialiser(Rpl332Message::class, Rpl332Message)
+        commandsToParsers[Rpl372Message.command] = KaleParseOnlyHandler(Rpl372Message.Parser)
 
-        routeCommandToParser("353", Rpl353Message)
-        routeMessageToSerialiser(Rpl353Message::class, Rpl353Message)
+        commandsToParsers[Rpl375Message.command] = KaleParseOnlyHandler(Rpl375Message.Parser)
 
-        routeCommandToParser("372", Rpl372Message)
-        routeMessageToSerialiser(Rpl372Message::class, Rpl372Message)
+        commandsToParsers[Rpl376Message.command] = KaleParseOnlyHandler(Rpl376Message.Parser)
 
-        routeCommandToParser("375", Rpl375Message)
-        routeMessageToSerialiser(Rpl375Message::class, Rpl375Message)
+        commandsToParsers[Rpl422Message.command] = KaleParseOnlyHandler(Rpl422Message.Parser)
 
-        routeCommandToParser("376", Rpl376Message)
-        routeMessageToSerialiser(Rpl376Message::class, Rpl376Message)
+        commandsToParsers[Rpl471Message.command] = KaleParseOnlyHandler(Rpl471Message.Parser)
 
-        routeCommandToParser("422", Rpl422Message)
-        routeMessageToSerialiser(Rpl422Message::class, Rpl422Message)
+        commandsToParsers[Rpl473Message.command] = KaleParseOnlyHandler(Rpl473Message.Parser)
 
-        routeCommandToParser("471", Rpl471Message)
-        routeMessageToSerialiser(Rpl471Message::class, Rpl471Message)
+        commandsToParsers[Rpl474Message.command] = KaleParseOnlyHandler(Rpl474Message.Parser)
 
-        routeCommandToParser("473", Rpl473Message)
-        routeMessageToSerialiser(Rpl473Message::class, Rpl473Message)
-
-        routeCommandToParser("474", Rpl474Message)
-        routeMessageToSerialiser(Rpl474Message::class, Rpl474Message)
-
-        routeCommandToParser("475", Rpl475Message)
-        routeMessageToSerialiser(Rpl475Message::class, Rpl475Message)
+        commandsToParsers[Rpl475Message.command] = KaleParseOnlyHandler(Rpl475Message.Parser)
 
         return this
     }

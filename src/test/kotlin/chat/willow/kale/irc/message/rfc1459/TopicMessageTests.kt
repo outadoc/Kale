@@ -8,52 +8,49 @@ import org.junit.Before
 import org.junit.Test
 
 class TopicMessageTests {
-    lateinit var factory: TopicMessage.Factory
+
+    private lateinit var messageParser: TopicMessage.Message.Parser
+    private lateinit var messageSerialiser: TopicMessage.Command.Serialiser
 
     @Before fun setUp() {
-        factory = TopicMessage
+        messageParser = TopicMessage.Message.Parser
+        messageSerialiser = TopicMessage.Command.Serialiser
     }
 
     @Test fun test_parse_Channel() {
-        val message = factory.parse(IrcMessage(command = "TOPIC", parameters = listOf("#channel")))
+        val message = messageParser.parse(IrcMessage(command = "TOPIC", prefix = "source", parameters = listOf("#channel")))
 
-        assertEquals(TopicMessage(channel = "#channel"), message)
+        assertEquals(TopicMessage.Message(source = Prefix(nick = "source"), channel = "#channel"), message)
     }
 
     @Test fun test_parse_Source_Channel() {
-        val message = factory.parse(IrcMessage(command = "TOPIC", prefix = "source", parameters = listOf("#channel")))
+        val message = messageParser.parse(IrcMessage(command = "TOPIC", prefix = "source", parameters = listOf("#channel")))
 
-        assertEquals(TopicMessage(source = Prefix(nick = "source"), channel = "#channel"), message)
+        assertEquals(TopicMessage.Message(source = Prefix(nick = "source"), channel = "#channel"), message)
     }
 
     @Test fun test_parse_Source_Channel_Topic() {
-        val message = factory.parse(IrcMessage(command = "TOPIC", prefix = "source", parameters = listOf("#channel", "channel topic!")))
+        val message = messageParser.parse(IrcMessage(command = "TOPIC", prefix = "source", parameters = listOf("#channel", "channel topic!")))
 
-        assertEquals(TopicMessage(source = Prefix(nick = "source"), channel = "#channel", topic = "channel topic!"), message)
+        assertEquals(TopicMessage.Message(source = Prefix(nick = "source"), channel = "#channel", topic = "channel topic!"), message)
     }
 
     @Test fun test_parse_TooFewParameters() {
-        val message = factory.parse(IrcMessage(command = "TOPIC", parameters = listOf()))
+        val message = messageParser.parse(IrcMessage(command = "TOPIC", parameters = listOf()))
 
         assertNull(message)
     }
 
-    @Test fun test_serialise_Channel() {
-        val message = factory.serialise(TopicMessage(channel = "#channel"))
+    @Test fun test_serialise_Source_Channel() {
+        val message = messageSerialiser.serialise(TopicMessage.Command(channel = "#channel"))
 
         assertEquals(IrcMessage(command = "TOPIC", parameters = listOf("#channel")), message)
     }
 
-    @Test fun test_serialise_Source_Channel() {
-        val message = factory.serialise(TopicMessage(source = Prefix(nick = "someone"), channel = "#channel"))
-
-        assertEquals(IrcMessage(command = "TOPIC", prefix = "someone", parameters = listOf("#channel")), message)
-    }
-
     @Test fun test_serialise_Source_Channel_Topic() {
-        val message = factory.serialise(TopicMessage(source = Prefix(nick = "someone"), channel = "#channel", topic = "another channel topic!"))
+        val message = messageSerialiser.serialise(TopicMessage.Command(channel = "#channel", topic = "another channel topic!"))
 
-        assertEquals(IrcMessage(command = "TOPIC", prefix = "someone", parameters = listOf("#channel", "another channel topic!")), message)
+        assertEquals(IrcMessage(command = "TOPIC", parameters = listOf("#channel", "another channel topic!")), message)
     }
 
 }

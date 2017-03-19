@@ -1,28 +1,26 @@
 package chat.willow.kale
 
-import chat.willow.kale.irc.message.extension.batch.BatchEndMessage
-import chat.willow.kale.irc.message.extension.batch.BatchStartMessage
-import chat.willow.kale.irc.message.extension.extended_join.ExtendedJoinMessage
+import chat.willow.kale.irc.message.extension.batch.BatchMessage
+import chat.willow.kale.irc.message.extension.sasl.rpl.Rpl903Message
+import chat.willow.kale.irc.message.extension.sasl.rpl.Rpl903MessageType
 import chat.willow.kale.irc.message.rfc1459.*
-import chat.willow.kale.irc.message.rfc1459.rpl.*
 import chat.willow.kale.irc.prefix.Prefix
-import chat.willow.kale.irc.tag.ITagStore
 import chat.willow.kale.irc.tag.KaleTagRouter
-import chat.willow.kale.irc.tag.extension.AccountTag
-import chat.willow.kale.irc.tag.extension.ServerTimeTag
 
 object KaleRunner {
     @JvmStatic fun main(args: Array<String>) {
         println("Hello, Kale!")
 
-        val kale = Kale(KaleRouter().useDefaults(), KaleTagRouter().useDefaults())
+        val kale = Kale(KaleRouter().useClientDefaults(), KaleTagRouter().useDefaults())
         val pingHandler = PingHandler()
         val pongHandler = PongHandler()
         val privMsgHandler = PrivMsgHandler()
+        val rpl903Handler = Rpl903Handler()
 
-        kale.register(pongHandler)
-        kale.register(pingHandler)
-        kale.register(privMsgHandler)
+        kale.router.register(PingMessage.command, pingHandler)
+        kale.router.register(PongMessage.command, pongHandler)
+        kale.router.register(PrivMsgMessage.command, privMsgHandler)
+        kale.router.register(Rpl903Message.command, rpl903Handler)
 
         kale.process("@tag;key=value :user!host@server WHATEVER :more stuff")
         kale.process("PING :token")
@@ -53,75 +51,59 @@ object KaleRunner {
         kale.process(":test.server 422 testnickname :MOTD File is missing")
         kale.process("BATCH +reference type param1")
         kale.process("BATCH -reference")
+        kale.process(":test.server 903 testnickname :message")
 
         kale.process("@account=testuser;time=2012-06-30T23:59:60.419Z PRIVMSG #mychannel :this is a message! ")
 
-        println(kale.serialise(PingMessage(token = "token")))
-        println(kale.serialise(PongMessage(token = "token2")))
-        println(kale.serialise(NickMessage(nickname = "nickname")))
-        println(kale.serialise(UserMessage(username = "username", mode = "mode", realname = "realname")))
-        println(kale.serialise(QuitMessage(message = "")))
-        println(kale.serialise(PassMessage(password = "password")))
-        println(kale.serialise(JoinMessage(channels = listOf("#channel", "#channel2"), keys = listOf("key1"))))
-        println(kale.serialise(ExtendedJoinMessage(source = Prefix("nickname"), channel = "#channel", account = "account", realName = "Real Name")))
-        println(kale.serialise(PartMessage(channels = listOf("#channel", "#channel2"))))
-        println(kale.serialise(ModeMessage(target = "#channel", modifiers = listOf(ModeMessage.ModeModifier(type = '+', mode = 'b', parameter = "somebody")))))
-        println(kale.serialise(PrivMsgMessage(source = Prefix(nick = "somebody", host = "somewhere"), target = "person", message = "hello")))
-        println(kale.serialise(PrivMsgMessage(source = Prefix(nick = "abot", host = "aserver"), target = "#channel", message = "I am a bot")))
-        println(kale.serialise(InviteMessage(source = Prefix(nick = "someone"), user = "user", channel = "#channel")))
-        println(kale.serialise(TopicMessage(source = Prefix(nick = "someone"), channel = "#channel", topic = "a topic!")))
-        println(kale.serialise(KickMessage(channels = listOf("#channel1", "#channel2"), users = listOf("user1", "user2"), comment = "kicked!")))
-        println(kale.serialise(Rpl001Message(source = "test.server", target = "testnickname", contents = "welcome to test server!")))
-        println(kale.serialise(Rpl002Message(source = "test.server", target = "testnickname", contents = "your host is imaginary.server, running version x")))
-        println(kale.serialise(Rpl003Message(source = "test.server", target = "testnickname", contents = "this server was created date")))
-        println(kale.serialise(Rpl005Message(source = "test.server", target = "testnickname", tokens = mapOf("KEY" to "VALUE", "KEY2" to null, "KEY3" to "\uD83D\uDC30"))))
-        println(kale.serialise(Rpl331Message(source = "test.server", channel = "#channel", contents = "no topic is set")))
-        println(kale.serialise(Rpl332Message(source = "test.server", target = "testnickname", channel = "#channel", topic = "channel topic!")))
-        println(kale.serialise(Rpl353Message(source = "test.server", target = "testnickname", visibility = "@", channel = "#channel", names = listOf("testnickname", "@another-nick"))))
-        println(kale.serialise(Rpl372Message(source = "test.server", target = "testnickname", contents = "- MOTD contents")))
-        println(kale.serialise(Rpl375Message(source = "test.server", target = "testnickname", contents = "- test.server Message of the day - ")))
-        println(kale.serialise(Rpl376Message(source = "test.server", target = "testnickname", contents = "End of MOTD command")))
-        println(kale.serialise(Rpl422Message(source = "test.server", target = "testnickname", contents = "MOTD File is missing")))
-        println(kale.serialise(BatchStartMessage(reference = "reference", type = "type", parameters = listOf("parameter1", "parameter2"))))
-        println(kale.serialise(BatchEndMessage(reference = "reference")))
+        println(kale.serialise(PingMessage.Command(token = "token")))
+        println(kale.serialise(PongMessage.Message(token = "token2")))
+        println(kale.serialise(NickMessage.Command(nickname = "nickname")))
+        println(kale.serialise(UserMessage.Command(username = "username", mode = "mode", realname = "realname")))
+        println(kale.serialise(QuitMessage.Command(message = "")))
+        println(kale.serialise(PassMessage.Command(password = "password")))
+        println(kale.serialise(JoinMessage.Command(channels = listOf("#channel", "#channel2"), keys = listOf("key1"))))
+        println(kale.serialise(PartMessage.Command(channels = listOf("#channel", "#channel2"))))
+        println(kale.serialise(ModeMessage.Command(target = "#channel", modifiers = listOf(ModeMessage.ModeModifier(type = '+', mode = 'b', parameter = "somebody")))))
+        println(kale.serialise(PrivMsgMessage.Command(target = "person", message = "hello")))
+        println(kale.serialise(PrivMsgMessage.Command(target = "#channel", message = "I am a bot")))
+        println(kale.serialise(InviteMessage.Message(source = Prefix(nick = "someone"), user = "user", channel = "#channel")))
+        println(kale.serialise(TopicMessage.Message(source = Prefix(nick = "someone"), channel = "#channel", topic = "a topic!")))
+        println(kale.serialise(KickMessage.Command(channels = listOf("#channel1", "#channel2"), users = listOf("user1", "user2"), comment = "kicked!")))
+        println(kale.serialise(BatchMessage.Start.Message(source = Prefix(nick = "someone"), reference = "reference", type = "type", parameters = listOf("parameter1", "parameter2"))))
+        println(kale.serialise(BatchMessage.End.Message(source = Prefix(nick = "someone"), reference = "reference")))
     }
 
-    class PingHandler: IKaleHandler<PingMessage> {
-        override val messageType = PingMessage::class.java
+    class PingHandler: KaleHandler<PingMessage.Command>(PingMessage.Command.Parser) {
 
-        override fun handle(message: PingMessage, tags: ITagStore) {
+        override fun handle(message: PingMessage.Command, metadata: IMetadataStore) {
             println("handling ping: $message")
         }
+
     }
 
-    class PongHandler: IKaleHandler<PongMessage> {
-        override val messageType = PongMessage::class.java
+    class PongHandler: KaleHandler<PongMessage.Message>(PongMessage.Message.Parser) {
 
-        override fun handle(message: PongMessage, tags: ITagStore) {
+        override fun handle(message: PongMessage.Message, metadata: IMetadataStore) {
             println("handling pong: $message")
         }
+
     }
 
-    class PrivMsgHandler: IKaleHandler<PrivMsgMessage> {
-        override val messageType = PrivMsgMessage::class.java
+    class PrivMsgHandler: KaleHandler<PrivMsgMessage.Message>(PrivMsgMessage.Message.Parser) {
 
-        override fun handle(message: PrivMsgMessage, tags: ITagStore) {
+        override fun handle(message: PrivMsgMessage.Message, metadata: IMetadataStore) {
             println("handling message: $message")
-
-            val time = tags[ServerTimeTag::class]
-            if (time == null) {
-                println(" no time")
-            } else {
-                println(" time: $time")
-            }
-
-            val account = tags[AccountTag::class]
-            if (account == null) {
-                println(" no account")
-            } else {
-                println(" account: $account")
-            }
         }
+
+    }
+
+    class Rpl903Handler: KaleHandler<Rpl903MessageType>(Rpl903Message.Parser) {
+
+        override fun handle(message: Rpl903MessageType, metadata: IMetadataStore) {
+            println("handling rpl 903: $message")
+        }
+
+
     }
 }
 

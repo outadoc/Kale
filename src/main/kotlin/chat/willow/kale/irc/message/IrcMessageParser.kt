@@ -11,7 +11,7 @@ object IrcMessageParser: IIrcMessageParser {
     val MAX_LINE_LENGTH = 8192
 
     override fun parse(line: String): IrcMessage? {
-        if (line.length > MAX_LINE_LENGTH) {
+        if (line.length > MAX_LINE_LENGTH || line.isBlank()) {
             return null
         }
 

@@ -7,26 +7,29 @@ import org.junit.Before
 import org.junit.Test
 
 class PongMessageTests {
-    lateinit var factory: PongMessage.Factory
+
+    private lateinit var messageParser: PongMessage.Message.Parser
+    private lateinit var messageSerialiser: PongMessage.Message.Serialiser
 
     @Before fun setUp() {
-        factory = PongMessage
+        messageParser = PongMessage.Message.Parser
+        messageSerialiser = PongMessage.Message.Serialiser
     }
 
     @Test fun test_parse() {
-        val message = factory.parse(IrcMessage(command = "PONG", parameters = listOf("token1")))
+        val message = messageParser.parse(IrcMessage(command = "PONG", parameters = listOf("token1")))
 
-        assertEquals(message, PongMessage(token = "token1"))
+        assertEquals(message, PongMessage.Message(token = "token1"))
     }
 
     @Test fun test_parse_noParameters() {
-        val message = factory.parse(IrcMessage(command = "PONG"))
+        val message = messageParser.parse(IrcMessage(command = "PONG"))
 
         assertNull(message)
     }
 
     @Test fun test_serialise() {
-        val message = factory.serialise(PongMessage(token = "anotherToken"))
+        val message = messageSerialiser.serialise(PongMessage.Message(token = "anotherToken"))
 
         assertEquals(message, IrcMessage(command = "PONG", parameters = listOf("anotherToken")))
     }

@@ -9,32 +9,34 @@ import org.junit.Test
 
 class AccountMessageTests {
 
-    lateinit var factory: AccountMessage.Factory
+    lateinit var messageParser: AccountMessage.Message.Parser
+    lateinit var messageSerialiser: AccountMessage.Message.Serialiser
 
     @Before fun setUp() {
-        factory = AccountMessage
+        messageParser = AccountMessage.Message.Parser
+        messageSerialiser = AccountMessage.Message.Serialiser
     }
 
     @Test fun test_parse_SourceAndAccount() {
-        val message = factory.parse(IrcMessage(command = "ACCOUNT", prefix = "nickname", parameters = listOf("account")))
+        val message = messageParser.parse(IrcMessage(command = "ACCOUNT", prefix = "nickname", parameters = listOf("account")))
 
-        assertEquals(AccountMessage(source = Prefix(nick = "nickname"), account = "account"), message)
+        assertEquals(AccountMessage.Message(source = Prefix(nick = "nickname"), account = "account"), message)
     }
 
     @Test fun test_parse_MissingPrefix_ReturnsNull() {
-        val message = factory.parse(IrcMessage(command = "ACCOUNT", parameters = listOf("account")))
+        val message = messageParser.parse(IrcMessage(command = "ACCOUNT", parameters = listOf("account")))
 
         assertNull(message)
     }
 
     @Test fun test_parse_TooFewParameters() {
-        val messageOne = factory.parse(IrcMessage(command = "ACCOUNT", prefix = "nickname"))
+        val messageOne = messageParser.parse(IrcMessage(command = "ACCOUNT", prefix = "nickname"))
 
         assertNull(messageOne)
     }
 
     @Test fun test_serialise_Source_Account() {
-        val message = factory.serialise(AccountMessage(source = Prefix(nick = "nickname"), account = "account"))
+        val message = messageSerialiser.serialise(AccountMessage.Message(source = Prefix(nick = "nickname"), account = "account"))
 
         assertEquals(IrcMessage(command = "ACCOUNT", prefix = "nickname", parameters = listOf("account")), message)
     }

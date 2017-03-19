@@ -1,6 +1,7 @@
 package chat.willow.kale.irc.message.extension.batch
 
 import chat.willow.kale.irc.message.IrcMessage
+import chat.willow.kale.irc.prefix.prefix
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Before
@@ -8,48 +9,50 @@ import org.junit.Test
 
 class BatchStartMessageTests {
 
-    private lateinit var factory: BatchStartMessage.Factory
+    private lateinit var messageParser: BatchMessage.Start.Message.Parser
+    private lateinit var messageSerialiser: BatchMessage.Start.Message.Serialiser
 
     @Before fun setUp() {
-        factory = BatchStartMessage
+        messageParser = BatchMessage.Start.Message.Parser
+        messageSerialiser = BatchMessage.Start.Message.Serialiser
     }
 
     @Test fun test_parse_NoBatchParameters() {
-        val message = factory.parse(IrcMessage(command = "BATCH", parameters = listOf("+batch1", "type")))
+        val message = messageParser.parse(IrcMessage(command = "BATCH", prefix = "someone", parameters = listOf("+batch1", "type")))
 
-        assertEquals(BatchStartMessage(reference = "batch1", type = "type"), message)
+        assertEquals(BatchMessage.Start.Message(source = prefix("someone"), reference = "batch1", type = "type"), message)
     }
 
     @Test fun test_parse_MultipleBatchParameters() {
-        val message = factory.parse(IrcMessage(command = "BATCH", parameters = listOf("+batch1", "type", "param1", "param2")))
+        val message = messageParser.parse(IrcMessage(command = "BATCH", prefix = "someone", parameters = listOf("+batch1", "type", "param1", "param2")))
 
-        assertEquals(BatchStartMessage(reference = "batch1", type = "type", parameters = listOf("param1", "param2")), message)
+        assertEquals(BatchMessage.Start.Message(source = prefix("someone"), reference = "batch1", type = "type", parameters = listOf("param1", "param2")), message)
     }
 
     @Test fun test_parse_MissingPlusCharacter_ReturnsNull() {
-        val message = factory.parse(IrcMessage(command = "BATCH", parameters = listOf("batch1", "type")))
+        val message = messageParser.parse(IrcMessage(command = "BATCH", parameters = listOf("batch1", "type")))
 
         assertNull(message)
     }
 
     @Test fun test_parse_TooFewParameters_ReturnsNull() {
-        val messageOne = factory.parse(IrcMessage(command = "BATCH", parameters = listOf("batch1")))
-        val messageTwo = factory.parse(IrcMessage(command = "BATCH", parameters = listOf()))
+        val messageOne = messageParser.parse(IrcMessage(command = "BATCH", parameters = listOf("batch1")))
+        val messageTwo = messageParser.parse(IrcMessage(command = "BATCH", parameters = listOf()))
 
         assertNull(messageOne)
         assertNull(messageTwo)
     }
 
     @Test fun test_serialise_NoBatchParameters() {
-        val message = factory.serialise(BatchStartMessage(reference = "reference", type = "type"))
+        val message = messageSerialiser.serialise(BatchMessage.Start.Message(source = prefix("someone"), reference = "reference", type = "type"))
 
-        assertEquals(IrcMessage(command = "BATCH", parameters = listOf("+reference", "type")), message)
+        assertEquals(IrcMessage(command = "BATCH", prefix = "someone", parameters = listOf("+reference", "type")), message)
     }
 
     @Test fun test_serialise_MultipleBatchParameters() {
-        val message = factory.serialise(BatchStartMessage(reference = "reference", type = "type", parameters = listOf("parameter1", "parameter2")))
+        val message = messageSerialiser.serialise(BatchMessage.Start.Message(source = prefix("someone"), reference = "reference", type = "type", parameters = listOf("parameter1", "parameter2")))
 
-        assertEquals(IrcMessage(command = "BATCH", parameters = listOf("+reference", "type", "parameter1", "parameter2")), message)
+        assertEquals(IrcMessage(command = "BATCH", prefix = "someone", parameters = listOf("+reference", "type", "parameter1", "parameter2")), message)
     }
 
 }

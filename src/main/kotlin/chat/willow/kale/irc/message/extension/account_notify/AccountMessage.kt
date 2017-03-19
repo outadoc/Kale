@@ -1,36 +1,48 @@
 package chat.willow.kale.irc.message.extension.account_notify
 
-import chat.willow.kale.irc.message.IMessage
-import chat.willow.kale.irc.message.IMessageParser
-import chat.willow.kale.irc.message.IMessageSerialiser
-import chat.willow.kale.irc.message.IrcMessage
+import chat.willow.kale.ICommand
+import chat.willow.kale.IrcMessageComponents
+import chat.willow.kale.irc.message.MessageParser
+import chat.willow.kale.irc.message.MessageSerialiser
 import chat.willow.kale.irc.prefix.Prefix
 import chat.willow.kale.irc.prefix.PrefixParser
 import chat.willow.kale.irc.prefix.PrefixSerialiser
 
-data class AccountMessage(val source: Prefix, val account: String): IMessage {
+object AccountMessage : ICommand {
 
-    override val command: String = "ACCOUNT"
+    override val command = "ACCOUNT"
 
-    companion object Factory: IMessageParser<AccountMessage>, IMessageSerialiser<AccountMessage> {
+    data class Message(val source: Prefix, val account: String) {
 
-        override fun serialise(message: AccountMessage): IrcMessage? {
-            val prefix = PrefixSerialiser.serialise(message.source)
-            return IrcMessage(command = message.command, prefix = prefix, parameters = listOf(message.account))
-        }
+        object Parser : MessageParser<Message>(command) {
 
-        override fun parse(message: IrcMessage): AccountMessage? {
-            val prefix = message.prefix ?: return null
+            override fun parseFromComponents(components: IrcMessageComponents): Message? {
+                val prefix = components.prefix ?: return null
 
-            if (message.parameters.isEmpty()) {
-                return null
+                if (components.parameters.isEmpty()) {
+                    return null
+                }
+
+                val source = PrefixParser.parse(prefix) ?: return null
+                val account = components.parameters[0]
+
+                return Message(source, account)
             }
 
-            val source = PrefixParser.parse(prefix) ?: return null
-            val account = message.parameters[0]
-
-            return AccountMessage(source = source, account = account)
         }
+
+        object Serialiser : MessageSerialiser<Message>(command) {
+
+            override fun serialiseToComponents(message: Message): IrcMessageComponents {
+                val prefix = PrefixSerialiser.serialise(message.source)
+
+                val parameters = listOf(message.account)
+
+                return IrcMessageComponents(prefix = prefix, parameters = parameters)
+            }
+
+        }
+
     }
 
 }

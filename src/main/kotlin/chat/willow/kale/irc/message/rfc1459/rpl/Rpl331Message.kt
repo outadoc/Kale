@@ -1,29 +1,14 @@
 package chat.willow.kale.irc.message.rfc1459.rpl
 
-import chat.willow.kale.irc.message.IMessage
-import chat.willow.kale.irc.message.IMessageParser
-import chat.willow.kale.irc.message.IMessageSerialiser
-import chat.willow.kale.irc.message.IrcMessage
+import chat.willow.kale.ICommand
 
-data class Rpl331Message(val source: String, val channel: String, val contents: String): IMessage {
-    override val command: String = "331"
+typealias Rpl331MessageType = RplSourceTargetContent.Message
 
-    companion object Factory: IMessageParser<Rpl331Message>, IMessageSerialiser<Rpl331Message> {
+object Rpl331Message : ICommand {
 
-        override fun serialise(message: Rpl331Message): IrcMessage? {
-            return IrcMessage(command = message.command, prefix = message.source, parameters = listOf(message.channel, message.contents))
-        }
+    override val command = "331"
 
-        override fun parse(message: IrcMessage): Rpl331Message? {
-            if (message.parameters.size < 2) {
-                return null
-            }
+    object Parser : RplSourceTargetContent.Parser(command)
+    object Serialiser : RplSourceTargetContent.Serialiser(command)
 
-            val source = message.prefix ?: ""
-            val channel = message.parameters[0]
-            val contents = message.parameters[1]
-
-            return Rpl331Message(source = source, channel = channel, contents = contents)
-        }
-    }
 }

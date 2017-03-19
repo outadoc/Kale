@@ -1,50 +1,70 @@
 package chat.willow.kale.irc.message.rfc1459
 
-import chat.willow.kale.irc.message.IMessage
-import chat.willow.kale.irc.message.IMessageParser
-import chat.willow.kale.irc.message.IMessageSerialiser
-import chat.willow.kale.irc.message.IrcMessage
+import chat.willow.kale.ICommand
+import chat.willow.kale.IrcMessageComponents
+import chat.willow.kale.irc.message.MessageParser
+import chat.willow.kale.irc.message.MessageSerialiser
 import chat.willow.kale.irc.prefix.Prefix
 import chat.willow.kale.irc.prefix.PrefixParser
 import chat.willow.kale.irc.prefix.PrefixSerialiser
 
-data class NickMessage(val source: Prefix? = null, val nickname: String, val hopcount: Int? = null): IMessage {
-    override val command: String = "NICK"
+object NickMessage : ICommand {
 
-    companion object Factory: IMessageParser<NickMessage>, IMessageSerialiser<NickMessage> {
+    override val command = "NICK"
 
-        override fun serialise(message: NickMessage): IrcMessage? {
-            val prefix = if (message.source != null) { PrefixSerialiser.serialise(message.source) } else { null }
+    data class Command(val nickname: String) {
 
-            var parameters = listOf(message.nickname)
+        object Parser : MessageParser<Command>(command) {
 
-            if (message.hopcount != null) {
-                parameters += message.hopcount.toString()
-            }
-
-            return IrcMessage(command = message.command, prefix = prefix, parameters = parameters)
-        }
-
-        override fun parse(message: IrcMessage): NickMessage? {
-            if (message.parameters.isEmpty()) {
-                return null
-            }
-
-            val source = PrefixParser.parse(message.prefix ?: "")
-            val nickname = message.parameters[0]
-
-            if (message.parameters.size < 2) {
-                return NickMessage(source = source, nickname = nickname)
-            } else {
-                val hopcount = try {
-                    message.parameters[1].toInt()
-                } catch (exception: NumberFormatException) {
+            override fun parseFromComponents(components: IrcMessageComponents): Command? {
+                if (components.parameters.isEmpty()) {
                     return null
                 }
 
-                return NickMessage(source = source, nickname = nickname, hopcount = hopcount)
+                val nickname = components.parameters[0]
+
+                return Command(nickname = nickname)
             }
+
         }
+
+        object Serialiser : MessageSerialiser<Command>(command) {
+
+            override fun serialiseToComponents(message: Command): IrcMessageComponents {
+                return IrcMessageComponents(parameters = listOf(message.nickname))
+            }
+            
+        }
+
+    }
+
+    data class Message(val source: Prefix, val nickname: String) {
+
+        object Parser : MessageParser<Message>(command) {
+
+            override fun parseFromComponents(components: IrcMessageComponents): Message? {
+                if (components.parameters.isEmpty() || components.prefix == null) {
+                    return null
+                }
+
+                val source = PrefixParser.parse(components.prefix) ?: return null
+                val nickname = components.parameters[0]
+
+                return Message(source = source, nickname = nickname)
+            }
+
+        }
+
+        object Serialiser : MessageSerialiser<Message>(command) {
+
+            override fun serialiseToComponents(message: Message): IrcMessageComponents {
+                val prefix = PrefixSerialiser.serialise(message.source)
+
+                return IrcMessageComponents(prefix = prefix, parameters = listOf(message.nickname))
+            }
+
+        }
+        
     }
 
 }

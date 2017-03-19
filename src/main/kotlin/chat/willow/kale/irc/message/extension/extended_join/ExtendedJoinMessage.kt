@@ -1,40 +1,50 @@
 package chat.willow.kale.irc.message.extension.extended_join
 
-import chat.willow.kale.irc.message.IMessage
-import chat.willow.kale.irc.message.IMessageParser
-import chat.willow.kale.irc.message.IMessageSerialiser
-import chat.willow.kale.irc.message.IrcMessage
+import chat.willow.kale.ICommand
+import chat.willow.kale.IrcMessageComponents
+import chat.willow.kale.irc.message.MessageParser
+import chat.willow.kale.irc.message.MessageSerialiser
 import chat.willow.kale.irc.prefix.Prefix
 import chat.willow.kale.irc.prefix.PrefixParser
 import chat.willow.kale.irc.prefix.PrefixSerialiser
 
-data class ExtendedJoinMessage(val source: Prefix, val channel: String, val account: String?, val realName: String): IMessage {
-    override val command: String = "JOIN"
+object ExtendedJoinMessage : ICommand {
 
-    companion object Factory: IMessageParser<ExtendedJoinMessage>, IMessageSerialiser<ExtendedJoinMessage> {
+    override val command = "JOIN"
 
-        override fun serialise(message: ExtendedJoinMessage): IrcMessage? {
-            val prefix = PrefixSerialiser.serialise(message.source)
+    data class Message(val source: Prefix, val channel: String, val account: String?, val realName: String) {
 
-            val account = message.account ?: "*"
+        object Parser : MessageParser<Message>(command) {
 
-            return IrcMessage(command = message.command, prefix = prefix, parameters = listOf(message.channel, account, message.realName))
-        }
+            override fun parseFromComponents(components: IrcMessageComponents): Message? {
+                if (components.parameters.size < 3 || components.prefix == null) {
+                    return null
+                }
 
-        override fun parse(message: IrcMessage): ExtendedJoinMessage? {
-            if (message.parameters.size < 3 || message.prefix == null) {
-                return null
+                val source = PrefixParser.parse(components.prefix) ?: return null
+                val channel = components.parameters[0]
+                val account = components.parameters[1]
+                val realName = components.parameters[2]
+
+                val parsedAccount = if (account == "*") { null } else { account }
+
+                return Message(source, channel, parsedAccount, realName)
             }
 
-            val source = PrefixParser.parse(message.prefix) ?: return null
-            val channel = message.parameters[0]
-            val account = message.parameters[1]
-            val realName = message.parameters[2]
-
-            val parsedAccount = if (account == "*") { null } else { account }
-
-            return ExtendedJoinMessage(source = source, channel = channel, account = parsedAccount, realName = realName)
         }
+
+        object Serialiser : MessageSerialiser<Message>(command) {
+
+            override fun serialiseToComponents(message: Message): IrcMessageComponents {
+                val prefix = PrefixSerialiser.serialise(message.source)
+
+                val account = message.account ?: "*"
+
+                return IrcMessageComponents(prefix = prefix, parameters = listOf(message.channel, account, message.realName))
+            }
+
+        }
+
     }
 
 }

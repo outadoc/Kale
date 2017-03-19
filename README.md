@@ -1,7 +1,9 @@
 # Kale
-Kotlin/JVM IRC message parsing, serialising and notifying. Provides useful abstractions with the intention of splitting message parsing and IRC state management.
+Kotlin/JVM IRC message parsing, serialising and notifying. Provides useful abstractions with the intention of splitting message parsing and IRC state management. Useful for building bots, clients and servers.
 
 [Warren](https://github.com/WillowChat/Warren) is the state tracking counterpart. If you're interested in making something for IRC, you probably want it instead. Kale by itself does not track any IRC state.
+
+[Burrow](https://github.com/WillowChat/Burrow) is a new IRC v3.2 server daemon, which uses the parsing and serialising bits of Kale.
 
 [Thump](https://github.com/WillowChat/Thump) is the primary upstream project - a bridge that lets people chat between Minecraft and IRC whilst they play.
 
@@ -9,7 +11,7 @@ Kotlin/JVM IRC message parsing, serialising and notifying. Provides useful abstr
 
 ## Features
 
-Warren and Kale have a few interesting features:
+Kale, Warren and Burrow have a few interesting features:
 
 * The responsibilities of parsing and state management are separated
 * Both parsing and state management are verified by hundreds of unit tests
@@ -21,12 +23,6 @@ Planned releases (and their features) are tracked in [Projects](https://github.c
 
 <a href="https://patreon.com/carrotcodes"><img src="https://s3.amazonaws.com/patreon_public_assets/toolbox/patreon.png" align="left" width="160" ></a>
 If you use this library and you'd like to support my open-source work, please consider tipping through [Patreon](https://patreon.com/carrotcodes).
-
-## TODO
-* [RFC 1459](https://tools.ietf.org/html/rfc1459)
- * Pretty much done for majority of usage - consider being more complete
-* [IRC v3](http://ircv3.net/irc/)
- * Messages for extensions listed on the IRCv3 libraries site: http://ircv3.net/software/libraries.html
 
 ## Code License
 The source code of this project is licensed under the terms of the ISC license, listed in the [LICENSE](LICENSE.md) file. A concise summary of the ISC license is available at [choosealicense.org](http://choosealicense.com/licenses/isc/).

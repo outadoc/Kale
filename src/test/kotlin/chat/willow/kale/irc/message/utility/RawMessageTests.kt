@@ -7,26 +7,27 @@ import org.junit.Before
 import org.junit.Test
 
 class RawMessageTests {
-    lateinit var factory: RawMessage.Factory
+
+    private lateinit var messageSerialiser: RawMessage.Line.Serialiser
 
     @Before fun setUp() {
-        factory = RawMessage
+        messageSerialiser = RawMessage.Line.Serialiser
     }
 
     @Test fun test_serialise_WellFormedLine() {
-        val message = factory.serialise(RawMessage(line = ":prefix 123 1 :2 3"))
+        val message = messageSerialiser.serialise(RawMessage.Line(line = ":prefix 123 1 :2 3"))
 
         assertEquals(IrcMessage(command = "123", prefix = "prefix", parameters = listOf("1", "2 3")), message)
     }
 
     @Test fun test_serialise_BadlyFormedLine_Empty() {
-        val message = factory.serialise(RawMessage(line = ""))
+        val message = messageSerialiser.serialise(RawMessage.Line(line = ""))
 
         assertNull(message)
     }
 
     @Test fun test_serialise_BadlyFormedLine_Garbage() {
-        val message = factory.serialise(RawMessage(line = ": :1 :2 :3"))
+        val message = messageSerialiser.serialise(RawMessage.Line(line = ": :1 :2 :3"))
 
         assertNull(message)
     }

@@ -7,50 +7,55 @@ import org.junit.Before
 import org.junit.Test
 
 class CapLsMessageTests {
-    lateinit var factory: CapLsMessage.Factory
+
+    lateinit var messageParser: CapMessage.Ls.Message.Parser
+    lateinit var messageSerialiser: CapMessage.Ls.Command.Serialiser
 
     @Before fun setUp() {
-        factory = CapLsMessage
+        messageParser = CapMessage.Ls.Message.Parser
+        messageSerialiser = CapMessage.Ls.Command.Serialiser
     }
 
     @Test fun test_parse_SingleCap() {
-        val message = factory.parse(IrcMessage(command = "CAP", parameters = listOf("test-nick", "LS", "cap1 ")))
+        val message = messageParser.parse(IrcMessage(command = "CAP", parameters = listOf("test-nick", "LS", "cap1 ")))
 
-        assertEquals(CapLsMessage(target = "test-nick", caps = mapOf("cap1" to null)), message)
+        assertEquals(CapMessage.Ls.Message(target = "test-nick", caps = mapOf("cap1" to null)), message)
     }
 
     @Test fun test_parse_MultipleCaps() {
-        val message = factory.parse(IrcMessage(command = "CAP", parameters = listOf("test-nick", "LS", "cap1 cap2=value cap3=")))
+        val message = messageParser.parse(IrcMessage(command = "CAP", parameters = listOf("test-nick", "LS", "cap1 cap2=value cap3=")))
 
-        assertEquals(CapLsMessage(target = "test-nick", caps = mapOf("cap1" to null, "cap2" to "value", "cap3" to "")), message)
+        assertEquals(CapMessage.Ls.Message(target = "test-nick", caps = mapOf("cap1" to null, "cap2" to "value", "cap3" to "")), message)
     }
 
     @Test fun test_parse_MultilineCaps() {
-        val message = factory.parse(IrcMessage(command = "CAP", parameters = listOf("test-nick", "LS", "*", "cap1 cap2=value cap3=")))
+        val message = messageParser.parse(IrcMessage(command = "CAP", parameters = listOf("test-nick", "LS", "*", "cap1 cap2=value cap3=")))
 
-        assertEquals(CapLsMessage(target = "test-nick", caps = mapOf("cap1" to null, "cap2" to "value", "cap3" to ""), isMultiline = true), message)
+        assertEquals(CapMessage.Ls.Message(target = "test-nick", caps = mapOf("cap1" to null, "cap2" to "value", "cap3" to ""), isMultiline = true), message)
     }
 
     @Test fun test_parse_TooFewParameters() {
-        val messageOne = factory.parse(IrcMessage(command = "CAP", parameters = listOf()))
-        val messageTwo = factory.parse(IrcMessage(command = "CAP", parameters = listOf("test-nick")))
-        val messageThree = factory.parse(IrcMessage(command = "CAP", parameters = listOf("test-nick", "LS")))
+        val messageOne = messageParser.parse(IrcMessage(command = "CAP", parameters = listOf()))
+        val messageTwo = messageParser.parse(IrcMessage(command = "CAP", parameters = listOf("test-nick")))
+        val messageThree = messageParser.parse(IrcMessage(command = "CAP", parameters = listOf("test-nick", "LS")))
 
         assertNull(messageOne)
         assertNull(messageTwo)
         assertNull(messageThree)
     }
 
-    @Test fun test_serialise_SingleCap() {
-        val message = factory.serialise(CapLsMessage(caps = mapOf("cap1" to null)))
+    @Test fun test_serialise_Version() {
+        val message = messageSerialiser.serialise(CapMessage.Ls.Command(version = "302"))
 
-        assertEquals(IrcMessage(command = "CAP", parameters = listOf("LS", "302", "cap1")), message)
+        assertEquals(IrcMessage(command = "CAP", parameters = listOf("LS", "302")), message)
     }
 
-    @Test fun test_serialise_MultipleCaps() {
-        val message = factory.serialise(CapLsMessage(caps = mapOf("cap1" to null, "cap2" to "", "cap3" to "val3")))
+    @Test fun test_serialise_NoVersion() {
+        val message = messageSerialiser.serialise(CapMessage.Ls.Command(version = null))
 
-        assertEquals(IrcMessage(command = "CAP", parameters = listOf("LS", "302", "cap1 cap2= cap3=val3")), message)
+        assertEquals(IrcMessage(command = "CAP", parameters = listOf("LS")), message)
     }
+
+    // TODO: Command tests too
 
 }

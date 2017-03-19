@@ -9,38 +9,40 @@ import org.junit.Test
 
 class AwayMessageTests {
 
-    lateinit var factory: AwayMessage.Factory
+    lateinit var messageParser: AwayMessage.Message.Parser
+    lateinit var messageSerialiser: AwayMessage.Message.Serialiser
 
     @Before fun setUp() {
-        factory = AwayMessage
+        messageParser = AwayMessage.Message.Parser
+        messageSerialiser = AwayMessage.Message.Serialiser
     }
 
     @Test fun test_parse_SourceAndMessage() {
-        val message = factory.parse(IrcMessage(command = "AWAY", prefix = "nickname", parameters = listOf("test away message")))
+        val message = messageParser.parse(IrcMessage(command = "AWAY", prefix = "nickname", parameters = listOf("test away message")))
 
-        assertEquals(AwayMessage(source = Prefix(nick = "nickname"), message = "test away message"), message)
+        assertEquals(AwayMessage.Message(source = Prefix(nick = "nickname"), message = "test away message"), message)
     }
 
     @Test fun test_parse_SourceWithoutMessage() {
-        val message = factory.parse(IrcMessage(command = "AWAY", prefix = "nickname", parameters = listOf()))
+        val message = messageParser.parse(IrcMessage(command = "AWAY", prefix = "nickname", parameters = listOf()))
 
-        assertEquals(AwayMessage(source = Prefix(nick = "nickname"), message = null), message)
+        assertEquals(AwayMessage.Message(source = Prefix(nick = "nickname"), message = null), message)
     }
 
     @Test fun test_parse_MissingPrefix_ReturnsNull() {
-        val message = factory.parse(IrcMessage(command = "AWAY", parameters = listOf("away")))
+        val message = messageParser.parse(IrcMessage(command = "AWAY", parameters = listOf("away")))
 
         assertNull(message)
     }
 
     @Test fun test_serialise_SourceAndMessage() {
-        val message = factory.serialise(AwayMessage(source = Prefix(nick = "nickname"), message = "test away message"))
+        val message = messageSerialiser.serialise(AwayMessage.Message(source = Prefix(nick = "nickname"), message = "test away message"))
 
         assertEquals(IrcMessage(command = "AWAY", prefix = "nickname", parameters = listOf("test away message")), message)
     }
 
     @Test fun test_serialise_SourceWithoutMessage() {
-        val message = factory.serialise(AwayMessage(source = Prefix(nick = "nickname"), message = null))
+        val message = messageSerialiser.serialise(AwayMessage.Message(source = Prefix(nick = "nickname"), message = null))
 
         assertEquals(IrcMessage(command = "AWAY", prefix = "nickname", parameters = listOf()), message)
     }

@@ -1,45 +1,28 @@
 package chat.willow.kale.irc.message.rfc1459.rpl
 
-import chat.willow.kale.irc.message.IrcMessage
+import org.junit.Assert
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Test
 
 class Rpl003MessageTests {
-    lateinit var factory: Rpl003Message.Factory
+
+    private lateinit var sut: Rpl003Message
 
     @Before fun setUp() {
-        factory = Rpl003Message
+        sut = Rpl003Message
     }
 
-    @Test fun test_parse_SourceTargetContents() {
-        val message = factory.parse(IrcMessage(command = "003", prefix = "imaginary.bunnies.io", parameters = listOf("test-nickname", "This server was created DATE")))
-
-        assertEquals(Rpl003Message(source = "imaginary.bunnies.io", target = "test-nickname", contents = "This server was created DATE"), message)
+    @Test fun test_command_correct() {
+        assertEquals("003", Rpl003Message.command)
     }
 
-    @Test fun test_parse_TargetContents_SourceIsEmptyString() {
-        val message = factory.parse(IrcMessage(command = "003", parameters = listOf("test-nickname2", "This server was created DATE")))
-
-        assertEquals(Rpl003Message(source = "", target = "test-nickname2", contents = "This server was created DATE"), message)
+    @Test fun test_parser_correct_instance() {
+        Assert.assertTrue(Rpl003Message.Parser is RplSourceTargetContent.Parser)
     }
 
-    @Test fun test_parse_TooFewParameters() {
-        val message = factory.parse(IrcMessage(command = "003", parameters = listOf("test-nickname3")))
-
-        assertNull(message)
+    @Test fun test_serialiser_correct_instance() {
+        Assert.assertTrue(Rpl003Message.Serialiser is RplSourceTargetContent.Serialiser)
     }
 
-    @Test fun test_serialise_SourceTargetContents() {
-        val message = factory.serialise(Rpl003Message(source = "", target = "test-nickname2", contents = "This server was created DATE"))
-
-        assertEquals(IrcMessage(command = "003", prefix = "", parameters = listOf("test-nickname2", "This server was created DATE")), message)
-    }
-
-    @Test fun test_serialise_TargetContents_SourceIsEmptyString() {
-        val message = factory.serialise(Rpl003Message(source = "", target = "test-nickname2", contents = "This server was created DATE"))
-
-        assertEquals(IrcMessage(command = "003", prefix = "", parameters = listOf("test-nickname2", "This server was created DATE")), message)
-    }
 }

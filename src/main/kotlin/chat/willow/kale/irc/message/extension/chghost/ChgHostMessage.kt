@@ -1,38 +1,47 @@
 package chat.willow.kale.irc.message.extension.chghost
 
-import chat.willow.kale.irc.message.IMessage
-import chat.willow.kale.irc.message.IMessageParser
-import chat.willow.kale.irc.message.IMessageSerialiser
-import chat.willow.kale.irc.message.IrcMessage
+import chat.willow.kale.ICommand
+import chat.willow.kale.IrcMessageComponents
+import chat.willow.kale.irc.message.MessageParser
+import chat.willow.kale.irc.message.MessageSerialiser
 import chat.willow.kale.irc.prefix.Prefix
 import chat.willow.kale.irc.prefix.PrefixParser
 import chat.willow.kale.irc.prefix.PrefixSerialiser
 
-data class ChgHostMessage(val source: Prefix, val newUser: String, val newHost: String): IMessage {
+object ChgHostMessage : ICommand {
 
-    override val command: String = "CHGHOST"
+    override val command = "CHGHOST"
 
-    companion object Factory: IMessageParser<ChgHostMessage>, IMessageSerialiser<ChgHostMessage> {
+    data class Message(val source: Prefix, val newUser: String, val newHost: String) {
 
-        override fun serialise(message: ChgHostMessage): IrcMessage? {
-            val prefix = PrefixSerialiser.serialise(message.source)
+        object Parser : MessageParser<Message>(command) {
 
-            return IrcMessage(command = message.command, prefix = prefix, parameters = listOf(message.newUser, message.newHost))
-        }
+            override fun parseFromComponents(components: IrcMessageComponents): Message? {
+                val prefix = components.prefix ?: return null
 
-        override fun parse(message: IrcMessage): ChgHostMessage? {
-            val prefix = message.prefix ?: return null
+                if (components.parameters.size < 2) {
+                    return null
+                }
 
-            if (message.parameters.size < 2) {
-                return null
+                val source = PrefixParser.parse(prefix) ?: return null
+                val newUser = components.parameters[0]
+                val newHost = components.parameters[1]
+
+                return Message(source, newUser, newHost)
             }
 
-            val source = PrefixParser.parse(prefix) ?: return null
-            val newUser = message.parameters[0]
-            val newHost = message.parameters[1]
-
-            return ChgHostMessage(source = source, newUser = newUser, newHost = newHost)
         }
+
+        object Serialiser : MessageSerialiser<Message>(command) {
+
+            override fun serialiseToComponents(message: Message): IrcMessageComponents {
+                val prefix = PrefixSerialiser.serialise(message.source)
+
+                return IrcMessageComponents(prefix = prefix, parameters = listOf(message.newUser, message.newHost))
+            }
+
+        }
+
     }
 
 }

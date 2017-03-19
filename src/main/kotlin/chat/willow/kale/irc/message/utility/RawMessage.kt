@@ -4,12 +4,17 @@ import chat.willow.kale.irc.message.IMessageSerialiser
 import chat.willow.kale.irc.message.IrcMessage
 import chat.willow.kale.irc.message.IrcMessageParser
 
-data class RawMessage(val line: String) {
+object RawMessage {
 
-    companion object Factory: IMessageSerialiser<RawMessage> {
-        override fun serialise(message: RawMessage): IrcMessage? {
-            return IrcMessageParser.parse(message.line)
+    data class Line(val line: String) {
+
+        object Serialiser : IMessageSerialiser<Line> {
+
+            override fun serialise(message: Line): IrcMessage? {
+                return IrcMessageParser.parse(message.line)
+            }
         }
+
     }
-    
+
 }

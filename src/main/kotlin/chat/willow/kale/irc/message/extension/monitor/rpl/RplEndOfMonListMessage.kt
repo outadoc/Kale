@@ -1,37 +1,47 @@
 package chat.willow.kale.irc.message.extension.monitor.rpl
 
-import chat.willow.kale.irc.message.IMessage
-import chat.willow.kale.irc.message.IMessageParser
-import chat.willow.kale.irc.message.IMessageSerialiser
-import chat.willow.kale.irc.message.IrcMessage
+import chat.willow.kale.ICommand
+import chat.willow.kale.IrcMessageComponents
+import chat.willow.kale.irc.message.MessageParser
+import chat.willow.kale.irc.message.MessageSerialiser
 import chat.willow.kale.irc.prefix.Prefix
 import chat.willow.kale.irc.prefix.PrefixParser
 import chat.willow.kale.irc.prefix.PrefixSerialiser
 
-data class RplEndOfMonListMessage(val prefix: Prefix, val nick: String, val message: String): IMessage {
-    override val command: String = "733"
+object RplEndOfMonList : ICommand {
 
-    companion object Factory: IMessageParser<RplEndOfMonListMessage>, IMessageSerialiser<RplEndOfMonListMessage> {
+    override val command = "733"
 
-        override fun serialise(message: RplEndOfMonListMessage): IrcMessage? {
-            val prefix = PrefixSerialiser.serialise(message.prefix)
+    data class Message(val prefix: Prefix, val nick: String, val message: String) {
 
-            return IrcMessage(command = message.command, prefix = prefix, parameters = listOf(message.nick, message.message))
-        }
+        object Parser : MessageParser<Message>(command) {
 
-        override fun parse(message: IrcMessage): RplEndOfMonListMessage? {
-            if (message.parameters.size < 2) {
-                return null
+            override fun parseFromComponents(components: IrcMessageComponents): Message? {
+                if (components.parameters.size < 2) {
+                    return null
+                }
+
+                val rawPrefix = components.prefix ?: return null
+                val prefix = PrefixParser.parse(rawPrefix) ?: return null
+
+                val nick = components.parameters[0]
+                val endMessage = components.parameters[1]
+
+                return Message(prefix, nick, endMessage)
             }
 
-            val rawPrefix = message.prefix ?: return null
-            val prefix = PrefixParser.parse(rawPrefix) ?: return null
-
-            val nick = message.parameters[0]
-            val endMessage = message.parameters[1]
-
-            return RplEndOfMonListMessage(prefix = prefix, nick = nick, message = endMessage)
         }
+
+        object Serialiser : MessageSerialiser<Message>(command) {
+
+            override fun serialiseToComponents(message: Message): IrcMessageComponents {
+                val prefix = PrefixSerialiser.serialise(message.prefix)
+
+                return IrcMessageComponents(prefix = prefix, parameters = listOf(message.nick, message.message))
+            }
+
+        }
+
     }
 
 }

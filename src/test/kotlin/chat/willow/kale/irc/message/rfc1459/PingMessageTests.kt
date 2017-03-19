@@ -7,26 +7,29 @@ import org.junit.Before
 import org.junit.Test
 
 class PingMessageTests {
-    lateinit var factory: PingMessage.Factory
+
+    private lateinit var messageParser: PingMessage.Command.Parser
+    private lateinit var messageSerialiser: PingMessage.Command.Serialiser
 
     @Before fun setUp() {
-        factory = PingMessage
+        messageParser = PingMessage.Command.Parser
+        messageSerialiser = PingMessage.Command.Serialiser
     }
 
     @Test fun test_parse() {
-        val message = factory.parse(IrcMessage(command = "PING", parameters = listOf("token1")))
+        val message = messageParser.parse(IrcMessage(command = "PING", parameters = listOf("token1")))
 
-        assertEquals(message, PingMessage(token = "token1"))
+        assertEquals(message, PingMessage.Command(token = "token1"))
     }
 
     @Test fun test_parse_noParameters() {
-        val message = factory.parse(IrcMessage(command = "PING"))
+        val message = messageParser.parse(IrcMessage(command = "PING"))
 
         assertNull(message)
     }
 
     @Test fun test_serialise() {
-        val message = factory.serialise(PingMessage(token = "anotherToken"))
+        val message = messageSerialiser.serialise(PingMessage.Command(token = "anotherToken"))
 
         assertEquals(message, IrcMessage(command = "PING", parameters = listOf("anotherToken")))
     }

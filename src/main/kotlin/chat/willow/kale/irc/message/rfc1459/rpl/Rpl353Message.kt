@@ -1,34 +1,45 @@
 package chat.willow.kale.irc.message.rfc1459.rpl
 
+import chat.willow.kale.ICommand
+import chat.willow.kale.IrcMessageComponents
 import chat.willow.kale.irc.CharacterCodes
-import chat.willow.kale.irc.message.IMessage
-import chat.willow.kale.irc.message.IMessageParser
-import chat.willow.kale.irc.message.IMessageSerialiser
-import chat.willow.kale.irc.message.IrcMessage
+import chat.willow.kale.irc.message.MessageParser
+import chat.willow.kale.irc.message.MessageSerialiser
 
-data class Rpl353Message(val source: String, val target: String, val visibility: String, val channel: String, val names: List<String>): IMessage {
-    override val command: String = "353"
+object Rpl353Message : ICommand {
 
-    companion object Factory: IMessageParser<Rpl353Message>, IMessageSerialiser<Rpl353Message> {
+    override val command = "353"
 
-        override fun serialise(message: Rpl353Message): IrcMessage? {
-            val names = message.names.joinToString(separator = CharacterCodes.SPACE.toString())
+    data class Message(val source: String, val target: String, val visibility: String, val channel: String, val names: List<String>) {
 
-            return IrcMessage(command = message.command, prefix = message.source, parameters = listOf(message.target, message.visibility, message.channel, names))
-        }
+        object Parser : MessageParser<Message>(command) {
 
-        override fun parse(message: IrcMessage): Rpl353Message? {
-            if (message.parameters.size < 4) {
-                return null
+            override fun parseFromComponents(components: IrcMessageComponents): Message? {
+                if (components.parameters.size < 4) {
+                    return null
+                }
+
+                val source = components.prefix ?: ""
+                val target = components.parameters[0]
+                val visibility = components.parameters[1]
+                val channel = components.parameters[2]
+                val names = components.parameters[3].split(delimiters = CharacterCodes.SPACE).filterNot(String::isEmpty)
+
+                return Message(source, target, visibility, channel, names)
             }
 
-            val source = message.prefix ?: ""
-            val target = message.parameters[0]
-            val visibility = message.parameters[1]
-            val channel = message.parameters[2]
-            val names = message.parameters[3].split(delimiters = CharacterCodes.SPACE).filterNot(String::isEmpty)
-
-            return Rpl353Message(source = source, target = target, visibility = visibility, channel = channel, names = names)
         }
+
+        object Serialiser : MessageSerialiser<Message>(command) {
+
+            override fun serialiseToComponents(message: Message): IrcMessageComponents {
+                val names = message.names.joinToString(separator = CharacterCodes.SPACE.toString())
+
+                return IrcMessageComponents(prefix = message.source, parameters = listOf(message.target, message.visibility, message.channel, names))
+            }
+
+        }
+
     }
+
 }

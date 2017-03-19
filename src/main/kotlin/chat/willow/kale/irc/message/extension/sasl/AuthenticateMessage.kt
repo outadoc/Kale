@@ -1,34 +1,67 @@
 package chat.willow.kale.irc.message.extension.sasl
 
+import chat.willow.kale.ICommand
+import chat.willow.kale.IrcMessageComponents
 import chat.willow.kale.irc.CharacterCodes
-import chat.willow.kale.irc.message.IMessage
-import chat.willow.kale.irc.message.IMessageParser
-import chat.willow.kale.irc.message.IMessageSerialiser
-import chat.willow.kale.irc.message.IrcMessage
+import chat.willow.kale.irc.message.MessageParser
+import chat.willow.kale.irc.message.MessageSerialiser
 
-data class AuthenticateMessage(val payload: String, val isEmpty: Boolean): IMessage {
-    override val command: String = "AUTHENTICATE"
+object AuthenticateMessage : ICommand {
 
-    companion object Factory: IMessageParser<AuthenticateMessage>, IMessageSerialiser<AuthenticateMessage> {
+    override val command = "AUTHENTICATE"
 
-        override fun serialise(message: AuthenticateMessage): IrcMessage? {
-            if (message.isEmpty) {
-                return IrcMessage(command = "AUTHENTICATE", parameters = listOf("${CharacterCodes.PLUS}"))
-            } else {
-                return IrcMessage(command = "AUTHENTICATE", parameters = listOf(message.payload))
+    data class Command(val payload: String) {
+
+        object Parser : MessageParser<Command>(command) {
+
+            override fun parseFromComponents(components: IrcMessageComponents): Command? {
+                if (components.parameters.isEmpty()) {
+                    return null
+                }
+
+                val payload = components.parameters[0]
+
+                return Command(payload)
             }
         }
 
-        override fun parse(message: IrcMessage): AuthenticateMessage? {
-            if (message.parameters.isEmpty()) {
-                return null
+        object Serialiser : MessageSerialiser<Command>(command) {
+
+            override fun serialiseToComponents(message: Command): IrcMessageComponents {
+                return IrcMessageComponents(parameters = listOf(message.payload))
             }
 
-            val payload = message.parameters[0]
-            val isEmpty = payload == "${CharacterCodes.PLUS}"
-
-            return AuthenticateMessage(payload = payload, isEmpty = isEmpty)
         }
+
+    }
+
+    data class Message(val payload: String, val isEmpty: Boolean) {
+
+        object Parser : MessageParser<Message>(command) {
+
+            override fun parseFromComponents(components: IrcMessageComponents): Message? {
+                if (components.parameters.isEmpty()) {
+                    return null
+                }
+
+                val payload = components.parameters[0]
+                val isEmpty = payload == "${CharacterCodes.PLUS}"
+
+                return Message(payload, isEmpty)
+            }
+        }
+
+        object Serialiser : MessageSerialiser<Message>(command) {
+
+            override fun serialiseToComponents(message: Message): IrcMessageComponents {
+                if (message.isEmpty) {
+                    return IrcMessageComponents(parameters = listOf("${CharacterCodes.PLUS}"))
+                } else {
+                    return IrcMessageComponents(parameters = listOf(message.payload))
+                }
+            }
+        }
+
     }
 
 }

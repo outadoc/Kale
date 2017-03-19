@@ -1,37 +1,76 @@
 package chat.willow.kale.irc.message.rfc1459
 
+import chat.willow.kale.ICommand
+import chat.willow.kale.IrcMessageComponents
 import chat.willow.kale.irc.CharacterCodes
-import chat.willow.kale.irc.message.IMessage
-import chat.willow.kale.irc.message.IMessageParser
-import chat.willow.kale.irc.message.IMessageSerialiser
-import chat.willow.kale.irc.message.IrcMessage
+import chat.willow.kale.irc.message.MessageParser
+import chat.willow.kale.irc.message.MessageSerialiser
 import chat.willow.kale.irc.prefix.Prefix
 import chat.willow.kale.irc.prefix.PrefixParser
 import chat.willow.kale.irc.prefix.PrefixSerialiser
 
-data class PartMessage(val source: Prefix? = null, val channels: List<String>): IMessage {
-    override val command: String = "PART"
+object PartMessage : ICommand {
+    
+    override val command = "PART"
+    
+    data class Command(val channels: List<String>) {
+        
+        object Parser : MessageParser<Command>(command) {
 
-    companion object Factory: IMessageParser<PartMessage>, IMessageSerialiser<PartMessage> {
+            override fun parseFromComponents(components: IrcMessageComponents): Command? {
+                if (components.parameters.isEmpty()) {
+                    return null
+                }
 
-        override fun serialise(message: PartMessage): IrcMessage? {
-            val prefix = if (message.source != null) { PrefixSerialiser.serialise(message.source) } else { null }
-            val channels = message.channels.joinToString(separator = CharacterCodes.COMMA.toString())
+                val unsplitChannels = components.parameters[0]
+                val channels = unsplitChannels.split(delimiters = CharacterCodes.COMMA)
 
-            return IrcMessage(command = message.command, prefix = prefix, parameters = listOf(channels))
+                return Command(channels)
+            }
+            
         }
+        
+        object Serialiser : MessageSerialiser<Command>(command) {
 
-        override fun parse(message: IrcMessage): PartMessage? {
-            if (message.parameters.isEmpty()) {
-                return null
+            override fun serialiseToComponents(message: Command): IrcMessageComponents {
+                val channels = message.channels.joinToString(separator = CharacterCodes.COMMA.toString())
+
+                return IrcMessageComponents(parameters = listOf(channels))
+            }
+            
+        }
+        
+    }
+    
+    data class Message(val source: Prefix, val channels: List<String>) {
+
+        object Parser : MessageParser<Message>(command) {
+
+            override fun parseFromComponents(components: IrcMessageComponents): Message? {
+                if (components.parameters.isEmpty() || components.prefix == null) {
+                    return null
+                }
+
+                val source = PrefixParser.parse(components.prefix) ?: return null
+                val unsplitChannels = components.parameters[0]
+                val channels = unsplitChannels.split(delimiters = CharacterCodes.COMMA)
+
+                return Message(source, channels)
             }
 
-            val source = PrefixParser.parse(message.prefix ?: "")
-            val unsplitChannels = message.parameters[0]
-            val channels = unsplitChannels.split(delimiters = CharacterCodes.COMMA)
-
-            return PartMessage(source = source, channels = channels)
         }
-    }
 
+        object Serialiser : MessageSerialiser<Message>(command) {
+
+            override fun serialiseToComponents(message: Message): IrcMessageComponents {
+                val prefix = PrefixSerialiser.serialise(message.source)
+                val channels = message.channels.joinToString(separator = CharacterCodes.COMMA.toString())
+
+                return IrcMessageComponents(prefix = prefix, parameters = listOf(channels))
+            }
+
+        }
+        
+    }
+    
 }

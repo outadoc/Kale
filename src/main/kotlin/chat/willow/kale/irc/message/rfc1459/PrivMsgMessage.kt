@@ -1,34 +1,48 @@
 package chat.willow.kale.irc.message.rfc1459
 
-import chat.willow.kale.irc.message.IMessage
-import chat.willow.kale.irc.message.IMessageParser
-import chat.willow.kale.irc.message.IMessageSerialiser
-import chat.willow.kale.irc.message.IrcMessage
+import chat.willow.kale.ICommand
+import chat.willow.kale.IrcMessageComponents
+import chat.willow.kale.irc.message.MessageParser
+import chat.willow.kale.irc.message.MessageSerialiser
 import chat.willow.kale.irc.prefix.Prefix
 import chat.willow.kale.irc.prefix.PrefixParser
-import chat.willow.kale.irc.prefix.PrefixSerialiser
 
-data class PrivMsgMessage(val source: Prefix? = null, val target: String, val message: String): IMessage {
-    override val command: String = "PRIVMSG"
+object PrivMsgMessage : ICommand {
 
-    companion object Factory: IMessageParser<PrivMsgMessage>, IMessageSerialiser<PrivMsgMessage> {
+    override val command = "PRIVMSG"
 
-        override fun serialise(message: PrivMsgMessage): IrcMessage? {
-            val prefix = if (message.source != null) { PrefixSerialiser.serialise(message.source) } else { null }
-            return IrcMessage(command = message.command, prefix = prefix, parameters = listOf(message.target, message.message))
-        }
+    data class Command(val target: String, val message: String) {
 
-        override fun parse(message: IrcMessage): PrivMsgMessage? {
-            if (message.parameters.size < 2) {
-                return null
+        object Serialiser : MessageSerialiser<Command>(command) {
+
+            override fun serialiseToComponents(message: Command): IrcMessageComponents {
+                val parameters = listOf(message.target, message.message)
+
+                return IrcMessageComponents(parameters)
             }
 
-            val source = PrefixParser.parse(message.prefix ?: "")
-            val target = message.parameters[0]
-            val privMessage = message.parameters[1]
-
-            return PrivMsgMessage(source = source, target = target, message = privMessage)
         }
+
+    }
+
+    data class Message(val source: Prefix, val target: String, val message: String) {
+
+        object Parser : MessageParser<Message>(command) {
+
+            override fun parseFromComponents(components: IrcMessageComponents): Message? {
+                if (components.parameters.size < 2) {
+                    return null
+                }
+
+                val source = PrefixParser.parse(components.prefix ?: "") ?: return null
+                val target = components.parameters[0]
+                val message = components.parameters[1]
+
+                return Message(source, target, message)
+            }
+
+        }
+
     }
 
 }

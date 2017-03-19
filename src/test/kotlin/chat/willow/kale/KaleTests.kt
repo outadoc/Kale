@@ -1,178 +1,135 @@
 package chat.willow.kale
 
-import chat.willow.kale.irc.message.IMessage
-import chat.willow.kale.irc.message.IMessageParser
 import chat.willow.kale.irc.message.IMessageSerialiser
 import chat.willow.kale.irc.message.IrcMessage
-import chat.willow.kale.irc.tag.*
-import org.junit.Assert.assertEquals
+import chat.willow.kale.irc.tag.IKaleTagRouter
+import chat.willow.kale.irc.tag.ITagParser
+import com.nhaarman.mockito_kotlin.*
+import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
+import org.mockito.ArgumentCaptor
 
 class KaleTests {
-    lateinit var kale: Kale
-    lateinit var kaleRouter: IKaleRouter
-    lateinit var kaleTagRouter: IKaleTagRouter
-    lateinit var mockHandlerOne: MockHandlerOne
-    lateinit var mockHandlerSub: MockHandlerSubcommand
+
+    private lateinit var sut: Kale
+    private lateinit var router: IKaleRouter
+    private lateinit var tagRouter: IKaleTagRouter
+    private lateinit var metadata: IMetadataStore
+
+    private lateinit var handlerOne: IKaleIrcMessageHandler
+    private lateinit var handlerTwo: IKaleIrcMessageHandler
 
     @Before fun setUp() {
-        kaleRouter = KaleRouter()
-        kaleTagRouter = KaleTagRouter()
+        router = mock()
+        tagRouter = mock()
+        metadata = mock()
 
-        mockHandlerOne = MockHandlerOne()
-        mockHandlerSub = MockHandlerSubcommand()
+        handlerOne = mock()
+        handlerTwo = mock()
 
-        kale = Kale(kaleRouter, kaleTagRouter)
-
-        kaleRouter.routeCommandToParser("TEST1", MockMessageOne)
-        kaleRouter.routeMessageToSerialiser(MockMessageOne::class, MockMessageOne)
-
-        kaleRouter.routeCommandToParser("TEST", MockSubcommandMessage)
-
-        kaleTagRouter.routeTagToParser("test", MockTestTag.Factory)
-
-        kale.register(mockHandlerOne)
-        kale.register(mockHandlerSub)
+        sut = Kale(router, tagRouter)
     }
 
-    @Test fun test_init_firesNoHandlers() {
-        assertEquals(0, mockHandlerOne.spyHandleMessageInvokations.size)
-        assertEquals(0, mockHandlerSub.spyHandleMessageInvokations.size)
+    @Test fun test_process_UnparseableLine_DoesNothing() {
+        sut.process(" ")
+
+        verifyZeroInteractions(router)
+        verifyZeroInteractions(tagRouter)
     }
 
-    @Test fun test_command_firesTestHandler() {
-        kale.process("TEST1 :token1")
+    @Test fun test_process_NoHandler_DoesNothing() {
+        whenever(router.handlerFor("1")).thenReturn(handlerOne)
+        whenever(router.handlerFor("2")).thenReturn(handlerTwo)
 
-        assertEquals(1, mockHandlerOne.spyHandleMessageInvokations.size)
-        assertEquals(0, mockHandlerSub.spyHandleMessageInvokations.size)
-        assertEquals(MockMessageOne(mockToken = "token1"), mockHandlerOne.spyHandleMessageInvokations[0])
+        sut.process("COMMAND")
+
+        verify(router, only()).handlerFor("COMMAND")
+        verifyZeroInteractions(handlerOne)
+        verifyZeroInteractions(handlerTwo)
     }
 
-    @Test fun test_subcommand_firesTestHandler() {
-        kale.process("TEST * SUB :token1")
+    @Test fun test_process_TellsHandlerToHandle() {
+        whenever(router.handlerFor("1")).thenReturn(handlerOne)
+        whenever(router.handlerFor("2")).thenReturn(handlerTwo)
 
-        assertEquals(1, mockHandlerSub.spyHandleMessageInvokations.size)
-        assertEquals(0, mockHandlerOne.spyHandleMessageInvokations.size)
-        assertEquals(MockSubcommandMessage(mockToken = "token1"), mockHandlerSub.spyHandleMessageInvokations[0])
+        sut.process("1")
+
+        verify(handlerOne).handle(eq(IrcMessage(command = "1")), any())
+        verifyZeroInteractions(handlerTwo)
     }
 
-    @Test fun test_multipleCommands_firesTestHandlerMultipleTimes() {
-        kale.process("TEST1 :token1")
-        kale.process("TEST2 :token1")
-        kale.process("TEST1 :token2")
+    @Test fun test_process_HandlesInOrder() {
+        whenever(router.handlerFor("1")).thenReturn(handlerOne)
+        whenever(router.handlerFor("2")).thenReturn(handlerTwo)
 
-        assertEquals(2, mockHandlerOne.spyHandleMessageInvokations.size)
-        assertEquals(MockMessageOne(mockToken = "token1"), mockHandlerOne.spyHandleMessageInvokations[0])
-        assertEquals(MockMessageOne(mockToken = "token2"), mockHandlerOne.spyHandleMessageInvokations[1])
-    }
+        sut.process("1")
+        sut.process("2")
+        sut.process("3")
 
-    @Test fun test_multipleCommands_orderPreserved() {
-        kale.process("TEST1 :token1")
-        kale.process("TEST1 :token2")
-        kale.process("TEST1 :token3")
-
-        assertEquals(3, mockHandlerOne.spyHandleMessageInvokations.size)
-        assertEquals(MockMessageOne(mockToken = "token1"), mockHandlerOne.spyHandleMessageInvokations[0])
-        assertEquals(MockMessageOne(mockToken = "token2"), mockHandlerOne.spyHandleMessageInvokations[1])
-        assertEquals(MockMessageOne(mockToken = "token3"), mockHandlerOne.spyHandleMessageInvokations[2])
-    }
-
-    @Test fun test_command_firesTestHandler_HasTags_ExpectTagsPassedToHandler() {
-        kale.process("@tag1;test=1 TEST1 :token1")
-
-        assertEquals(1, mockHandlerOne.spyHandleMessageInvokations.size)
-        assertEquals(0, mockHandlerSub.spyHandleMessageInvokations.size)
-        assertEquals(MockMessageOne(mockToken = "token1"), mockHandlerOne.spyHandleMessageInvokations[0])
-
-        assertEquals(MockTestTag(value = "1"), mockHandlerOne.spyHandleMetadataInvokations[0][MockTestTag::class])
-    }
-
-    @Test fun test_serialise_SanityCheck() {
-        val message = kale.serialise(MockMessageOne(mockToken = "TestToken1"))
-
-        assertEquals(message, IrcMessage(command = "TEST1", parameters = listOf("TestToken1")))
-    }
-
-    @Test fun test_serialise_UnknownMessage() {
-        val message = kale.serialise(MockUnknownMessage(unknownParameter = "UnknownParameter1"))
-
-        assertEquals(message, null)
-    }
-
-    @Test fun test_unregister_RemovesCorrectHandler() {
-        kale.unregister(mockHandlerOne)
-
-        kale.process("TEST1 :token")
-        kale.process("TEST * SUB :token")
-
-        assertEquals(0, mockHandlerOne.spyHandleMessageInvokations.size)
-        assertEquals(1, mockHandlerSub.spyHandleMessageInvokations.size)
-    }
-
-    class MockHandlerOne : IKaleHandler<MockMessageOne> {
-        val spyHandleMessageInvokations = mutableListOf<MockMessageOne>()
-        val spyHandleMetadataInvokations = mutableListOf<ITagStore>()
-
-        override val messageType = MockMessageOne::class.java
-
-        override fun handle(message: MockMessageOne, tags: ITagStore) {
-            spyHandleMessageInvokations += message
-            spyHandleMetadataInvokations += tags
+        inOrder(handlerOne, handlerTwo) {
+            verify(handlerOne).handle(eq(IrcMessage(command = "1")), any())
+            verify(handlerTwo).handle(eq(IrcMessage(command = "2")), any())
         }
     }
 
-    data class MockMessageOne(val mockToken: String): IMessage {
-        override val command: String = "TEST1"
+    @Test fun test_process_ValidMetadata_MetadataIsCorrect() {
+        whenever(router.handlerFor("1")).thenReturn(handlerOne)
 
-        companion object Factory: IMessageParser<MockMessageOne>, IMessageSerialiser<MockMessageOne> {
-            override fun parse(message: IrcMessage): MockMessageOne? {
-                return MockMessageOne(message.parameters[0])
-            }
+        val tagParser: ITagParser<String> = mock()
+        val metadata = "some metadata"
+        whenever(tagParser.parse(any())).thenReturn(metadata)
+        whenever(tagRouter.parserFor("tag1")).thenReturn(tagParser)
 
-            override fun serialise(message: MockMessageOne): IrcMessage? {
-                return IrcMessage(command = message.command, parameters = listOf(message.mockToken))
-            }
+        sut.process("@tag1=value1;tag2 1")
+
+        argumentCaptor<IMetadataStore>().apply {
+            verify(handlerOne).handle(any(), capture())
+
+            assertEquals(metadata, firstValue[String::class])
         }
     }
 
-    class MockHandlerSubcommand : IKaleHandler<MockSubcommandMessage> {
-        val spyHandleMessageInvokations = mutableListOf<MockSubcommandMessage>()
-        val spyHandleMetadataInvokations = mutableListOf<ITagStore>()
+    @Test fun test_process_InvalidMetadataLookup_MetadataIsNull() {
+        whenever(router.handlerFor("1")).thenReturn(handlerOne)
 
-        override val messageType = MockSubcommandMessage::class.java
+        val tagParser: ITagParser<String> = mock()
+        val metadata = "some metadata"
+        whenever(tagParser.parse(any())).thenReturn(metadata)
+        whenever(tagRouter.parserFor("tag1")).thenReturn(tagParser)
 
-        override fun handle(message: MockSubcommandMessage, tags: ITagStore) {
-            spyHandleMessageInvokations += message
-            spyHandleMetadataInvokations += tags
+        sut.process("@tag1=value1;tag2 1")
+
+        argumentCaptor<IMetadataStore>().apply {
+            verify(handlerOne).handle(any(), capture())
+
+            assertNull(firstValue[Int::class])
         }
     }
 
-    data class MockSubcommandMessage(val mockToken: String): IMessage {
-        override val command: String = "TEST"
+    @Test fun test_serialise_RouterHasNoSerialiser_ReturnsNull() {
+        val thing: Any = mock()
 
-        companion object Factory: IMessageParser<MockSubcommandMessage>, IMessageSerialiser<MockSubcommandMessage> {
-            override fun parse(message: IrcMessage): MockSubcommandMessage? {
-                return MockSubcommandMessage(message.parameters[2])
-            }
+        val result = sut.serialise(thing)
 
-            override fun serialise(message: MockSubcommandMessage): IrcMessage? {
-                return IrcMessage(command = message.command, parameters = listOf("*", "SUB", message.mockToken))
-            }
-        }
+        assertNull(result)
     }
 
-    data class MockUnknownMessage(val unknownParameter: String): IMessage {
-        override val command: String = "UNKNOWN"
-    }
+    @Test fun test_serialise_RouterHasSerialiser_ReturnsSerialisedMessage() {
+        val thing: Int = 1
+        val expectedReturnMessage: IrcMessage = IrcMessage(command = "ANY")
 
-    data class MockTestTag(val value: String) {
-        companion object Factory: ITagParser<MockTestTag> {
-            override fun parse(tag: Tag): MockTestTag? {
-                val value = tag.value ?: return null
-
-                return MockTestTag(value = value)
+        val anySerialiser = object : IMessageSerialiser<Int> {
+            override fun serialise(message: Int): IrcMessage? {
+                return expectedReturnMessage
             }
         }
+
+        whenever(router.serialiserFor(any<Class<*>>())).thenReturn(anySerialiser)
+
+        val result = sut.serialise(thing)
+
+        assertTrue(expectedReturnMessage === result)
     }
+
 }

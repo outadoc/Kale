@@ -1,38 +1,47 @@
 package chat.willow.kale.irc.message.extension.away_notify
 
-import chat.willow.kale.irc.message.IMessage
-import chat.willow.kale.irc.message.IMessageParser
-import chat.willow.kale.irc.message.IMessageSerialiser
-import chat.willow.kale.irc.message.IrcMessage
+import chat.willow.kale.ICommand
+import chat.willow.kale.IrcMessageComponents
+import chat.willow.kale.irc.message.MessageParser
+import chat.willow.kale.irc.message.MessageSerialiser
 import chat.willow.kale.irc.prefix.Prefix
 import chat.willow.kale.irc.prefix.PrefixParser
 import chat.willow.kale.irc.prefix.PrefixSerialiser
 
-data class AwayMessage(val source: Prefix, val message: String?): IMessage {
+object AwayMessage : ICommand {
 
-    override val command: String = "AWAY"
+    override val command = "AWAY"
 
-    companion object Factory: IMessageParser<AwayMessage>, IMessageSerialiser<AwayMessage> {
+    data class Message(val source: Prefix, val message: String?) {
 
-        override fun serialise(message: AwayMessage): IrcMessage? {
-            val prefix = PrefixSerialiser.serialise(message.source)
-            val awayMessage = message.message
+        object Parser : MessageParser<Message>(command) {
 
-            if (awayMessage == null) {
-                return IrcMessage(command = message.command, prefix = prefix, parameters = listOf())
-            } else {
-                return IrcMessage(command = message.command, prefix = prefix, parameters = listOf(awayMessage))
+            override fun parseFromComponents(components: IrcMessageComponents): Message? {
+                val prefix = components.prefix ?: return null
+
+                val source = PrefixParser.parse(prefix) ?: return null
+                val awayMessage = components.parameters.getOrNull(0)
+
+                return Message(source, awayMessage)
             }
+
         }
 
-        override fun parse(message: IrcMessage): AwayMessage? {
-            val prefix = message.prefix ?: return null
+        object Serialiser : MessageSerialiser<Message>(command) {
 
-            val source = PrefixParser.parse(prefix) ?: return null
-            val awayMessage = message.parameters.getOrNull(0)
+            override fun serialiseToComponents(message: Message): IrcMessageComponents {
+                val prefix = PrefixSerialiser.serialise(message.source)
+                val awayMessage = message.message
 
-            return AwayMessage(source = source, message = awayMessage)
+                return if (awayMessage == null) {
+                    IrcMessageComponents(prefix = prefix, parameters = listOf())
+                } else {
+                    IrcMessageComponents(prefix = prefix, parameters = listOf(awayMessage))
+                }
+            }
+
         }
+
     }
 
 }

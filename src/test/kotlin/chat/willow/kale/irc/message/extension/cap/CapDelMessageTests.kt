@@ -8,34 +8,36 @@ import org.junit.Test
 
 class CapDelMessageTests {
 
-    private lateinit var factory: CapDelMessage.Factory
+    lateinit var messageParser: CapMessage.Del.Message.Parser
+    lateinit var messageSerialiser: CapMessage.Del.Message.Serialiser
 
     @Before fun setUp() {
-        factory = CapDelMessage
+        messageParser = CapMessage.Del.Message.Parser
+        messageSerialiser = CapMessage.Del.Message.Serialiser
     }
 
     @Test fun test_parse_SingleCap() {
-        val message = factory.parse(IrcMessage(command = "CAP", parameters = listOf("test-nick", "DEL", "cap1 ")))
+        val message = messageParser.parse(IrcMessage(command = "CAP", parameters = listOf("test-nick", "DEL", "cap1 ")))
 
-        assertEquals(CapDelMessage(target = "test-nick", caps = listOf("cap1")), message)
+        assertEquals(CapMessage.Del.Message(target = "test-nick", caps = listOf("cap1")), message)
     }
 
     @Test fun test_parse_MultipleCaps() {
-        val message = factory.parse(IrcMessage(command = "CAP", parameters = listOf("test-nick", "DEL", "cap1 cap2 cap3")))
+        val message = messageParser.parse(IrcMessage(command = "CAP", parameters = listOf("test-nick", "DEL", "cap1 cap2 cap3")))
 
-        assertEquals(CapDelMessage(target = "test-nick", caps = listOf("cap1", "cap2", "cap3")), message)
+        assertEquals(CapMessage.Del.Message(target = "test-nick", caps = listOf("cap1", "cap2", "cap3")), message)
     }
 
     @Test fun test_parse_CapsWithValues_ValuesDiscarded() {
-        val message = factory.parse(IrcMessage(command = "CAP", parameters = listOf("test-nick", "DEL", "cap1 cap2=value cap3=")))
+        val message = messageParser.parse(IrcMessage(command = "CAP", parameters = listOf("test-nick", "DEL", "cap1 cap2=value cap3=")))
 
-        assertEquals(CapDelMessage(target = "test-nick", caps = listOf("cap1", "cap2", "cap3")), message)
+        assertEquals(CapMessage.Del.Message(target = "test-nick", caps = listOf("cap1", "cap2", "cap3")), message)
     }
 
     @Test fun test_parse_TooFewParameters() {
-        val messageOne = factory.parse(IrcMessage(command = "CAP", parameters = listOf()))
-        val messageTwo = factory.parse(IrcMessage(command = "CAP", parameters = listOf("test-nick")))
-        val messageThree = factory.parse(IrcMessage(command = "CAP", parameters = listOf("test-nick", "DEL")))
+        val messageOne = messageParser.parse(IrcMessage(command = "CAP", parameters = listOf()))
+        val messageTwo = messageParser.parse(IrcMessage(command = "CAP", parameters = listOf("test-nick")))
+        val messageThree = messageParser.parse(IrcMessage(command = "CAP", parameters = listOf("test-nick", "DEL")))
 
         assertNull(messageOne)
         assertNull(messageTwo)
@@ -43,13 +45,13 @@ class CapDelMessageTests {
     }
 
     @Test fun test_serialise_SingleCap() {
-        val message = factory.serialise(CapDelMessage(target = "someone", caps = listOf("cap1")))
+        val message = messageSerialiser.serialise(CapMessage.Del.Message(target = "someone", caps = listOf("cap1")))
 
         assertEquals(IrcMessage(command = "CAP", parameters = listOf("someone", "DEL", "cap1")), message)
     }
 
     @Test fun test_serialise_MultipleCaps() {
-        val message = factory.serialise(CapDelMessage(target = "someone", caps = listOf("cap1", "cap2", "cap3")))
+        val message = messageSerialiser.serialise(CapMessage.Del.Message(target = "someone", caps = listOf("cap1", "cap2", "cap3")))
 
         assertEquals(IrcMessage(command = "CAP", parameters = listOf("someone", "DEL", "cap1 cap2 cap3")), message)
     }

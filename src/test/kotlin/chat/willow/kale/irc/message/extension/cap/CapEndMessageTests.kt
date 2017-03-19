@@ -7,28 +7,29 @@ import org.junit.Before
 import org.junit.Test
 
 class CapEndMessageTests {
-    lateinit var factory: CapEndMessage.Factory
+
+    lateinit var messageParser: CapMessage.End.Command.Parser
+    lateinit var messageSerialiser: CapMessage.End.Command.Serialiser
 
     @Before fun setUp() {
-        factory = CapEndMessage
+        messageParser = CapMessage.End.Command.Parser
+        messageSerialiser = CapMessage.End.Command.Serialiser
     }
 
     @Test fun test_parse() {
-        val message = factory.parse(IrcMessage(command = "CAP", parameters = listOf("test-nick", "END")))
+        val message = messageParser.parse(IrcMessage(command = "CAP", parameters = listOf("END")))
 
-        assertEquals(CapEndMessage(target = "test-nick"), message)
+        assertEquals(CapMessage.End.Command, message)
     }
 
     @Test fun test_parse_TooFewParameters() {
-        val messageOne = factory.parse(IrcMessage(command = "CAP", parameters = listOf()))
-        val messageTwo = factory.parse(IrcMessage(command = "CAP", parameters = listOf("test-nick")))
+        val messageOne = messageParser.parse(IrcMessage(command = "CAP", parameters = listOf()))
 
         assertNull(messageOne)
-        assertNull(messageTwo)
     }
 
     @Test fun test_serialise() {
-        val message = factory.serialise(CapEndMessage())
+        val message = messageSerialiser.serialise(CapMessage.End.Command)
 
         assertEquals(IrcMessage(command = "CAP", parameters = listOf("END")), message)
     }

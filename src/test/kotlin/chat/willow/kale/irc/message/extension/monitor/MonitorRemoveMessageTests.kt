@@ -7,40 +7,43 @@ import org.junit.Before
 import org.junit.Test
 
 class MonitorAddMessageTests {
-    private lateinit var factory: MonitorAddMessage.Factory
+
+    private lateinit var messageParser: MonitorMessage.Add.Command.Parser
+    private lateinit var messageSerialiser: MonitorMessage.Add.Command.Serialiser
 
     @Before fun setUp() {
-        factory = MonitorAddMessage
+        messageParser = MonitorMessage.Add.Command.Parser
+        messageSerialiser = MonitorMessage.Add.Command.Serialiser
     }
 
     @Test fun test_parse_SingleTarget() {
-        val message = factory.parse(IrcMessage(command = "MONITOR", parameters = listOf("+", "target")))
+        val message = messageParser.parse(IrcMessage(command = "MONITOR", parameters = listOf("+", "target")))
 
-        assertEquals(MonitorAddMessage(targets = listOf("target")), message)
+        assertEquals(MonitorMessage.Add.Command(targets = listOf("target")), message)
     }
 
     @Test fun test_parse_MultipleTargets() {
-        val message = factory.parse(IrcMessage(command = "MONITOR", parameters = listOf("+", "target1,target2")))
+        val message = messageParser.parse(IrcMessage(command = "MONITOR", parameters = listOf("+", "target1,target2")))
 
-        assertEquals(MonitorAddMessage(targets = listOf("target1", "target2")), message)
+        assertEquals(MonitorMessage.Add.Command(targets = listOf("target1", "target2")), message)
     }
 
     @Test fun test_parse_TooFewParameters() {
-        val messageOne = factory.parse(IrcMessage(command = "MONITOR", parameters = listOf("+")))
-        val messageTwo = factory.parse(IrcMessage(command = "MONITOR", parameters = listOf()))
+        val messageOne = messageParser.parse(IrcMessage(command = "MONITOR", parameters = listOf("+")))
+        val messageTwo = messageParser.parse(IrcMessage(command = "MONITOR", parameters = listOf()))
 
         assertNull(messageOne)
         assertNull(messageTwo)
     }
 
     @Test fun test_serialise_SingleTarget() {
-        val message = factory.serialise(MonitorAddMessage(targets = listOf("target")))
+        val message = messageSerialiser.serialise(MonitorMessage.Add.Command(targets = listOf("target")))
 
         assertEquals(IrcMessage(command = "MONITOR", parameters = listOf("+", "target")), message)
     }
 
     @Test fun test_serialise_MultipleTargets() {
-        val message = factory.serialise(MonitorAddMessage(targets = listOf("target1", "target2")))
+        val message = messageSerialiser.serialise(MonitorMessage.Add.Command(targets = listOf("target1", "target2")))
 
         assertEquals(IrcMessage(command = "MONITOR", parameters = listOf("+", "target1,target2")), message)
     }

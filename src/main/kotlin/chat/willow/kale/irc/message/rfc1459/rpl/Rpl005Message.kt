@@ -1,58 +1,69 @@
 package chat.willow.kale.irc.message.rfc1459.rpl
 
+import chat.willow.kale.ICommand
+import chat.willow.kale.IrcMessageComponents
 import chat.willow.kale.irc.CharacterCodes
-import chat.willow.kale.irc.message.IMessage
-import chat.willow.kale.irc.message.IMessageParser
-import chat.willow.kale.irc.message.IMessageSerialiser
-import chat.willow.kale.irc.message.IrcMessage
+import chat.willow.kale.irc.message.MessageParser
+import chat.willow.kale.irc.message.MessageSerialiser
 
-data class Rpl005Message(val source: String, val target: String, val tokens: Map<String, String?>): IMessage {
-    override val command: String = "005"
+object Rpl005Message : ICommand {
 
-    companion object Factory: IMessageParser<Rpl005Message>, IMessageSerialiser<Rpl005Message> {
+    override val command = "005"
 
-        override fun serialise(message: Rpl005Message): IrcMessage? {
-            val tokens = mutableListOf<String>()
+    data class Message(val source: String, val target: String, val tokens: Map<String, String?>) {
 
-            for ((key, value) in message.tokens) {
-                if (value.isNullOrEmpty()) {
-                    tokens.add(key)
-                } else {
-                    tokens.add("$key${CharacterCodes.EQUALS}$value")
+        object Parser : MessageParser<Message>(command) {
+
+            override fun parseFromComponents(components: IrcMessageComponents): Message? {
+                if (components.parameters.size < 2) {
+                    return null
                 }
+
+                val source = components.prefix ?: ""
+                val target = components.parameters[0]
+
+                val tokens = mutableMapOf<String, String?>()
+
+                for (i in 1..components.parameters.size - 1) {
+                    val token = components.parameters[i].split(delimiters = CharacterCodes.EQUALS, limit = 2)
+
+                    if (token.isEmpty() || token[0].isNullOrEmpty()) {
+                        continue
+                    }
+
+                    var value = token.getOrNull(1)
+                    if (value != null && value.isEmpty()) {
+                        value = null
+                    }
+
+                    tokens[token[0]] = value
+                }
+
+                return Message(source, target, tokens)
             }
 
-            val parameters = listOf(message.target) + tokens
-
-            return IrcMessage(command = message.command, prefix = message.source, parameters = parameters)
         }
 
-        override fun parse(message: IrcMessage): Rpl005Message? {
-            if (message.parameters.size < 2) {
-                return null
-            }
+        object Serialiser : MessageSerialiser<Message>(command) {
 
-            val source = message.prefix ?: ""
-            val target = message.parameters[0]
+            override fun serialiseToComponents(message: Message): IrcMessageComponents {
+                val tokens = mutableListOf<String>()
 
-            val tokens = mutableMapOf<String, String?>()
-
-            for (i in 1..message.parameters.size - 1) {
-                val token = message.parameters[i].split(delimiters = CharacterCodes.EQUALS, limit = 2)
-
-                if (token.isEmpty() || token[0].isNullOrEmpty()) {
-                    continue
+                for ((key, value) in message.tokens) {
+                    if (value.isNullOrEmpty()) {
+                        tokens.add(key)
+                    } else {
+                        tokens.add("$key${CharacterCodes.EQUALS}$value")
+                    }
                 }
 
-                var value = token.getOrNull(1)
-                if (value != null && value.isEmpty()) {
-                    value = null
-                }
+                val parameters = listOf(message.target) + tokens
 
-                tokens[token[0]] = value
+                return IrcMessageComponents(prefix = message.source, parameters = parameters)
             }
 
-            return Rpl005Message(source = source, target = target, tokens = tokens)
         }
+
     }
+
 }

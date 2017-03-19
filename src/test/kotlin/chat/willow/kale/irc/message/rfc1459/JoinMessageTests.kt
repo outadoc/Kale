@@ -2,82 +2,62 @@ package chat.willow.kale.irc.message.rfc1459
 
 import chat.willow.kale.irc.message.IrcMessage
 import chat.willow.kale.irc.prefix.Prefix
+import chat.willow.kale.irc.prefix.prefix
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Test
 
 class JoinMessageTests {
-    lateinit var factory: JoinMessage.Factory
+
+    private lateinit var messageParser: JoinMessage.Message.Parser
+    private lateinit var messageSerialiser: JoinMessage.Command.Serialiser
 
     @Before fun setUp() {
-        factory = JoinMessage
+        messageParser = JoinMessage.Message.Parser
+        messageSerialiser = JoinMessage.Command.Serialiser
     }
 
     @Test fun test_parse_OneChannel() {
-        val message = factory.parse(IrcMessage(command = "JOIN", parameters = listOf("channel1")))
+        val message = messageParser.parse(IrcMessage(command = "JOIN", prefix = "someone", parameters = listOf("channel1")))
 
-        assertEquals(message, JoinMessage(channels = listOf("channel1")))
+        assertEquals(message, JoinMessage.Message(source = prefix("someone"), channels = listOf("channel1")))
     }
 
     @Test fun test_parse_MultipleChannels() {
-        val message = factory.parse(IrcMessage(command = "JOIN", parameters = listOf("channel1,channel2,channel3")))
+        val message = messageParser.parse(IrcMessage(command = "JOIN", prefix = "someone", parameters = listOf("channel1,channel2,channel3")))
 
-        assertEquals(message, JoinMessage(channels = listOf("channel1", "channel2", "channel3")))
-    }
-
-    @Test fun test_parse_OneChannelAndKey() {
-        val message = factory.parse(IrcMessage(command = "JOIN", parameters = listOf("channel1", "key1")))
-
-        assertEquals(message, JoinMessage(channels = listOf("channel1"), keys = listOf("key1")))
-    }
-
-    @Test fun test_parse_MultipleChannels_OneKey() {
-        val message = factory.parse(IrcMessage(command = "JOIN", parameters = listOf("channel1,channel2,channel3", "key1")))
-
-        assertEquals(message, JoinMessage(channels = listOf("channel1", "channel2", "channel3"), keys = listOf("key1")))
-    }
-
-    @Test fun test_parse_MultipleChannels_MultipleKeys() {
-        val message = factory.parse(IrcMessage(command = "JOIN", parameters = listOf("channel1,channel2", "key1,key2")))
-
-        assertEquals(message, JoinMessage(channels = listOf("channel1", "channel2"), keys = listOf("key1", "key2")))
+        assertEquals(message, JoinMessage.Message(source = prefix("someone"), channels = listOf("channel1", "channel2", "channel3")))
     }
 
     @Test fun test_parse_NoParameters() {
-        val message = factory.parse(IrcMessage(command = "JOIN"))
+        val message = messageParser.parse(IrcMessage(command = "JOIN"))
 
         assertNull(message)
     }
 
     @Test fun test_parse_SomeoneJoiningAChannel() {
-        val message = factory.parse(IrcMessage(command = "JOIN", prefix = "someone@somewhere", parameters = listOf("#channel")))
+        val message = messageParser.parse(IrcMessage(command = "JOIN", prefix = "someone@somewhere", parameters = listOf("#channel")))
 
-        assertEquals(JoinMessage(source = Prefix(nick = "someone", host = "somewhere"), channels = listOf("#channel")), message)
+        assertEquals(JoinMessage.Message(source = Prefix(nick = "someone", host = "somewhere"), channels = listOf("#channel")), message)
     }
 
     @Test fun test_serialise_MultipleChannels() {
-        val message = factory.serialise(JoinMessage(channels = listOf("channel1", "channel2")))
+        val message = messageSerialiser.serialise(JoinMessage.Command(channels = listOf("channel1", "channel2")))
 
         assertEquals(message, IrcMessage(command = "JOIN", parameters = listOf("channel1,channel2")))
     }
 
     @Test fun test_serialise_MultipleChannels_OneKey() {
-        val message = factory.serialise(JoinMessage(channels = listOf("channel1", "channel2"), keys = listOf("key1")))
+        val message = messageSerialiser.serialise(JoinMessage.Command(channels = listOf("channel1", "channel2"), keys = listOf("key1")))
 
         assertEquals(message, IrcMessage(command = "JOIN", parameters = listOf("channel1,channel2", "key1")))
     }
 
     @Test fun test_serialise_MultipleChannels_MultipleKeys() {
-        val message = factory.serialise(JoinMessage(channels = listOf("channel1", "channel2", "channel3"), keys = listOf("key1", "key2")))
+        val message = messageSerialiser.serialise(JoinMessage.Command(channels = listOf("channel1", "channel2", "channel3"), keys = listOf("key1", "key2")))
 
         assertEquals(message, IrcMessage(command = "JOIN", parameters = listOf("channel1,channel2,channel3", "key1,key2")))
-    }
-
-    @Test fun test_serialise_SomeoneJoiningAChannel() {
-        val message = factory.serialise(JoinMessage(source = Prefix(nick = "someone", host = "somewhere"), channels = listOf("#channel")))
-
-        assertEquals(IrcMessage(command = "JOIN", prefix = "someone@somewhere", parameters = listOf("#channel")), message)
     }
 
 }

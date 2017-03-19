@@ -17,10 +17,9 @@ val kotlinVersion by project
 val projectTitle = "Kale"
 
 buildscript {
-    val buildscriptKotlinVersion = "1.1.0"
+    val buildscriptKotlinVersion = "1.1.1"
 
     repositories {
-        maven { setUrl("http://dl.bintray.com/kotlin/kotlin-eap-1.1") }
         gradleScriptKotlin()
         jcenter()
     }
@@ -76,7 +75,7 @@ dependencies {
 
     testCompile("junit:junit:4.12")
     testCompile("org.mockito:mockito-core:2.2.9")
-    testCompile("com.nhaarman:mockito-kotlin:0.10.0")
+    testCompile("com.nhaarman:mockito-kotlin:1.3.0")
     testCompile("ch.qos.logback:logback-classic:1.1.2")
 }
 
