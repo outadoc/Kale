@@ -63,11 +63,11 @@ class KaleSubcommandHandler(private val handlers: Map<String, IKaleIrcMessageHan
     private val LOGGER = loggerFor<KaleSubcommandHandler>()
 
     override fun handle(message: IrcMessage, metadata: IMetadataStore) {
-        if (message.parameters.isEmpty()) {
+        if (message.parameters.size <= subcommandPosition) {
             return
         }
 
-        val subcommand = message.parameters[0]
+        val subcommand = message.parameters[subcommandPosition]
 
         val handler = handlers[subcommand]
         if (handler == null) {
