@@ -2,7 +2,7 @@ package chat.willow.kale.irc.message.rfc1459.rpl
 
 import chat.willow.kale.ICommand
 
-typealias Rpl474MessageType = RplSourceTargetContent.Message
+typealias Rpl474MessageType = RplSourceTargetChannelContent.Message
 
 object Rpl474Message : ICommand {
 
