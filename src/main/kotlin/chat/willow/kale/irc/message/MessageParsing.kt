@@ -31,7 +31,7 @@ abstract class MessageParser<out T>(private val command: String) : IMessageParse
 abstract class SubcommandParser<out T>(private val subcommand: String, private val subcommandPosition: Int = 0) : IMessageParser<T> {
 
     override fun parse(message: IrcMessage): T? {
-        if (message.parameters.size <= subcommand) {
+        if (message.parameters.size <= subcommandPosition) {
             return null
         }
 
