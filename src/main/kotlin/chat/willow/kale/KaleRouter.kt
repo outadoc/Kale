@@ -93,6 +93,8 @@ class KaleRouter : IKaleRouter {
         commandsToParsers["JOIN"] = KaleParseOnlyHandler(JoinMessage.Message.Parser)
         register(JoinMessage.Command::class, JoinMessage.Command.Serialiser)
 
+        register(UserMessage.Command::class, UserMessage.Command.Serialiser)
+
         val capHandlers = mapOf(
                 CapMessage.Ls.subcommand to KaleParseOnlyHandler(CapMessage.Ls.Message.Parser),
                 CapMessage.Ack.subcommand to KaleParseOnlyHandler(CapMessage.Ack.Message.Parser),
