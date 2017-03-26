@@ -18,11 +18,11 @@ class Rpl474MessageTests {
     }
 
     @Test fun test_parser_correct_instance() {
-        Assert.assertTrue(Rpl474Message.Parser is RplSourceTargetContent.Parser)
+        Assert.assertTrue(Rpl474Message.Parser is RplSourceTargetChannelContent.Parser)
     }
 
     @Test fun test_serialiser_correct_instance() {
-        Assert.assertTrue(Rpl474Message.Serialiser is RplSourceTargetContent.Serialiser)
+        Assert.assertTrue(Rpl474Message.Serialiser is RplSourceTargetChannelContent.Serialiser)
     }
 
 }
