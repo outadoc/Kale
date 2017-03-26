@@ -20,6 +20,7 @@ import kotlin.reflect.KClass
 interface IKaleRouter {
 
     fun register(command: String, handler: IKaleIrcMessageHandler)
+    fun unregister(command: String)
     fun handlerFor(command: String): IKaleIrcMessageHandler?
 
     fun <M: Any> register(messageClass: KClass<M>, serialiser: IMessageSerialiser<M>)
@@ -34,6 +35,10 @@ class KaleRouter : IKaleRouter {
 
     override fun register(command: String, handler: IKaleIrcMessageHandler) {
         commandsToParsers[command] = handler
+    }
+
+    override fun unregister(command: String) {
+        commandsToParsers -= command
     }
 
     override fun handlerFor(command: String): IKaleIrcMessageHandler? {

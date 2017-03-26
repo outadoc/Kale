@@ -46,6 +46,16 @@ class KaleRouterTests {
         assertTrue(newHandlerOne === handler)
     }
 
+    @Test fun test_handlerFor_AfterUnregisteringCommand_ReturnsNull() {
+        sut.register("1", handlerOne)
+        sut.register("2", handlerTwo)
+        sut.unregister("1")
+
+        val handler = sut.handlerFor("1")
+
+        assertNull(handler)
+    }
+
     @Test fun test_serialiserFor_MessageNotRegistered_ReturnsNull() {
         val serialiser = sut.serialiserFor(Int::class.java)
 
