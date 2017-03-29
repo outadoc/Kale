@@ -12,7 +12,7 @@ import org.junit.Test
 class KaleTests {
 
     private lateinit var sut: Kale
-    private lateinit var router: IKaleRouter
+    private lateinit var router: IKaleRouter<IKaleIrcMessageHandler>
     private lateinit var tagRouter: IKaleTagRouter
     private lateinit var metadataFactory: IKaleMetadataFactory
     private lateinit var metadata: IMetadataStore

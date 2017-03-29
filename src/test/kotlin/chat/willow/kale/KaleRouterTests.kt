@@ -9,7 +9,7 @@ import org.junit.Test
 
 class KaleRouterTests {
 
-    private lateinit var sut: KaleRouter
+    private lateinit var sut: KaleRouter<IKaleIrcMessageHandler>
     private lateinit var handlerOne: IKaleIrcMessageHandler
     private lateinit var handlerTwo: IKaleIrcMessageHandler
 

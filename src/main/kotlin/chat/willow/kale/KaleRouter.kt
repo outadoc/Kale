@@ -17,23 +17,23 @@ import chat.willow.kale.irc.message.rfc1459.rpl.*
 import chat.willow.kale.irc.message.utility.RawMessage
 import kotlin.reflect.KClass
 
-interface IKaleRouter {
+interface IKaleRouter<H> {
 
-    fun register(command: String, handler: IKaleIrcMessageHandler)
+    fun register(command: String, handler: H)
     fun unregister(command: String)
-    fun handlerFor(command: String): IKaleIrcMessageHandler?
+    fun handlerFor(command: String): H?
 
     fun <M: Any> register(messageClass: KClass<M>, serialiser: IMessageSerialiser<M>)
     fun <M: Any> serialiserFor(messageClass: Class<M>): IMessageSerialiser<M>?
 
 }
 
-class KaleRouter : IKaleRouter {
+open class KaleRouter<T>: IKaleRouter<T> {
 
-    private val commandsToParsers = hashMapOf<String, IKaleIrcMessageHandler>()
+    private val commandsToParsers = hashMapOf<String, T>()
     private val messagesToSerialisers = hashMapOf<Class<*>, IMessageSerialiser<*>>()
 
-    override fun register(command: String, handler: IKaleIrcMessageHandler) {
+    override fun register(command: String, handler: T) {
         commandsToParsers[command] = handler
     }
 
@@ -41,7 +41,7 @@ class KaleRouter : IKaleRouter {
         commandsToParsers -= command
     }
 
-    override fun handlerFor(command: String): IKaleIrcMessageHandler? {
+    override fun handlerFor(command: String): T? {
         return commandsToParsers[command]
     }
 
@@ -49,48 +49,52 @@ class KaleRouter : IKaleRouter {
         messagesToSerialisers[messageClass.java] = serialiser
     }
 
-    override fun <M: Any> serialiserFor(messageClass: Class<M>): IMessageSerialiser<M>? {
+    override fun <M : Any> serialiserFor(messageClass: Class<M>): IMessageSerialiser<M>? {
         @Suppress("UNCHECKED_CAST")
         return messagesToSerialisers[messageClass] as? IMessageSerialiser<M>
     }
 
-    fun useClientDefaults(): KaleRouter {
+}
+
+class KaleClientRouter : KaleRouter<IKaleIrcMessageHandler>() {
+
+    init {
         register(RawMessage.Line::class, RawMessage.Line.Serialiser)
 
-        commandsToParsers["PING"] = KaleParseOnlyHandler(PingMessage.Command.Parser)
+        register("PING", KaleParseOnlyHandler(PingMessage.Command.Parser))
         register(PingMessage.Command::class, PingMessage.Command.Serialiser)
 
-        commandsToParsers["PONG"] = KaleParseOnlyHandler(PongMessage.Message.Parser)
+        register("PONG", KaleParseOnlyHandler(PongMessage.Message.Parser))
         register(PongMessage.Message::class, PongMessage.Message.Serialiser)
 
-        commandsToParsers["NICK"] = KaleParseOnlyHandler(NickMessage.Message.Parser)
+        register("NICK", KaleParseOnlyHandler(NickMessage.Message.Parser))
         register(NickMessage.Command::class, NickMessage.Command.Serialiser)
 
-        commandsToParsers["QUIT"] = KaleParseOnlyHandler(QuitMessage.Message.Parser)
+        register("QUIT", KaleParseOnlyHandler(QuitMessage.Message.Parser))
         register(QuitMessage.Command::class, QuitMessage.Command.Serialiser)
 
-        commandsToParsers["PART"] = KaleParseOnlyHandler(PartMessage.Message.Parser)
+        register("PART", KaleParseOnlyHandler(PartMessage.Message.Parser))
         register(PartMessage.Command::class, PartMessage.Command.Serialiser)
 
-        commandsToParsers["MODE"] = KaleParseOnlyHandler(ModeMessage.Message.Parser)
+        register("MODE", KaleParseOnlyHandler(ModeMessage.Message.Parser))
         register(ModeMessage.Command::class, ModeMessage.Command.Serialiser)
 
-        commandsToParsers["PRIVMSG"] = KaleParseOnlyHandler(PrivMsgMessage.Message.Parser)
+        register("PRIVMSG", KaleParseOnlyHandler(PrivMsgMessage.Message.Parser))
         register(PrivMsgMessage.Command::class, PrivMsgMessage.Command.Serialiser)
 
-        commandsToParsers["NOTICE"] = KaleParseOnlyHandler(NoticeMessage.Message.Parser)
+        register("NOTICE", KaleParseOnlyHandler(NoticeMessage.Message.Parser))
         register(NoticeMessage.Message::class, NoticeMessage.Message.Serialiser)
 
-        commandsToParsers["INVITE"] = KaleParseOnlyHandler(InviteMessage.Message.Parser)
+        register("INVITE", KaleParseOnlyHandler(InviteMessage.Message.Parser))
         register(InviteMessage.Command::class, InviteMessage.Command.Serialiser)
 
-        commandsToParsers["TOPIC"] = KaleParseOnlyHandler(TopicMessage.Message.Parser)
+        register("TOPIC", KaleParseOnlyHandler(TopicMessage.Message.Parser))
         register(TopicMessage.Command::class, TopicMessage.Command.Serialiser)
 
-        commandsToParsers["KICK"] = KaleParseOnlyHandler(KickMessage.Message.Parser)
+        register("KICK", KaleParseOnlyHandler(KickMessage.Message.Parser))
         register(KickMessage.Command::class, KickMessage.Command.Serialiser)
 
-        commandsToParsers["JOIN"] = KaleParseOnlyHandler(JoinMessage.Message.Parser)
+        register("JOIN", KaleParseOnlyHandler(JoinMessage.Message.Parser))
         register(JoinMessage.Command::class, JoinMessage.Command.Serialiser)
 
         register(UserMessage.Command::class, UserMessage.Command.Serialiser)
@@ -119,62 +123,60 @@ class KaleRouter : IKaleRouter {
         register(MonitorMessage.ListAll.Command::class, MonitorMessage.ListAll.Command.Serialiser)
         register(MonitorMessage.Clear.Command::class, MonitorMessage.Clear.Command.Serialiser)
 
-        commandsToParsers[RplEndOfMonList.command] = KaleParseOnlyHandler(RplEndOfMonList.Message.Parser)
+        register(RplEndOfMonList.command, KaleParseOnlyHandler(RplEndOfMonList.Message.Parser))
 
-        commandsToParsers[RplMonList.command] = KaleParseOnlyHandler(RplMonList.Message.Parser)
+        register(RplMonList.command, KaleParseOnlyHandler(RplMonList.Message.Parser))
 
-        commandsToParsers[RplMonListIsFull.command] = KaleParseOnlyHandler(RplMonListIsFull.Message.Parser)
+        register(RplMonListIsFull.command, KaleParseOnlyHandler(RplMonListIsFull.Message.Parser))
 
-        commandsToParsers[RplMonOffline.command] = KaleParseOnlyHandler(RplMonOffline.Message.Parser)
+        register(RplMonOffline.command, KaleParseOnlyHandler(RplMonOffline.Message.Parser))
 
-        commandsToParsers[RplMonOnline.command] = KaleParseOnlyHandler(RplMonOnline.Message.Parser)
+        register(RplMonOnline.command, KaleParseOnlyHandler(RplMonOnline.Message.Parser))
 
-        commandsToParsers[AuthenticateMessage.command] = KaleParseOnlyHandler(AuthenticateMessage.Message.Parser)
+        register(AuthenticateMessage.command, KaleParseOnlyHandler(AuthenticateMessage.Message.Parser))
         register(AuthenticateMessage.Command::class, AuthenticateMessage.Command.Serialiser)
 
-        commandsToParsers[AccountMessage.command] = KaleParseOnlyHandler(AccountMessage.Message.Parser)
+        register(AccountMessage.command, KaleParseOnlyHandler(AccountMessage.Message.Parser))
 
-        commandsToParsers[AwayMessage.command] = KaleParseOnlyHandler(AwayMessage.Message.Parser)
+        register(AwayMessage.command, KaleParseOnlyHandler(AwayMessage.Message.Parser))
 
-        commandsToParsers[ChgHostMessage.command] = KaleParseOnlyHandler(ChgHostMessage.Message.Parser)
+        register(ChgHostMessage.command, KaleParseOnlyHandler(ChgHostMessage.Message.Parser))
 
-        commandsToParsers[Rpl903Message.command] = KaleParseOnlyHandler(Rpl903Message.Parser)
+        register(Rpl903Message.command, KaleParseOnlyHandler(Rpl903Message.Parser))
 
-        commandsToParsers[Rpl904Message.command] = KaleParseOnlyHandler(Rpl904Message.Parser)
+        register(Rpl904Message.command, KaleParseOnlyHandler(Rpl904Message.Parser))
 
-        commandsToParsers[Rpl905Message.command] = KaleParseOnlyHandler(Rpl905Message.Parser)
+        register(Rpl905Message.command, KaleParseOnlyHandler(Rpl905Message.Parser))
 
-        commandsToParsers[Rpl001Message.command] = KaleParseOnlyHandler(Rpl001Message.Parser)
+        register(Rpl001Message.command, KaleParseOnlyHandler(Rpl001Message.Parser))
 
-        commandsToParsers[Rpl002Message.command] = KaleParseOnlyHandler(Rpl002Message.Parser)
+        register(Rpl002Message.command, KaleParseOnlyHandler(Rpl002Message.Parser))
 
-        commandsToParsers[Rpl003Message.command] = KaleParseOnlyHandler(Rpl003Message.Parser)
+        register(Rpl003Message.command, KaleParseOnlyHandler(Rpl003Message.Parser))
 
-        commandsToParsers[Rpl005Message.command] = KaleParseOnlyHandler(Rpl005Message.Message.Parser)
+        register(Rpl005Message.command, KaleParseOnlyHandler(Rpl005Message.Message.Parser))
 
-        commandsToParsers[Rpl331Message.command] = KaleParseOnlyHandler(Rpl331Message.Parser)
+        register(Rpl331Message.command, KaleParseOnlyHandler(Rpl331Message.Parser))
 
-        commandsToParsers[Rpl332Message.command] = KaleParseOnlyHandler(Rpl332Message.Parser)
+        register(Rpl332Message.command, KaleParseOnlyHandler(Rpl332Message.Parser))
 
-        commandsToParsers[Rpl353Message.command] = KaleParseOnlyHandler(Rpl353Message.Message.Parser)
+        register(Rpl353Message.command, KaleParseOnlyHandler(Rpl353Message.Message.Parser))
 
-        commandsToParsers[Rpl372Message.command] = KaleParseOnlyHandler(Rpl372Message.Parser)
+        register(Rpl372Message.command, KaleParseOnlyHandler(Rpl372Message.Parser))
 
-        commandsToParsers[Rpl375Message.command] = KaleParseOnlyHandler(Rpl375Message.Parser)
+        register(Rpl375Message.command, KaleParseOnlyHandler(Rpl375Message.Parser))
 
-        commandsToParsers[Rpl376Message.command] = KaleParseOnlyHandler(Rpl376Message.Parser)
+        register(Rpl376Message.command, KaleParseOnlyHandler(Rpl376Message.Parser))
 
-        commandsToParsers[Rpl422Message.command] = KaleParseOnlyHandler(Rpl422Message.Parser)
+        register(Rpl422Message.command, KaleParseOnlyHandler(Rpl422Message.Parser))
 
-        commandsToParsers[Rpl471Message.command] = KaleParseOnlyHandler(Rpl471Message.Parser)
+        register(Rpl471Message.command, KaleParseOnlyHandler(Rpl471Message.Parser))
 
-        commandsToParsers[Rpl473Message.command] = KaleParseOnlyHandler(Rpl473Message.Parser)
+        register(Rpl473Message.command, KaleParseOnlyHandler(Rpl473Message.Parser))
 
-        commandsToParsers[Rpl474Message.command] = KaleParseOnlyHandler(Rpl474Message.Parser)
+        register(Rpl474Message.command, KaleParseOnlyHandler(Rpl474Message.Parser))
 
-        commandsToParsers[Rpl475Message.command] = KaleParseOnlyHandler(Rpl475Message.Parser)
-
-        return this
+        register(Rpl475Message.command, KaleParseOnlyHandler(Rpl475Message.Parser))
     }
 
 }

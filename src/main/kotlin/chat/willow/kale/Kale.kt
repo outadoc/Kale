@@ -21,7 +21,7 @@ interface IKaleParsingStateDelegate {
 
 }
 
-class Kale(val router: IKaleRouter, private val metadataFactory: IKaleMetadataFactory) : IKale {
+class Kale(val router: IKaleRouter<IKaleIrcMessageHandler>, private val metadataFactory: IKaleMetadataFactory) : IKale {
     private val LOGGER = loggerFor<Kale>()
 
     override var parsingStateDelegate: IKaleParsingStateDelegate? = null
