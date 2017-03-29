@@ -3,18 +3,18 @@ package chat.willow.kale
 import chat.willow.kale.irc.message.IMessageSerialiser
 import chat.willow.kale.irc.message.IrcMessage
 import chat.willow.kale.irc.tag.IKaleTagRouter
-import chat.willow.kale.irc.tag.ITagParser
 import com.nhaarman.mockito_kotlin.*
-import org.junit.Assert.*
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
-import org.mockito.ArgumentCaptor
 
 class KaleTests {
 
     private lateinit var sut: Kale
     private lateinit var router: IKaleRouter
     private lateinit var tagRouter: IKaleTagRouter
+    private lateinit var metadataFactory: IKaleMetadataFactory
     private lateinit var metadata: IMetadataStore
 
     private lateinit var handlerOne: IKaleIrcMessageHandler
@@ -23,12 +23,15 @@ class KaleTests {
     @Before fun setUp() {
         router = mock()
         tagRouter = mock()
+        metadataFactory = mock()
         metadata = mock()
+
+        whenever(metadataFactory.construct(any())).thenReturn(metadata)
 
         handlerOne = mock()
         handlerTwo = mock()
 
-        sut = Kale(router, tagRouter)
+        sut = Kale(router, metadataFactory)
     }
 
     @Test fun test_process_UnparseableLine_DoesNothing() {
@@ -70,40 +73,6 @@ class KaleTests {
         inOrder(handlerOne, handlerTwo) {
             verify(handlerOne).handle(eq(IrcMessage(command = "1")), any())
             verify(handlerTwo).handle(eq(IrcMessage(command = "2")), any())
-        }
-    }
-
-    @Test fun test_process_ValidMetadata_MetadataIsCorrect() {
-        whenever(router.handlerFor("1")).thenReturn(handlerOne)
-
-        val tagParser: ITagParser<String> = mock()
-        val metadata = "some metadata"
-        whenever(tagParser.parse(any())).thenReturn(metadata)
-        whenever(tagRouter.parserFor("tag1")).thenReturn(tagParser)
-
-        sut.process("@tag1=value1;tag2 1")
-
-        argumentCaptor<IMetadataStore>().apply {
-            verify(handlerOne).handle(any(), capture())
-
-            assertEquals(metadata, firstValue[String::class])
-        }
-    }
-
-    @Test fun test_process_InvalidMetadataLookup_MetadataIsNull() {
-        whenever(router.handlerFor("1")).thenReturn(handlerOne)
-
-        val tagParser: ITagParser<String> = mock()
-        val metadata = "some metadata"
-        whenever(tagParser.parse(any())).thenReturn(metadata)
-        whenever(tagRouter.parserFor("tag1")).thenReturn(tagParser)
-
-        sut.process("@tag1=value1;tag2 1")
-
-        argumentCaptor<IMetadataStore>().apply {
-            verify(handlerOne).handle(any(), capture())
-
-            assertNull(firstValue[Int::class])
         }
     }
 
