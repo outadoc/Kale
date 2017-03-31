@@ -13,12 +13,14 @@ class PrivMsgMessageTests {
     private lateinit var messageParser: PrivMsgMessage.Message.Parser
     private lateinit var commandParser: PrivMsgMessage.Command.Parser
     private lateinit var commandSerialiser: PrivMsgMessage.Command.Serialiser
+    private lateinit var messageSerialiser: PrivMsgMessage.Message.Serialiser
 
 
     @Before fun setUp() {
         messageParser = PrivMsgMessage.Message.Parser
         commandParser = PrivMsgMessage.Command.Parser
         commandSerialiser = PrivMsgMessage.Command.Serialiser
+        messageSerialiser = PrivMsgMessage.Message.Serialiser
     }
 
     @Test fun test_parse_MessageFromUser() {
@@ -96,4 +98,11 @@ class PrivMsgMessageTests {
 
         assertEquals(message, IrcMessage(command = "PRIVMSG", parameters = listOf("#*.edu", "NSFNet is undergoing work, expect interruptions")))
     }
+
+    @Test fun test_serialise_Message() {
+        val message = messageSerialiser.serialise(PrivMsgMessage.Message(source = prefix("server"), target = "someone", message = "server message"))
+
+        assertEquals(message, IrcMessage(command = "PRIVMSG", prefix = "server", parameters = listOf("someone", "server message")))
+    }
+    
 }

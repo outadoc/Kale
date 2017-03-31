@@ -6,6 +6,7 @@ import chat.willow.kale.irc.message.MessageParser
 import chat.willow.kale.irc.message.MessageSerialiser
 import chat.willow.kale.irc.prefix.Prefix
 import chat.willow.kale.irc.prefix.PrefixParser
+import chat.willow.kale.irc.prefix.PrefixSerialiser
 
 object PrivMsgMessage : ICommand {
 
@@ -55,6 +56,16 @@ object PrivMsgMessage : ICommand {
                 return Message(source, target, message)
             }
 
+        }
+
+        object Serialiser : MessageSerialiser<Message>(command) {
+
+            override fun serialiseToComponents(message: Message): IrcMessageComponents {
+                val prefix = PrefixSerialiser.serialise(message.source)
+                val parameters = listOf(message.target, message.message)
+
+                return IrcMessageComponents(prefix = prefix, parameters = parameters)
+            }
         }
 
     }
