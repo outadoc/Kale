@@ -11,11 +11,14 @@ import org.junit.Test
 class PrivMsgMessageTests {
 
     private lateinit var messageParser: PrivMsgMessage.Message.Parser
-    private lateinit var messageSerialiser: PrivMsgMessage.Command.Serialiser
+    private lateinit var commandParser: PrivMsgMessage.Command.Parser
+    private lateinit var commandSerialiser: PrivMsgMessage.Command.Serialiser
+
 
     @Before fun setUp() {
         messageParser = PrivMsgMessage.Message.Parser
-        messageSerialiser = PrivMsgMessage.Command.Serialiser
+        commandParser = PrivMsgMessage.Command.Parser
+        commandSerialiser = PrivMsgMessage.Command.Serialiser
     }
 
     @Test fun test_parse_MessageFromUser() {
@@ -56,26 +59,40 @@ class PrivMsgMessageTests {
         assertNull(messageTwo)
     }
 
+    @Test fun test_parse_Command() {
+        val message = commandParser.parse(IrcMessage(command = "PRIVMSG", parameters = listOf("target", "a message")))
+
+        assertEquals(message, PrivMsgMessage.Command(target = "target", message = "a message"))
+    }
+
+    @Test fun test_parse_Command_TooFewParameters() {
+        val messageOne = commandParser.parse(IrcMessage(command = "PRIVMSG", parameters = listOf()))
+        val messageTwo = commandParser.parse(IrcMessage(command = "PRIVMSG", parameters = listOf("test")))
+
+        assertNull(messageOne)
+        assertNull(messageTwo)
+    }
+
     @Test fun test_serialise_MessageToUser() {
-        val message = messageSerialiser.serialise(PrivMsgMessage.Command(target = "Angel", message = "yes I'm receiving it !"))
+        val message = commandSerialiser.serialise(PrivMsgMessage.Command(target = "Angel", message = "yes I'm receiving it !"))
 
         assertEquals(message, IrcMessage(command = "PRIVMSG", parameters = listOf("Angel", "yes I'm receiving it !")))
     }
 
     @Test fun test_serialise_MessageToHostmask() {
-        val message = messageSerialiser.serialise(PrivMsgMessage.Command(target = "jto@tolsun.oulu.fi", message = "Hello !"))
+        val message = commandSerialiser.serialise(PrivMsgMessage.Command(target = "jto@tolsun.oulu.fi", message = "Hello !"))
 
         assertEquals(message, IrcMessage(command = "PRIVMSG", parameters = listOf("jto@tolsun.oulu.fi", "Hello !")))
     }
 
     @Test fun test_serialise_MessageToServerWildcard() {
-        val message = messageSerialiser.serialise(PrivMsgMessage.Command(target = "$*.fi", message = "Server tolsun.oulu.fi rebooting."))
+        val message = commandSerialiser.serialise(PrivMsgMessage.Command(target = "$*.fi", message = "Server tolsun.oulu.fi rebooting."))
 
         assertEquals(message, IrcMessage(command = "PRIVMSG", parameters = listOf("$*.fi", "Server tolsun.oulu.fi rebooting.")))
     }
 
     @Test fun test_serialise_MessageToHostWildcard() {
-        val message = messageSerialiser.serialise(PrivMsgMessage.Command(target = "#*.edu", message = "NSFNet is undergoing work, expect interruptions"))
+        val message = commandSerialiser.serialise(PrivMsgMessage.Command(target = "#*.edu", message = "NSFNet is undergoing work, expect interruptions"))
 
         assertEquals(message, IrcMessage(command = "PRIVMSG", parameters = listOf("#*.edu", "NSFNet is undergoing work, expect interruptions")))
     }

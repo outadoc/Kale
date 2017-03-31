@@ -13,6 +13,20 @@ object PrivMsgMessage : ICommand {
 
     data class Command(val target: String, val message: String) {
 
+        object Parser : MessageParser<Command>(command) {
+
+            override fun parseFromComponents(components: IrcMessageComponents): Command? {
+                if (components.parameters.size < 2) {
+                    return null
+                }
+
+                val target = components.parameters[0]
+                val message = components.parameters[1]
+
+                return Command(target, message)
+            }
+        }
+
         object Serialiser : MessageSerialiser<Command>(command) {
 
             override fun serialiseToComponents(message: Command): IrcMessageComponents {
