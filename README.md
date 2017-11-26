@@ -5,34 +5,29 @@ Kotlin/JVM IRC message parsing, serialising and notifying. Provides useful abstr
 
 [Burrow](https://github.com/WillowChat/Burrow) is a new IRC v3.2 server daemon, which uses the parsing and serialising bits of Kale.
 
-[Thump](https://github.com/WillowChat/Thump) is the primary upstream project - a bridge that lets people chat between Minecraft and IRC whilst they play.
+[Thump](https://github.com/WillowChat/Thump) is a bridge that lets people chat between Minecraft and IRC whilst they play.
 
 [![codecov](https://codecov.io/gh/WillowChat/Kale/branch/develop/graph/badge.svg)](https://codecov.io/gh/WillowChat/Kale)
 
-## Features
+There are basic examples of usage in [KaleRunner.kt](src/main/kotlin/chat/willow/kale/KaleRunner.kt)
 
-Kale, Warren and Burrow have a few interesting features:
+## Goals
 
-* The responsibilities of parsing and state management are separated
-* Both parsing and state management are verified by hundreds of unit tests
-* Messages, and state handlers, are individually encapsulated
+* Own the parsing & serialising bit of IRC clients and servers
+* Let users feed raw lines in, and be notified with strongly typed output messages, covering RFC1459 and IRCv3
+* Verify the above with an extensive suite of unit tests
 
-Planned releases (and their features) are tracked in [Projects](https://github.com/WillowChat/Kale/projects).
-
-## Support
-
-<a href="https://patreon.com/carrotcodes"><img src="https://s3.amazonaws.com/patreon_public_assets/toolbox/patreon.png" align="left" width="160" ></a>
-If you use this library and you'd like to support my open-source work, please consider tipping through [Patreon](https://patreon.com/carrotcodes).
+If this sounds good to you, you can support development through [Patreon](https://crrt.io/patreon) 🎉!
 
 ## Code License
 The source code of this project is licensed under the terms of the ISC license, listed in the [LICENSE](LICENSE.md) file. A concise summary of the ISC license is available at [choosealicense.org](http://choosealicense.com/licenses/isc/).
 
 ## Building
-This project uses Gradle and IntelliJ IDEA for pretty easy setup and building.
+This project uses Gradle for pretty easy setup and building.
 
 The general idea:
-* **Setup**: `./gradlew clean idea`
+* **Setup**: `./gradlew clean`
 * **Building**: `./gradlew build`
-* **Producing an all-in-one Jar**: `./gradlew build shadowJar`
+* **Testing**: `./gradlew test`
 
 If you run in to odd Gradle issues, doing `./gradlew clean` usually fixes it.
