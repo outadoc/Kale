@@ -15,7 +15,7 @@ object PartMessage : ICommand {
     
     data class Command(val channels: List<String>) {
         
-        object Parser : MessageParser<Command>(command) {
+        object Parser : MessageParser<Command>() {
 
             override fun parseFromComponents(components: IrcMessageComponents): Command? {
                 if (components.parameters.isEmpty()) {
@@ -44,7 +44,7 @@ object PartMessage : ICommand {
     
     data class Message(val source: Prefix, val channels: List<String>) {
 
-        object Parser : MessageParser<Message>(command) {
+        object Parser : MessageParser<Message>() {
 
             override fun parseFromComponents(components: IrcMessageComponents): Message? {
                 if (components.parameters.isEmpty() || components.prefix == null) {

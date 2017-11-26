@@ -14,7 +14,7 @@ object InviteMessage : ICommand {
 
     data class Command(val user: String, val channel: String) {
 
-        object Parser : MessageParser<Command>(command) {
+        object Parser : MessageParser<Command>() {
 
             override fun parseFromComponents(components: IrcMessageComponents): Command? {
                 if (components.parameters.size < 2) {
@@ -40,7 +40,7 @@ object InviteMessage : ICommand {
 
     data class Message(val source: Prefix, val user: String, val channel: String) {
 
-        object Parser : MessageParser<Message>(command) {
+        object Parser : MessageParser<Message>() {
 
             override fun parseFromComponents(components: IrcMessageComponents): Message? {
                 if (components.parameters.size < 2) {

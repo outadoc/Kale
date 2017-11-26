@@ -8,7 +8,7 @@ abstract class RplSourceTargetChannelContent {
 
     data class Message(val source: String, val target: String, val channel: String, val content: String)
 
-    abstract class Parser(val command: String) : MessageParser<Message>(command) {
+    abstract class Parser(val command: String) : MessageParser<Message>() {
 
         override fun parseFromComponents(components: IrcMessageComponents): Message? {
             if (components.parameters.size < 3) {

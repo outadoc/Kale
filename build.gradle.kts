@@ -72,6 +72,8 @@ dependencies {
     compile(kotlinModule("stdlib", kotlinVersion as String))
 
     compile("org.slf4j:slf4j-api:1.7.21")
+    compile("io.reactivex.rxjava2:rxjava:2.1.6")
+    compile("io.reactivex.rxjava2:rxkotlin:2.1.0")
 
     testCompile("junit:junit:4.12")
     testCompile("org.mockito:mockito-core:2.2.9")

@@ -2,6 +2,8 @@ package chat.willow.kale.irc.message.rfc1459
 
 import chat.willow.kale.ICommand
 import chat.willow.kale.IrcMessageComponents
+import chat.willow.kale.KaleDescriptor
+import chat.willow.kale.commandMatcher
 import chat.willow.kale.irc.message.MessageParser
 import chat.willow.kale.irc.message.MessageSerialiser
 
@@ -11,7 +13,9 @@ object UserMessage : ICommand {
 
     data class Command(val username: String, val mode: String, val realname: String) {
 
-        object Parser : MessageParser<Command>(command) {
+        object Descriptor : KaleDescriptor<Command>(matcher = commandMatcher(UserMessage.command), parser = Parser)
+
+        object Parser : MessageParser<Command>() {
 
             override fun parseFromComponents(components: IrcMessageComponents): Command? {
                 if (components.parameters.size < 4) {

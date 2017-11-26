@@ -14,7 +14,7 @@ object AccountMessage : ICommand {
 
     data class Message(val source: Prefix, val account: String) {
 
-        object Parser : MessageParser<Message>(command) {
+        object Parser : MessageParser<Message>() {
 
             override fun parseFromComponents(components: IrcMessageComponents): Message? {
                 val prefix = components.prefix ?: return null

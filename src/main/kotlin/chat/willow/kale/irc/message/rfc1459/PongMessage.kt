@@ -11,7 +11,7 @@ object PongMessage : ICommand {
 
     data class Message(val token: String) {
 
-        object Parser : MessageParser<Message>(command) {
+        object Parser : MessageParser<Message>() {
 
             override fun parseFromComponents(components: IrcMessageComponents): Message? {
                 if (components.parameters.isEmpty()) {

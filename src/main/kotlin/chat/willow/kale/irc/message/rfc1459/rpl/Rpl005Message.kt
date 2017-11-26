@@ -12,7 +12,7 @@ object Rpl005Message : ICommand {
 
     data class Message(val source: String, val target: String, val tokens: Map<String, String?>) {
 
-        object Parser : MessageParser<Message>(command) {
+        object Parser : MessageParser<Message>() {
 
             override fun parseFromComponents(components: IrcMessageComponents): Message? {
                 if (components.parameters.size < 2) {

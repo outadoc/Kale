@@ -11,7 +11,7 @@ object PingMessage : ICommand {
 
     data class Command(val token: String) {
 
-        object Parser : MessageParser<Command>(command) {
+        object Parser : MessageParser<Command>() {
 
             override fun parseFromComponents(components: IrcMessageComponents): Command? {
                 if (components.parameters.isEmpty()) {

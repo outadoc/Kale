@@ -11,7 +11,7 @@ object PassMessage : ICommand {
 
     data class Command(val password: String) {
 
-        object Parser : MessageParser<Command>(command) {
+        object Parser : MessageParser<Command>() {
 
             override fun parseFromComponents(components: IrcMessageComponents): Command? {
                 if (components.parameters.isEmpty()) {

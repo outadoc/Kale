@@ -9,51 +9,10 @@ import org.junit.Test
 
 class KaleRouterTests {
 
-    private lateinit var sut: KaleRouter<IKaleIrcMessageHandler>
-    private lateinit var handlerOne: IKaleIrcMessageHandler
-    private lateinit var handlerTwo: IKaleIrcMessageHandler
+    private lateinit var sut: KaleRouter
 
     @Before fun setUp() {
-        handlerOne = mock()
-        handlerTwo = mock()
-
         sut = KaleRouter()
-    }
-
-    @Test fun test_handlerFor_CommandNotRegistered_ReturnsNull() {
-        val handler = sut.handlerFor("COMMAND")
-
-        assertNull(handler)
-    }
-
-    @Test fun test_handlerFor_CommandRegistered_ReturnsCorrectHandler() {
-        sut.register("1", handlerOne)
-        sut.register("2", handlerTwo)
-
-        val handler = sut.handlerFor("1")
-
-        assertTrue(handlerOne === handler)
-    }
-
-    @Test fun test_handlerFor_AfterReRegisteringCommand_WithDifferentHandler_ReturnsNewHandler() {
-        val newHandlerOne: IKaleIrcMessageHandler = mock()
-        sut.register("1", handlerOne)
-        sut.register("2", handlerTwo)
-        sut.register("1", newHandlerOne)
-
-        val handler = sut.handlerFor("1")
-
-        assertTrue(newHandlerOne === handler)
-    }
-
-    @Test fun test_handlerFor_AfterUnregisteringCommand_ReturnsNull() {
-        sut.register("1", handlerOne)
-        sut.register("2", handlerTwo)
-        sut.unregister("1")
-
-        val handler = sut.handlerFor("1")
-
-        assertNull(handler)
     }
 
     @Test fun test_serialiserFor_MessageNotRegistered_ReturnsNull() {
@@ -83,7 +42,5 @@ class KaleRouterTests {
 
         assertTrue(newSerialiserOne === serialiser)
     }
-
-    // TODO: Test client defaults?
 
 }

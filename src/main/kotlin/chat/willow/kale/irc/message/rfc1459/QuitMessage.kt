@@ -14,7 +14,7 @@ object QuitMessage : ICommand {
 
     data class Command(val message: String? = null) {
 
-        object Parser : MessageParser<Command>(command) {
+        object Parser : MessageParser<Command>() {
 
             override fun parseFromComponents(components: IrcMessageComponents): Command? {
                 val quitMessage = components.parameters.getOrNull(0)
@@ -40,7 +40,7 @@ object QuitMessage : ICommand {
 
     data class Message(val source: Prefix, val message: String? = null) {
 
-        object Parser : MessageParser<Message>(command) {
+        object Parser : MessageParser<Message>() {
 
             override fun parseFromComponents(components: IrcMessageComponents): Message? {
                 if (components.prefix == null) {

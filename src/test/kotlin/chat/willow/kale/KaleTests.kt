@@ -2,8 +2,12 @@ package chat.willow.kale
 
 import chat.willow.kale.irc.message.IMessageSerialiser
 import chat.willow.kale.irc.message.IrcMessage
+import chat.willow.kale.irc.message.MessageParser
 import chat.willow.kale.irc.tag.IKaleTagRouter
+import chat.willow.kale.irc.tag.TagStore
 import com.nhaarman.mockito_kotlin.*
+import io.reactivex.Observable
+import io.reactivex.rxkotlin.Observables
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -12,13 +16,17 @@ import org.junit.Test
 class KaleTests {
 
     private lateinit var sut: Kale
-    private lateinit var router: IKaleRouter<IKaleIrcMessageHandler>
+    private lateinit var router: IKaleRouter
     private lateinit var tagRouter: IKaleTagRouter
     private lateinit var metadataFactory: IKaleMetadataFactory
     private lateinit var metadata: IMetadataStore
 
-    private lateinit var handlerOne: IKaleIrcMessageHandler
-    private lateinit var handlerTwo: IKaleIrcMessageHandler
+    object TestMessageOne
+    object TestMessageTwo
+
+    private fun <T> testDescriptor(command: String, result: T?) = KaleDescriptor(matcher = { it.command == command }, parser = object : MessageParser<T>() {
+        override fun parseFromComponents(components: IrcMessageComponents): T? = result
+    })
 
     @Before fun setUp() {
         router = mock()
@@ -28,55 +36,87 @@ class KaleTests {
 
         whenever(metadataFactory.construct(any())).thenReturn(metadata)
 
-        handlerOne = mock()
-        handlerTwo = mock()
-
         sut = Kale(router, metadataFactory)
     }
 
-    @Test fun test_process_UnparseableLine_DoesNothing() {
-        sut.process(" ")
+    @Test fun `when an unparseable line is given, nothing happens`() {
+        val observer = sut.messages.test()
 
-        verifyZeroInteractions(router)
-        verifyZeroInteractions(tagRouter)
+        sut.lines.onNext(" ")
+
+        observer.assertNoValues()
     }
 
-    @Test fun test_process_NoHandler_DoesNothing() {
-        whenever(router.handlerFor("1")).thenReturn(handlerOne)
-        whenever(router.handlerFor("2")).thenReturn(handlerTwo)
+    @Test fun `when a correct line is given, and a valid observer is registered, it is notified`() {
+        val testObserver = sut.observe(testDescriptor("something", result = TestMessageOne)).test()
 
-        sut.process("COMMAND")
+        sut.lines.onNext("something")
 
-        verify(router, only()).handlerFor("COMMAND")
-        verifyZeroInteractions(handlerOne)
-        verifyZeroInteractions(handlerTwo)
+        testObserver.assertValue(KaleObservable(TestMessageOne, metadata))
     }
 
-    @Test fun test_process_TellsHandlerToHandle() {
-        whenever(router.handlerFor("1")).thenReturn(handlerOne)
-        whenever(router.handlerFor("2")).thenReturn(handlerTwo)
+    @Test fun `when multiple correct lines are given, and valid observers are registered, they are notified in order`() {
+        val testObserverOne = sut.observe(testDescriptor("something1", result = TestMessageOne))
+        val testObserverTwo = sut.observe(testDescriptor("something2", result = TestMessageTwo))
 
-        sut.process("1")
+        val results = Observable.merge(testObserverOne, testObserverTwo).test()
 
-        verify(handlerOne).handle(eq(IrcMessage(command = "1")), any())
-        verifyZeroInteractions(handlerTwo)
+        sut.lines.onNext("something1")
+        sut.lines.onNext("something2")
+
+        results.assertValues(KaleObservable(TestMessageOne, metadata), KaleObservable(TestMessageTwo, metadata))
     }
 
-    @Test fun test_process_HandlesInOrder() {
-        whenever(router.handlerFor("1")).thenReturn(handlerOne)
-        whenever(router.handlerFor("2")).thenReturn(handlerTwo)
+    @Test fun `when multiple misc lines are given, observers are still notified in order`() {
+        val testObserverOne = sut.observe(testDescriptor("something1", result = TestMessageOne))
+        val testObserverTwo = sut.observe(testDescriptor("something2", result = TestMessageTwo))
 
-        sut.process("1")
-        sut.process("2")
-        sut.process("3")
+        val results = Observable.merge(testObserverOne, testObserverTwo).test()
 
-        inOrder(handlerOne, handlerTwo) {
-            verify(handlerOne).handle(eq(IrcMessage(command = "1")), any())
-            verify(handlerTwo).handle(eq(IrcMessage(command = "2")), any())
-        }
+        sut.lines.onNext("something2")
+        sut.lines.onNext("not_something")
+        sut.lines.onNext("something1")
+        sut.lines.onNext("still_not_something")
+
+        results.assertValues(KaleObservable(TestMessageTwo, metadata), KaleObservable(TestMessageOne, metadata))
     }
 
-    @Test fun test_serialise_RouterHasNoSerialiser_ReturnsNull() {
+    @Test fun `when a parseable line is given, messages outputs correct line`() {
+        val results = sut.messages.test()
+
+        sut.lines.onNext("HELLO kale")
+
+        results.assertValue(KaleObservable(IrcMessage(command = "HELLO", parameters = listOf("kale")), metadata))
+    }
+
+    @Test fun `when parseable lines are given, messages output in order`() {
+        val results = sut.messages.test()
+
+        sut.lines.onNext("HELLO kale")
+        sut.lines.onNext("WORLD kale")
+
+        results.assertValues(
+                KaleObservable(IrcMessage(command = "HELLO", parameters = listOf("kale")), metadata),
+                KaleObservable(IrcMessage(command = "WORLD", parameters = listOf("kale")), metadata)
+        )
+    }
+
+    @Test fun `when misc lines are given, messages still output in order`() {
+        val results = sut.messages.test()
+
+        sut.lines.onNext( " ")
+        sut.lines.onNext("HELLO kale")
+        sut.lines.onNext( " ")
+        sut.lines.onNext("WORLD kale")
+        sut.lines.onNext( " ")
+
+        results.assertValues(
+                KaleObservable(IrcMessage(command = "HELLO", parameters = listOf("kale")), metadata),
+                KaleObservable(IrcMessage(command = "WORLD", parameters = listOf("kale")), metadata)
+        )
+    }
+
+    @Test fun `when serialising without a route, return null`() {
         val thing: Any = mock()
 
         val result = sut.serialise(thing)
@@ -84,7 +124,7 @@ class KaleTests {
         assertNull(result)
     }
 
-    @Test fun test_serialise_RouterHasSerialiser_ReturnsSerialisedMessage() {
+    @Test fun `when serialising with a valid route, return correct message`() {
         val thing: Int = 1
         val expectedReturnMessage: IrcMessage = IrcMessage(command = "ANY")
 

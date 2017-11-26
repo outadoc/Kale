@@ -15,7 +15,7 @@ object RplMonOffline : ICommand {
 
     data class Message(val prefix: Prefix, val nickOrStar: String, val targets: List<Prefix>) {
 
-        object Parser : MessageParser<Message>(command) {
+        object Parser : MessageParser<Message>() {
 
             override fun parseFromComponents(components: IrcMessageComponents): Message? {
                 if (components.parameters.size < 2) {

@@ -14,7 +14,7 @@ object ExtendedJoinMessage : ICommand {
 
     data class Message(val source: Prefix, val channel: String, val account: String?, val realName: String) {
 
-        object Parser : MessageParser<Message>(command) {
+        object Parser : MessageParser<Message>() {
 
             override fun parseFromComponents(components: IrcMessageComponents): Message? {
                 if (components.parameters.size < 3 || components.prefix == null) {

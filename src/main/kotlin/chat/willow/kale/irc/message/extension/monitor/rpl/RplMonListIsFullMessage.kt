@@ -15,7 +15,7 @@ object RplMonListIsFull : ICommand {
 
     data class Message(val prefix: Prefix, val nick: String, val limit: String, val targets: List<Prefix>, val message: String) {
 
-        object Parser : MessageParser<Message>(command) {
+        object Parser : MessageParser<Message>() {
 
             override fun parseFromComponents(components: IrcMessageComponents): Message? {
                 if (components.parameters.size < 4) {

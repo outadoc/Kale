@@ -12,7 +12,7 @@ object AuthenticateMessage : ICommand {
 
     data class Command(val payload: String) {
 
-        object Parser : MessageParser<Command>(command) {
+        object Parser : MessageParser<Command>() {
 
             override fun parseFromComponents(components: IrcMessageComponents): Command? {
                 if (components.parameters.isEmpty()) {
@@ -37,7 +37,7 @@ object AuthenticateMessage : ICommand {
 
     data class Message(val payload: String, val isEmpty: Boolean) {
 
-        object Parser : MessageParser<Message>(command) {
+        object Parser : MessageParser<Message>() {
 
             override fun parseFromComponents(components: IrcMessageComponents): Message? {
                 if (components.parameters.isEmpty()) {
