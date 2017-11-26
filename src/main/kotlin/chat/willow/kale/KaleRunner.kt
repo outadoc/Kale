@@ -1,8 +1,6 @@
 package chat.willow.kale
 
 import chat.willow.kale.irc.message.extension.batch.BatchMessage
-import chat.willow.kale.irc.message.extension.sasl.rpl.Rpl903Message
-import chat.willow.kale.irc.message.extension.sasl.rpl.Rpl903MessageType
 import chat.willow.kale.irc.message.rfc1459.*
 import chat.willow.kale.irc.prefix.Prefix
 import chat.willow.kale.irc.tag.KaleTagRouter

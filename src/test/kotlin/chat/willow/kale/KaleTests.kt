@@ -4,10 +4,10 @@ import chat.willow.kale.irc.message.IMessageSerialiser
 import chat.willow.kale.irc.message.IrcMessage
 import chat.willow.kale.irc.message.MessageParser
 import chat.willow.kale.irc.tag.IKaleTagRouter
-import chat.willow.kale.irc.tag.TagStore
-import com.nhaarman.mockito_kotlin.*
+import com.nhaarman.mockito_kotlin.any
+import com.nhaarman.mockito_kotlin.mock
+import com.nhaarman.mockito_kotlin.whenever
 import io.reactivex.Observable
-import io.reactivex.rxkotlin.Observables
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before

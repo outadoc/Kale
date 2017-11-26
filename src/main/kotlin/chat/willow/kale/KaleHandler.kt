@@ -1,7 +1,5 @@
 package chat.willow.kale
 
-import chat.willow.kale.irc.message.IMessageParser
-import chat.willow.kale.irc.message.IrcMessage
 import chat.willow.kale.irc.tag.ITagStore
 
 typealias IMetadataStore = ITagStore
