@@ -1,6 +1,6 @@
 package chat.willow.kale.helper
 
-open class CaseInsensitiveNamedMap<NamedType : INamed>(val mapper: ICaseMapper) {
+open class CaseInsensitiveNamedMap<NamedType : INamed>(private val mapper: ICaseMapper) {
 
     private val namedThings = mutableMapOf<String, NamedType>()
 

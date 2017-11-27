@@ -222,17 +222,15 @@ object ModeMessage : ICommand {
     }
 
     private fun parseModes(token: String): List<Char> {
-        val modes = (0..token.length - 1).map { token[it] }
-
-        return modes
+        return (0 until token.length).map { token[it] }
     }
 
     private fun takesAParameter(isAdding: Boolean, token: Char): Boolean {
         val delegateTakesAParameter = parsingStateDelegate?.modeTakesAParameter(isAdding, token)
-        return delegateTakesAParameter ?: if (isAdding) {
-            return defaultPlusRequiringParameter.contains(token)
+        return delegateTakesAParameter ?: return if (isAdding) {
+            defaultPlusRequiringParameter.contains(token)
         } else {
-            return defaultMinusRequiringParameter.contains(token)
+            defaultMinusRequiringParameter.contains(token)
         }
     }
 

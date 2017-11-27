@@ -79,7 +79,7 @@ object SerialiserHelper {
             }
         }
 
-        return serialisedKeyValues.filterNotNull().joinToString(separator = chunkSeparator.toString())
+        return serialisedKeyValues.joinToString(separator = chunkSeparator.toString())
     }
 
 }

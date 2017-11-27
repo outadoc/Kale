@@ -31,8 +31,7 @@ object RplMonListIsFull : ICommand {
 
                 val targets = rawTargets
                         .split(delimiters = CharacterCodes.COMMA)
-                        .map { PrefixParser.parse(it) }
-                        .filterNotNull()
+                        .mapNotNull { PrefixParser.parse(it) }
 
                 val endMessage = components.parameters[3]
 
@@ -44,9 +43,7 @@ object RplMonListIsFull : ICommand {
         object Serialiser : MessageSerialiser<Message>(command) {
 
             override fun serialiseToComponents(message: Message): IrcMessageComponents {
-                val targets = message.targets
-                        .map { PrefixSerialiser.serialise(it) }
-                        .joinToString(separator = CharacterCodes.COMMA.toString())
+                val targets = message.targets.joinToString(separator = CharacterCodes.COMMA.toString()) { PrefixSerialiser.serialise(it) }
 
                 val prefix = PrefixSerialiser.serialise(message.prefix)
 

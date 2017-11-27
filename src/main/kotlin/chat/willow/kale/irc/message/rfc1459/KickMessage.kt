@@ -47,10 +47,10 @@ object KickMessage : ICommand {
                 val users = message.users.joinToString(separator = CharacterCodes.COMMA.toString())
                 val comment = message.comment
 
-                if (comment != null) {
-                    return IrcMessageComponents(parameters = listOf(channels, users, comment))
+                return if (comment != null) {
+                    IrcMessageComponents(parameters = listOf(channels, users, comment))
                 } else {
-                    return IrcMessageComponents(parameters = listOf(channels, users))
+                    IrcMessageComponents(parameters = listOf(channels, users))
                 }
             }
             
@@ -92,10 +92,10 @@ object KickMessage : ICommand {
                 val users = message.users.joinToString(separator = CharacterCodes.COMMA.toString())
                 val comment = message.comment
 
-                if (comment != null) {
-                    return IrcMessageComponents(prefix = prefix, parameters = listOf(channels, users, comment))
+                return if (comment != null) {
+                    IrcMessageComponents(prefix = prefix, parameters = listOf(channels, users, comment))
                 } else {
-                    return IrcMessageComponents(prefix = prefix, parameters = listOf(channels, users))
+                    IrcMessageComponents(prefix = prefix, parameters = listOf(channels, users))
                 }
             }
 

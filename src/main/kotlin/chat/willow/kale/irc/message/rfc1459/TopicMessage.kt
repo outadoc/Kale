@@ -36,10 +36,10 @@ object TopicMessage : ICommand {
         object Serialiser : MessageSerialiser<Command>(command) {
             
             override fun serialiseToComponents(message: Command): IrcMessageComponents {
-                if (message.topic != null) {
-                    return IrcMessageComponents(parameters = listOf(message.channel, message.topic))
+                return if (message.topic != null) {
+                    IrcMessageComponents(parameters = listOf(message.channel, message.topic))
                 } else {
-                    return IrcMessageComponents(parameters = listOf(message.channel))
+                    IrcMessageComponents(parameters = listOf(message.channel))
                 }
             }
             
@@ -72,10 +72,10 @@ object TopicMessage : ICommand {
             override fun serialiseToComponents(message: Message): IrcMessageComponents {
                 val prefix = PrefixSerialiser.serialise(message.source)
 
-                if (message.topic != null) {
-                    return IrcMessageComponents(prefix = prefix, parameters = listOf(message.channel, message.topic))
+                return if (message.topic != null) {
+                    IrcMessageComponents(prefix = prefix, parameters = listOf(message.channel, message.topic))
                 } else {
-                    return IrcMessageComponents(prefix = prefix, parameters = listOf(message.channel))
+                    IrcMessageComponents(prefix = prefix, parameters = listOf(message.channel))
                 }
             }
 

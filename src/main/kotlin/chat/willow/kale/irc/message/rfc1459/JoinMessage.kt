@@ -29,13 +29,13 @@ object JoinMessage : ICommand {
                 val unsplitChannels = components.parameters[0]
                 val channels = unsplitChannels.split(delimiters = CharacterCodes.COMMA).filterNot(String::isEmpty)
 
-                if (components.parameters.size < 2) {
-                    return Command(channels)
+                return if (components.parameters.size < 2) {
+                    Command(channels)
                 } else {
                     val unsplitKeys = components.parameters[1]
                     val keys = unsplitKeys.split(delimiters = CharacterCodes.COMMA).filterNot(String::isEmpty)
 
-                    return Command(channels, keys)
+                    Command(channels, keys)
                 }
             }
         }
@@ -45,12 +45,12 @@ object JoinMessage : ICommand {
             override fun serialiseToComponents(message: Command): IrcMessageComponents {
                 val channels = message.channels.joinToString(separator = CharacterCodes.COMMA.toString())
 
-                if (message.keys == null || message.keys.isEmpty()) {
-                    return IrcMessageComponents(parameters = listOf(channels))
+                return if (message.keys == null || message.keys.isEmpty()) {
+                    IrcMessageComponents(parameters = listOf(channels))
                 } else {
                     val keys = message.keys.joinToString(separator = CharacterCodes.COMMA.toString())
 
-                    return IrcMessageComponents(parameters = listOf(channels, keys))
+                    IrcMessageComponents(parameters = listOf(channels, keys))
                 }
             }
         }

@@ -18,7 +18,7 @@ enum class CaseMapping(val upperToLowerMapping: Map<Char, Char>) {
 
     fun toLower(string: String): String {
         val charArray = string.toCharArray()
-        for (i in 0..charArray.size-1) {
+        for (i in 0 until charArray.size) {
             val replacement = upperToLowerMapping[charArray[i]]
             if (replacement != null) {
                 charArray[i] = replacement

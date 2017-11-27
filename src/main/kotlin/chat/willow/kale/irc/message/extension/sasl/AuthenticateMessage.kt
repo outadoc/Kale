@@ -60,10 +60,10 @@ object AuthenticateMessage : ICommand {
         object Serialiser : MessageSerialiser<Message>(command) {
 
             override fun serialiseToComponents(message: Message): IrcMessageComponents {
-                if (message.isEmpty) {
-                    return IrcMessageComponents(parameters = listOf("${CharacterCodes.PLUS}"))
+                return if (message.isEmpty) {
+                    IrcMessageComponents(parameters = listOf("${CharacterCodes.PLUS}"))
                 } else {
-                    return IrcMessageComponents(parameters = listOf(message.payload))
+                    IrcMessageComponents(parameters = listOf(message.payload))
                 }
             }
         }

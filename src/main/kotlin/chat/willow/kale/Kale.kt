@@ -40,8 +40,8 @@ interface IKaleParsingStateDelegate {
 
 }
 
-class Kale(val router: IKaleRouter, private val metadataFactory: IKaleMetadataFactory) : IKale {
-    override val lines = PublishSubject.create<String>()
+class Kale(private val router: IKaleRouter, private val metadataFactory: IKaleMetadataFactory) : IKale {
+    override val lines = PublishSubject.create<String>()!!
     override val messages: Observable<KaleObservable<IrcMessage>>
 
     private val LOGGER = loggerFor<Kale>()

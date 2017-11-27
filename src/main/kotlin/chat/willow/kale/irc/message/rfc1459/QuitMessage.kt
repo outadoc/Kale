@@ -31,10 +31,10 @@ object QuitMessage : ICommand {
         object Serialiser : MessageSerialiser<Command>(command) {
 
             override fun serialiseToComponents(message: Command): IrcMessageComponents {
-                if (message.message == null) {
-                    return IrcMessageComponents()
+                return if (message.message == null) {
+                    IrcMessageComponents()
                 } else {
-                    return IrcMessageComponents(parameters = listOf(message.message))
+                    IrcMessageComponents(parameters = listOf(message.message))
                 }
             }
             
@@ -67,10 +67,10 @@ object QuitMessage : ICommand {
             override fun serialiseToComponents(message: Message): IrcMessageComponents {
                 val prefix = PrefixSerialiser.serialise(message.source)
 
-                if (message.message == null) {
-                    return IrcMessageComponents(prefix = prefix)
+                return if (message.message == null) {
+                    IrcMessageComponents(prefix = prefix)
                 } else {
-                    return IrcMessageComponents(prefix = prefix, parameters = listOf(message.message))
+                    IrcMessageComponents(prefix = prefix, parameters = listOf(message.message))
                 }
             }
 
