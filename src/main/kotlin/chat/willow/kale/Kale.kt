@@ -1,6 +1,9 @@
 package chat.willow.kale
 
-import chat.willow.kale.irc.message.*
+import chat.willow.kale.irc.message.IMessageParser
+import chat.willow.kale.irc.message.IMessageSerialiser
+import chat.willow.kale.irc.message.IrcMessage
+import chat.willow.kale.irc.message.IrcMessageParser
 import chat.willow.kale.irc.message.rfc1459.ModeMessage
 import io.reactivex.Observable
 import io.reactivex.Observer
