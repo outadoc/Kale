@@ -24,7 +24,7 @@ object CapMessage : ICommand {
 
         data class Command(val version: String?) {
 
-            object Descriptor : KaleDescriptor<Command>(matcher = commandMatcher(command), parser = Parser)
+            object Descriptor : KaleDescriptor<Command>(matcher = subcommandMatcher(command, subcommand, subcommandPosition = 0), parser = Parser)
 
             object Parser : SubcommandParser<Command>(subcommand) {
 
@@ -56,7 +56,7 @@ object CapMessage : ICommand {
 
             // CAP * LS ...
 
-            object Descriptor : KaleDescriptor<Message>(matcher = commandMatcher(command), parser = Parser)
+            object Descriptor : KaleDescriptor<Message>(matcher = subcommandMatcher(command, subcommand, subcommandPosition = 1), parser = Parser)
 
             object Parser : SubcommandParser<Message>(subcommand, subcommandPosition = 1) {
 
@@ -108,7 +108,7 @@ object CapMessage : ICommand {
 
             // CAP ACK :caps
 
-            object Descriptor : KaleDescriptor<Command>(matcher = commandMatcher(command), parser = Parser)
+            object Descriptor : KaleDescriptor<Command>(matcher = subcommandMatcher(command, subcommand, subcommandPosition = 0), parser = Parser)
 
             object Parser : SubcommandParser<Command>(subcommand) {
 
@@ -142,7 +142,7 @@ object CapMessage : ICommand {
         data class Message(val target: String, val caps: List<String>) {
 
             // CAP * ACK :
-            object Descriptor : KaleDescriptor<Message>(matcher = commandMatcher(command), parser = Parser)
+            object Descriptor : KaleDescriptor<Message>(matcher = subcommandMatcher(command, subcommand, subcommandPosition = 1), parser = Parser)
 
             object Parser : SubcommandParser<Message>(subcommand, subcommandPosition = 1) {
 
@@ -185,7 +185,7 @@ object CapMessage : ICommand {
 
             // CAP * DEL :
 
-            object Descriptor : KaleDescriptor<Message>(matcher = commandMatcher(command), parser = Parser)
+            object Descriptor : KaleDescriptor<Message>(matcher = subcommandMatcher(command, subcommand, subcommandPosition = 1), parser = Parser)
 
             object Parser : SubcommandParser<Message>(subcommand, subcommandPosition = 1) {
 
@@ -227,7 +227,7 @@ object CapMessage : ICommand {
 
             // CAP END
 
-            object Descriptor : KaleDescriptor<Command>(matcher = commandMatcher(command), parser = Parser)
+            object Descriptor : KaleDescriptor<Command>(matcher = subcommandMatcher(command, subcommand, subcommandPosition = 0), parser = Parser)
 
             object Parser : SubcommandParser<Command>(subcommand) {
 
@@ -258,7 +258,7 @@ object CapMessage : ICommand {
             // CAP * NAK :
             // TODO: Same as DEL
 
-            object Descriptor : KaleDescriptor<Message>(matcher = commandMatcher(command), parser = Parser)
+            object Descriptor : KaleDescriptor<Message>(matcher = subcommandMatcher(command, subcommand, subcommandPosition = 1), parser = Parser)
 
             object Parser : SubcommandParser<Message>(subcommand, subcommandPosition = 1) {
 
@@ -301,7 +301,7 @@ object CapMessage : ICommand {
             // CAP * NEW :
             // TODO: Same as DEL
 
-            object Descriptor : KaleDescriptor<Message>(matcher = commandMatcher(command), parser = Parser)
+            object Descriptor : KaleDescriptor<Message>(matcher = subcommandMatcher(command, subcommand, subcommandPosition = 1), parser = Parser)
 
             object Parser : SubcommandParser<Message>(subcommand, subcommandPosition = 1) {
 
@@ -343,7 +343,7 @@ object CapMessage : ICommand {
             // CAP REQ :
             // TODO: Same as ACK
 
-            object Descriptor : KaleDescriptor<Command>(matcher = commandMatcher(command), parser = Parser)
+            object Descriptor : KaleDescriptor<Command>(matcher = subcommandMatcher(command, subcommand, subcommandPosition = 0), parser = Parser)
 
             object Parser : SubcommandParser<Command>(subcommand) {
 

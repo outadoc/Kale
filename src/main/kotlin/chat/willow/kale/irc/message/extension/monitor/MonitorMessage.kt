@@ -15,7 +15,7 @@ object MonitorMessage : ICommand {
 
         data class Command(val targets: List<String>) {
 
-            object Descriptor : KaleDescriptor<Command>(matcher = commandMatcher(command), parser = Parser)
+            object Descriptor : KaleDescriptor<Command>(matcher = subcommandMatcher(command, subcommand, subcommandPosition = 0), parser = Parser)
 
             object Parser : SubcommandParser<Command>(subcommand) {
 
@@ -52,7 +52,7 @@ object MonitorMessage : ICommand {
 
         object Command {
 
-            object Descriptor : KaleDescriptor<Command>(matcher = commandMatcher(command), parser = Parser)
+            object Descriptor : KaleDescriptor<Command>(matcher = subcommandMatcher(command, subcommand, subcommandPosition = 0), parser = Parser)
 
             object Parser : SubcommandParser<Command>(subcommand) {
 
@@ -81,7 +81,7 @@ object MonitorMessage : ICommand {
 
         object Command {
 
-            object Descriptor : KaleDescriptor<Command>(matcher = commandMatcher(command), parser = Parser)
+            object Descriptor : KaleDescriptor<Command>(matcher = subcommandMatcher(command, subcommand, subcommandPosition = 0), parser = Parser)
 
             object Parser : SubcommandParser<Command>(subcommand) {
 
@@ -110,7 +110,7 @@ object MonitorMessage : ICommand {
 
         data class Command(val targets: List<String>) {
 
-            object Descriptor : KaleDescriptor<Command>(matcher = commandMatcher(command), parser = Parser)
+            object Descriptor : KaleDescriptor<Command>(matcher = subcommandMatcher(command, subcommand, subcommandPosition = 0), parser = Parser)
 
             object Parser : SubcommandParser<Command>(subcommand) {
 
@@ -149,7 +149,7 @@ object MonitorMessage : ICommand {
 
         object Command {
 
-            object Descriptor : KaleDescriptor<Command>(matcher = commandMatcher(command), parser = Parser)
+            object Descriptor : KaleDescriptor<Command>(matcher = subcommandMatcher(command, subcommand, subcommandPosition = 0), parser = Parser)
 
             object Parser : SubcommandParser<Command>(subcommand) {
 

@@ -18,7 +18,8 @@ object BatchMessage : ICommand {
 
         data class Message(val source: Prefix, val reference: String, val type: String, val parameters: List<String> = listOf()) {
 
-            object Descriptor : KaleDescriptor<Message>(matcher = commandMatcher(command), parser = Parser)
+            // BATCH +something
+            // todo: descriptor
 
             object Parser : PrefixSubcommandParser<Message>(subcommand) {
 
@@ -59,7 +60,8 @@ object BatchMessage : ICommand {
 
         data class Message(val source: Prefix, val reference: String) {
 
-            object Descriptor : KaleDescriptor<Message>(matcher = commandMatcher(command), parser = Parser)
+            // BATCH -something
+            // todo: descriptor
 
             object Parser : PrefixSubcommandParser<Message>(subcommand) {
 
