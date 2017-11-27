@@ -1,7 +1,7 @@
 # Kale
 Kotlin/JVM IRC message parsing, serialising and notifying. Provides useful abstractions with the intention of splitting message parsing and IRC state management. Useful for building bots, clients and servers.
 
-[Warren](https://github.com/WillowChat/Warren) is the state tracking counterpart. If you're interested in making something for IRC, you probably want it instead. Kale by itself does not track any IRC state.
+[Warren](https://github.com/WillowChat/Warren) is the state tracking counterpart.
 
 [Burrow](https://github.com/WillowChat/Burrow) is a new IRC v3.2 server daemon, which uses the parsing and serialising bits of Kale.
 
