@@ -2,6 +2,8 @@ package chat.willow.kale.irc.message.extension.sasl
 
 import chat.willow.kale.ICommand
 import chat.willow.kale.IrcMessageComponents
+import chat.willow.kale.KaleDescriptor
+import chat.willow.kale.commandMatcher
 import chat.willow.kale.irc.CharacterCodes
 import chat.willow.kale.irc.message.MessageParser
 import chat.willow.kale.irc.message.MessageSerialiser
@@ -11,6 +13,8 @@ object AuthenticateMessage : ICommand {
     override val command = "AUTHENTICATE"
 
     data class Command(val payload: String) {
+
+        object Descriptor : KaleDescriptor<Command>(matcher = commandMatcher(command), parser = Parser)
 
         object Parser : MessageParser<Command>() {
 
@@ -36,6 +40,8 @@ object AuthenticateMessage : ICommand {
     }
 
     data class Message(val payload: String, val isEmpty: Boolean) {
+
+        object Descriptor : KaleDescriptor<Message>(matcher = commandMatcher(command), parser = Parser)
 
         object Parser : MessageParser<Message>() {
 

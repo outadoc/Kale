@@ -2,6 +2,8 @@ package chat.willow.kale.irc.message.rfc1459.rpl
 
 import chat.willow.kale.ICommand
 import chat.willow.kale.IrcMessageComponents
+import chat.willow.kale.KaleDescriptor
+import chat.willow.kale.commandMatcher
 import chat.willow.kale.irc.CharacterCodes
 import chat.willow.kale.irc.message.MessageParser
 import chat.willow.kale.irc.message.MessageSerialiser
@@ -11,6 +13,8 @@ object Rpl005Message : ICommand {
     override val command = "005"
 
     data class Message(val source: String, val target: String, val tokens: Map<String, String?>) {
+
+        object Descriptor : KaleDescriptor<Message>(matcher = commandMatcher(command), parser = Parser)
 
         object Parser : MessageParser<Message>() {
 
@@ -24,10 +28,10 @@ object Rpl005Message : ICommand {
 
                 val tokens = mutableMapOf<String, String?>()
 
-                for (i in 1..components.parameters.size - 1) {
+                for (i in 1 until components.parameters.size) {
                     val token = components.parameters[i].split(delimiters = CharacterCodes.EQUALS, limit = 2)
 
-                    if (token.isEmpty() || token[0].isNullOrEmpty()) {
+                    if (token.isEmpty() || token[0].isEmpty()) {
                         continue
                     }
 

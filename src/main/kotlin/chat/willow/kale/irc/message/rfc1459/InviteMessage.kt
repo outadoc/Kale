@@ -2,6 +2,8 @@ package chat.willow.kale.irc.message.rfc1459
 
 import chat.willow.kale.ICommand
 import chat.willow.kale.IrcMessageComponents
+import chat.willow.kale.KaleDescriptor
+import chat.willow.kale.commandMatcher
 import chat.willow.kale.irc.message.MessageParser
 import chat.willow.kale.irc.message.MessageSerialiser
 import chat.willow.kale.irc.prefix.Prefix
@@ -13,6 +15,8 @@ object InviteMessage : ICommand {
     override val command = "INVITE"
 
     data class Command(val user: String, val channel: String) {
+
+        object Descriptor : KaleDescriptor<Command>(matcher = commandMatcher(command), parser = Parser)
 
         object Parser : MessageParser<Command>() {
 

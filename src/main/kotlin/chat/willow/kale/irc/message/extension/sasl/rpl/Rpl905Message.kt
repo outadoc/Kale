@@ -11,5 +11,6 @@ object Rpl905Message : ICommand {
 
     object Parser : RplSourceTargetContent.Parser(command)
     object Serialiser : RplSourceTargetContent.Serialiser(command)
+    object Descriptor : RplSourceTargetContent.Descriptor(command, Parser)
 
 }

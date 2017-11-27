@@ -1,9 +1,6 @@
 package chat.willow.kale
 
-import chat.willow.kale.irc.message.IMessageSerialiser
-import chat.willow.kale.irc.message.IrcMessage
-import chat.willow.kale.irc.message.IrcMessageParser
-import chat.willow.kale.irc.message.MessageParser
+import chat.willow.kale.irc.message.*
 import chat.willow.kale.irc.message.rfc1459.ModeMessage
 import io.reactivex.Observable
 import io.reactivex.Observer
@@ -17,7 +14,7 @@ fun commandMatcher(command: String): KaleMatcher
 fun subcommandMatcher(command: String, subcommand: String, subcommandPosition: Int = 1): KaleMatcher
         = { it.command.equals(command, ignoreCase = true) && it.parameters.getOrNull(subcommandPosition)?.equals(subcommand, ignoreCase = true) ?: false }
 
-open class KaleDescriptor<out T>(val matcher: KaleMatcher, val parser: MessageParser<T>)
+open class KaleDescriptor<out T>(val matcher: KaleMatcher, val parser: IMessageParser<T>)
 
 data class KaleObservable<out T>(val message: T, val meta: IMetadataStore)
 
@@ -76,7 +73,7 @@ class Kale(val router: IKaleRouter, private val metadataFactory: IKaleMetadataFa
         return Observable.just(KaleObservable(ircMessage, metadata))
     }
 
-    private fun <T> process(kaleObservable: KaleObservable<IrcMessage>, parser: MessageParser<T>): Observable<KaleObservable<T>> {
+    private fun <T> process(kaleObservable: KaleObservable<IrcMessage>, parser: IMessageParser<T>): Observable<KaleObservable<T>> {
         val parsedMessage = parser.parse(kaleObservable.message)
         if (parsedMessage == null) {
             LOGGER.warn("failed to parse message to expected type: ${kaleObservable.message} $kaleObservable")

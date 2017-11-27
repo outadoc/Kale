@@ -1,8 +1,6 @@
 package chat.willow.kale.irc.message.extension.monitor
 
-import chat.willow.kale.ICommand
-import chat.willow.kale.ISubcommand
-import chat.willow.kale.IrcMessageComponents
+import chat.willow.kale.*
 import chat.willow.kale.irc.CharacterCodes
 import chat.willow.kale.irc.message.SubcommandParser
 import chat.willow.kale.irc.message.SubcommandSerialiser
@@ -16,6 +14,8 @@ object MonitorMessage : ICommand {
         override val subcommand = CharacterCodes.PLUS.toString()
 
         data class Command(val targets: List<String>) {
+
+            object Descriptor : KaleDescriptor<Command>(matcher = commandMatcher(command), parser = Parser)
 
             object Parser : SubcommandParser<Command>(subcommand) {
 
@@ -52,6 +52,8 @@ object MonitorMessage : ICommand {
 
         object Command {
 
+            object Descriptor : KaleDescriptor<Command>(matcher = commandMatcher(command), parser = Parser)
+
             object Parser : SubcommandParser<Command>(subcommand) {
 
                 override fun parseFromComponents(components: IrcMessageComponents): Command? {
@@ -79,6 +81,8 @@ object MonitorMessage : ICommand {
 
         object Command {
 
+            object Descriptor : KaleDescriptor<Command>(matcher = commandMatcher(command), parser = Parser)
+
             object Parser : SubcommandParser<Command>(subcommand) {
 
                 override fun parseFromComponents(components: IrcMessageComponents): Command? {
@@ -105,6 +109,8 @@ object MonitorMessage : ICommand {
         // TODO: same as Add
 
         data class Command(val targets: List<String>) {
+
+            object Descriptor : KaleDescriptor<Command>(matcher = commandMatcher(command), parser = Parser)
 
             object Parser : SubcommandParser<Command>(subcommand) {
 
@@ -142,6 +148,8 @@ object MonitorMessage : ICommand {
         // TODO: same as Clear
 
         object Command {
+
+            object Descriptor : KaleDescriptor<Command>(matcher = commandMatcher(command), parser = Parser)
 
             object Parser : SubcommandParser<Command>(subcommand) {
 

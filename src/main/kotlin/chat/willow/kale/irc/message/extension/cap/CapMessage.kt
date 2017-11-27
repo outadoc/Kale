@@ -1,8 +1,6 @@
 package chat.willow.kale.irc.message.extension.cap
 
-import chat.willow.kale.ICommand
-import chat.willow.kale.ISubcommand
-import chat.willow.kale.IrcMessageComponents
+import chat.willow.kale.*
 import chat.willow.kale.irc.CharacterCodes
 import chat.willow.kale.irc.message.*
 
@@ -25,6 +23,8 @@ object CapMessage : ICommand {
         // CAP LS <version>
 
         data class Command(val version: String?) {
+
+            object Descriptor : KaleDescriptor<Command>(matcher = commandMatcher(command), parser = Parser)
 
             object Parser : SubcommandParser<Command>(subcommand) {
 
@@ -55,6 +55,8 @@ object CapMessage : ICommand {
         data class Message(val target: String, val caps: Map<String, String?>, val isMultiline: Boolean = false) {
 
             // CAP * LS ...
+
+            object Descriptor : KaleDescriptor<Message>(matcher = commandMatcher(command), parser = Parser)
 
             object Parser : SubcommandParser<Message>(subcommand, subcommandPosition = 1) {
 
@@ -106,6 +108,8 @@ object CapMessage : ICommand {
 
             // CAP ACK :caps
 
+            object Descriptor : KaleDescriptor<Command>(matcher = commandMatcher(command), parser = Parser)
+
             object Parser : SubcommandParser<Command>(subcommand) {
 
                 override fun parseFromComponents(components: IrcMessageComponents): Command? {
@@ -138,6 +142,7 @@ object CapMessage : ICommand {
         data class Message(val target: String, val caps: List<String>) {
 
             // CAP * ACK :
+            object Descriptor : KaleDescriptor<Message>(matcher = commandMatcher(command), parser = Parser)
 
             object Parser : SubcommandParser<Message>(subcommand, subcommandPosition = 1) {
 
@@ -180,6 +185,8 @@ object CapMessage : ICommand {
 
             // CAP * DEL :
 
+            object Descriptor : KaleDescriptor<Message>(matcher = commandMatcher(command), parser = Parser)
+
             object Parser : SubcommandParser<Message>(subcommand, subcommandPosition = 1) {
 
                 override fun parseFromComponents(components: IrcMessageComponents): Message? {
@@ -220,6 +227,8 @@ object CapMessage : ICommand {
 
             // CAP END
 
+            object Descriptor : KaleDescriptor<Command>(matcher = commandMatcher(command), parser = Parser)
+
             object Parser : SubcommandParser<Command>(subcommand) {
 
                 override fun parseFromComponents(components: IrcMessageComponents): Command? {
@@ -248,6 +257,8 @@ object CapMessage : ICommand {
 
             // CAP * NAK :
             // TODO: Same as DEL
+
+            object Descriptor : KaleDescriptor<Message>(matcher = commandMatcher(command), parser = Parser)
 
             object Parser : SubcommandParser<Message>(subcommand, subcommandPosition = 1) {
 
@@ -290,6 +301,8 @@ object CapMessage : ICommand {
             // CAP * NEW :
             // TODO: Same as DEL
 
+            object Descriptor : KaleDescriptor<Message>(matcher = commandMatcher(command), parser = Parser)
+
             object Parser : SubcommandParser<Message>(subcommand, subcommandPosition = 1) {
 
                 override fun parseFromComponents(components: IrcMessageComponents): Message? {
@@ -329,6 +342,8 @@ object CapMessage : ICommand {
 
             // CAP REQ :
             // TODO: Same as ACK
+
+            object Descriptor : KaleDescriptor<Command>(matcher = commandMatcher(command), parser = Parser)
 
             object Parser : SubcommandParser<Command>(subcommand) {
 

@@ -8,7 +8,8 @@ object Rpl332Message : ICommand {
 
     override val command = "332"
 
-    object Parser : RplSourceTargetChannelContent.Parser(Rpl471Message.command)
-    object Serialiser : RplSourceTargetChannelContent.Serialiser(Rpl471Message.command)
+    object Parser : RplSourceTargetChannelContent.Parser(command)
+    object Serialiser : RplSourceTargetChannelContent.Serialiser(command)
+    object Descriptor : RplSourceTargetChannelContent.Descriptor(command, Parser)
 
 }

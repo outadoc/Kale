@@ -2,6 +2,8 @@ package chat.willow.kale.irc.message.rfc1459
 
 import chat.willow.kale.ICommand
 import chat.willow.kale.IrcMessageComponents
+import chat.willow.kale.KaleDescriptor
+import chat.willow.kale.commandMatcher
 import chat.willow.kale.irc.message.MessageParser
 import chat.willow.kale.irc.message.MessageSerialiser
 
@@ -10,6 +12,8 @@ object PingMessage : ICommand {
     override val command = "PING"
 
     data class Command(val token: String) {
+
+        object Descriptor : KaleDescriptor<Command>(matcher = commandMatcher(command), parser = Parser)
 
         object Parser : MessageParser<Command>() {
 

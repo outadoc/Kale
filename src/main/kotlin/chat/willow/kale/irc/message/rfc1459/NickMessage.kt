@@ -16,7 +16,7 @@ object NickMessage : ICommand {
 
     data class Command(val nickname: String) {
 
-        object Descriptor : KaleDescriptor<Command>(matcher = commandMatcher(NickMessage.command), parser = Parser)
+        object Descriptor : KaleDescriptor<Command>(matcher = commandMatcher(command), parser = Parser)
 
         object Parser : MessageParser<Command>() {
 
@@ -44,7 +44,7 @@ object NickMessage : ICommand {
 
     data class Message(val source: Prefix, val nickname: String) {
 
-        object Descriptor : KaleDescriptor<Message>(matcher = commandMatcher(NickMessage.command), parser = Parser)
+        object Descriptor : KaleDescriptor<Message>(matcher = commandMatcher(command), parser = Parser)
 
         object Parser : MessageParser<Message>() {
 

@@ -10,5 +10,6 @@ object Rpl474Message : ICommand {
 
     object Parser : RplSourceTargetChannelContent.Parser(command)
     object Serialiser : RplSourceTargetChannelContent.Serialiser(command)
+    object Descriptor : RplSourceTargetChannelContent.Descriptor(command, Parser)
 
 }

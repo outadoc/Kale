@@ -1,8 +1,6 @@
 package chat.willow.kale.irc.message.extension.batch
 
-import chat.willow.kale.ICommand
-import chat.willow.kale.ISubcommand
-import chat.willow.kale.IrcMessageComponents
+import chat.willow.kale.*
 import chat.willow.kale.irc.CharacterCodes
 import chat.willow.kale.irc.message.PrefixSubcommandParser
 import chat.willow.kale.irc.message.PrefixSubcommandSerialiser
@@ -19,6 +17,8 @@ object BatchMessage : ICommand {
         override val subcommand = CharacterCodes.PLUS.toString()
 
         data class Message(val source: Prefix, val reference: String, val type: String, val parameters: List<String> = listOf()) {
+
+            object Descriptor : KaleDescriptor<Message>(matcher = commandMatcher(command), parser = Parser)
 
             object Parser : PrefixSubcommandParser<Message>(subcommand) {
 
@@ -58,6 +58,8 @@ object BatchMessage : ICommand {
         override val subcommand = CharacterCodes.MINUS.toString()
 
         data class Message(val source: Prefix, val reference: String) {
+
+            object Descriptor : KaleDescriptor<Message>(matcher = commandMatcher(command), parser = Parser)
 
             object Parser : PrefixSubcommandParser<Message>(subcommand) {
 

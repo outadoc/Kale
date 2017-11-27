@@ -13,7 +13,7 @@ object UserMessage : ICommand {
 
     data class Command(val username: String, val mode: String, val realname: String) {
 
-        object Descriptor : KaleDescriptor<Command>(matcher = commandMatcher(UserMessage.command), parser = Parser)
+        object Descriptor : KaleDescriptor<Command>(matcher = commandMatcher(command), parser = Parser)
 
         object Parser : MessageParser<Command>() {
 

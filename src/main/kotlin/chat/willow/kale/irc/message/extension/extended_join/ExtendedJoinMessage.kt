@@ -2,6 +2,8 @@ package chat.willow.kale.irc.message.extension.extended_join
 
 import chat.willow.kale.ICommand
 import chat.willow.kale.IrcMessageComponents
+import chat.willow.kale.KaleDescriptor
+import chat.willow.kale.commandMatcher
 import chat.willow.kale.irc.message.MessageParser
 import chat.willow.kale.irc.message.MessageSerialiser
 import chat.willow.kale.irc.prefix.Prefix
@@ -13,6 +15,8 @@ object ExtendedJoinMessage : ICommand {
     override val command = "JOIN"
 
     data class Message(val source: Prefix, val channel: String, val account: String?, val realName: String) {
+
+        object Descriptor : KaleDescriptor<Message>(matcher = commandMatcher(command), parser = Parser)
 
         object Parser : MessageParser<Message>() {
 

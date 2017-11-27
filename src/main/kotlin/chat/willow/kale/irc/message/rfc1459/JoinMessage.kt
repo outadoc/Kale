@@ -2,6 +2,8 @@ package chat.willow.kale.irc.message.rfc1459
 
 import chat.willow.kale.ICommand
 import chat.willow.kale.IrcMessageComponents
+import chat.willow.kale.KaleDescriptor
+import chat.willow.kale.commandMatcher
 import chat.willow.kale.irc.CharacterCodes
 import chat.willow.kale.irc.message.MessageParser
 import chat.willow.kale.irc.message.MessageSerialiser
@@ -14,6 +16,8 @@ object JoinMessage : ICommand {
     override val command = "JOIN"
 
     data class Command(val channels: List<String>, val keys: List<String>? = null) {
+
+        object Descriptor : KaleDescriptor<Command>(matcher = commandMatcher(command), parser = Parser)
 
         object Parser : MessageParser<Command>() {
 
@@ -54,6 +58,8 @@ object JoinMessage : ICommand {
     }
 
     data class Message(val source: Prefix, val channels: List<String>) {
+
+        object Descriptor : KaleDescriptor<Message>(matcher = commandMatcher(command), parser = Parser)
 
         object Parser : MessageParser<Message>() {
 

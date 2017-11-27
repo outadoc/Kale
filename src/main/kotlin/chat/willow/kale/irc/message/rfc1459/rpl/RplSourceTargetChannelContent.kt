@@ -1,6 +1,9 @@
 package chat.willow.kale.irc.message.rfc1459.rpl
 
 import chat.willow.kale.IrcMessageComponents
+import chat.willow.kale.KaleDescriptor
+import chat.willow.kale.commandMatcher
+import chat.willow.kale.irc.message.IMessageParser
 import chat.willow.kale.irc.message.MessageParser
 import chat.willow.kale.irc.message.MessageSerialiser
 
@@ -31,5 +34,7 @@ abstract class RplSourceTargetChannelContent {
         }
 
     }
+
+    abstract class Descriptor(command: String, parser: IMessageParser<Message>) : KaleDescriptor<Message>(matcher = commandMatcher(command), parser = parser)
 
 }

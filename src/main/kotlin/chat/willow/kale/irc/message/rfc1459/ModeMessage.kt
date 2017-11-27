@@ -1,15 +1,12 @@
 package chat.willow.kale.irc.message.rfc1459
 
-import chat.willow.kale.ICommand
-import chat.willow.kale.IKaleParsingStateDelegate
-import chat.willow.kale.IrcMessageComponents
+import chat.willow.kale.*
 import chat.willow.kale.irc.CharacterCodes
 import chat.willow.kale.irc.message.MessageParser
 import chat.willow.kale.irc.message.MessageSerialiser
 import chat.willow.kale.irc.prefix.Prefix
 import chat.willow.kale.irc.prefix.PrefixParser
 import chat.willow.kale.irc.prefix.PrefixSerialiser
-import chat.willow.kale.loggerFor
 import java.util.*
 
 object ModeMessage : ICommand {
@@ -21,6 +18,8 @@ object ModeMessage : ICommand {
     override val command = "MODE"
 
     data class Command(val target: String, val modifiers: List<ModeModifier>) {
+
+        object Descriptor : KaleDescriptor<Command>(matcher = commandMatcher(command), parser = Parser)
 
         object Parser : MessageParser<Command>() {
 
@@ -68,6 +67,8 @@ object ModeMessage : ICommand {
     }
 
     data class Message(val source: Prefix, val target: String, val modifiers: List<ModeModifier>) {
+
+        object Descriptor : KaleDescriptor<Message>(matcher = commandMatcher(command), parser = Parser)
 
         object Parser : MessageParser<Message>() {
 
