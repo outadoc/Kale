@@ -2,12 +2,11 @@ package chat.willow.kale.irc.message.rfc1459.rpl
 
 import chat.willow.kale.ICommand
 
-typealias Rpl002MessageType = RplSourceTargetContent.Message
-
 object Rpl002Message : ICommand {
 
     override val command = "002"
 
+    class Message(source: String, target: String, content: String): RplSourceTargetContent.Message(source, target, content)
     object Parser : RplSourceTargetContent.Parser(command)
     object Serialiser : RplSourceTargetContent.Serialiser(command)
     object Descriptor : RplSourceTargetContent.Descriptor(command, Parser)

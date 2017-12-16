@@ -25,13 +25,13 @@ data class TagStore(private val store: MutableMap<Class<*>, Any> = mutableMapOf(
     }
 
     override fun toString(): String {
-        val contents = if (store.isEmpty()) {
+        val content = if (store.isEmpty()) {
             "Empty"
         } else {
-            "contents=$store"
+            "content=$store"
         }
 
-        return "TagStore($contents)"
+        return "TagStore($content)"
     }
 }
 

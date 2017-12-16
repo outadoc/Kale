@@ -42,7 +42,7 @@ object KaleRunner {
         kale.lines.onNext(":test.server 331 #channel :no topic is set")
         kale.lines.onNext(":test.server 332 testnickname #channel :channel topic!")
         kale.lines.onNext(":test.server 353 testnickname @ #channel :testnickname @another-nick")
-        kale.lines.onNext(":test.server 372 testnickname :- MOTD contents")
+        kale.lines.onNext(":test.server 372 testnickname :- MOTD content")
         kale.lines.onNext(":test.server 375 testnickname :- test.server Message of the day - ")
         kale.lines.onNext(":test.server 376 testnickname :End of MOTD command")
         kale.lines.onNext(":test.server 422 testnickname :MOTD File is missing")
