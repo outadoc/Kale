@@ -9,7 +9,7 @@ import chat.willow.kale.irc.message.MessageSerialiser
 
 object RplSourceTargetContent {
 
-    class Message(val source: String, val target: String, val contents: String) {
+    open class Message(val source: String, val target: String, val contents: String) {
         override fun equals(other: Any?): Boolean {
             if (this === other) return true
             if (other !is Message) return false
