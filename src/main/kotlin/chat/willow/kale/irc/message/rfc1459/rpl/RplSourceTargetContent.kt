@@ -9,7 +9,25 @@ import chat.willow.kale.irc.message.MessageSerialiser
 
 object RplSourceTargetContent {
 
-    data class Message(val source: String, val target: String, val contents: String)
+    class Message(val source: String, val target: String, val contents: String) {
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            if (other !is Message) return false
+
+            if (source != other.source) return false
+            if (target != other.target) return false
+            if (contents != other.contents) return false
+
+            return true
+        }
+
+        override fun hashCode(): Int {
+            var result = source.hashCode()
+            result = 31 * result + target.hashCode()
+            result = 31 * result + contents.hashCode()
+            return result
+        }
+    }
 
     abstract class Parser(val command: String) : MessageParser<Message>() {
 
