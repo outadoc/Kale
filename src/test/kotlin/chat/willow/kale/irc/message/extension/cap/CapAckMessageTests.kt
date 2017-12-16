@@ -19,13 +19,13 @@ class CapAckMessageTests {
     @Test fun test_parse_SingleCap() {
         val message = messageParser.parse(IrcMessage(command = "CAP", parameters = listOf("test-nick", "ACK", "cap1 ")))
 
-        assertEquals(CapMessage.Ack.Message(target = "test-nick", caps = listOf("cap1")), message)
+        assertEquals(CapMessage.Ack.Message(source = null, target = "test-nick", caps = listOf("cap1")), message)
     }
 
     @Test fun test_parse_MultipleCaps() {
         val message = messageParser.parse(IrcMessage(command = "CAP", parameters = listOf("test-nick", "ACK", "cap1 cap2 cap3")))
 
-        assertEquals(CapMessage.Ack.Message(target = "test-nick", caps = listOf("cap1", "cap2", "cap3")), message)
+        assertEquals(CapMessage.Ack.Message(source = null, target = "test-nick", caps = listOf("cap1", "cap2", "cap3")), message)
     }
 
     @Test fun test_parse_TooFewParameters() {
@@ -39,13 +39,13 @@ class CapAckMessageTests {
     }
 
     @Test fun test_serialise_SingleCap() {
-        val message = messageSerialiser.serialise(CapMessage.Ack.Message(target = "*", caps = listOf("cap1")))
+        val message = messageSerialiser.serialise(CapMessage.Ack.Message(source = null, target = "*", caps = listOf("cap1")))
 
         assertEquals(IrcMessage(command = "CAP", parameters = listOf("*", "ACK", "cap1")), message)
     }
 
     @Test fun test_serialise_MultipleCaps() {
-        val message = messageSerialiser.serialise(CapMessage.Ack.Message(target = "*", caps = listOf("cap1", "cap2", "cap3")))
+        val message = messageSerialiser.serialise(CapMessage.Ack.Message(source = null, target = "*", caps = listOf("cap1", "cap2", "cap3")))
 
         assertEquals(IrcMessage(command = "CAP", parameters = listOf("*", "ACK", "cap1 cap2 cap3")), message)
     }

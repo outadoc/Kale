@@ -3,6 +3,9 @@ package chat.willow.kale.irc.message.extension.cap
 import chat.willow.kale.*
 import chat.willow.kale.irc.CharacterCodes
 import chat.willow.kale.irc.message.*
+import chat.willow.kale.irc.prefix.Prefix
+import chat.willow.kale.irc.prefix.PrefixParser
+import chat.willow.kale.irc.prefix.PrefixSerialiser
 
 object CapMessage : ICommand {
 
@@ -52,7 +55,7 @@ object CapMessage : ICommand {
 
         }
 
-        data class Message(val target: String, val caps: Map<String, String?>, val isMultiline: Boolean = false) {
+        data class Message(val source: Prefix?, val target: String, val caps: Map<String, String?>, val isMultiline: Boolean = false) {
 
             // CAP * LS ...
 
@@ -65,6 +68,7 @@ object CapMessage : ICommand {
                         return null
                     }
 
+                    val source = PrefixParser.parse(components.prefix ?: "")
                     val target = components.parameters[0]
                     val asteriskOrCaps = components.parameters[1]
 
@@ -81,7 +85,7 @@ object CapMessage : ICommand {
 
                     val caps = ParseHelper.parseToKeysAndOptionalValues(rawCaps, CharacterCodes.SPACE, CharacterCodes.EQUALS)
 
-                    return Message(target, caps, isMultiline)
+                    return Message(source, target, caps, isMultiline)
                 }
 
             }
@@ -91,7 +95,11 @@ object CapMessage : ICommand {
                 override fun serialiseToComponents(message: Message): IrcMessageComponents {
                     val caps = SerialiserHelper.serialiseKeysAndOptionalValues(message.caps, CharacterCodes.EQUALS, CharacterCodes.SPACE)
 
-                    return IrcMessageComponents(parameters = listOf(message.target, caps))
+                    return if (message.source != null) {
+                        IrcMessageComponents(prefix = PrefixSerialiser.serialise(message.source), parameters = listOf(message.target, caps))
+                    } else {
+                        IrcMessageComponents(parameters = listOf(message.target, caps))
+                    }
                 }
 
             }
@@ -139,7 +147,7 @@ object CapMessage : ICommand {
 
         }
 
-        data class Message(val target: String, val caps: List<String>) {
+        data class Message(val source: Prefix?, val target: String, val caps: List<String>) {
 
             // CAP * ACK :
             object Descriptor : KaleDescriptor<Message>(matcher = subcommandMatcher(command, subcommand, subcommandPosition = 1), parser = Parser)
@@ -151,12 +159,13 @@ object CapMessage : ICommand {
                         return null
                     }
 
+                    val prefix = PrefixParser.parse(components.prefix ?: "")
                     val target = components.parameters[0]
                     val rawCaps = components.parameters[1]
 
                     val caps = rawCaps.split(delimiters = CharacterCodes.SPACE).filterNot(String::isEmpty)
 
-                    return Message(target, caps)
+                    return Message(prefix, target, caps)
                 }
 
             }
@@ -168,7 +177,11 @@ object CapMessage : ICommand {
 
                     val parameters = listOf(message.target, caps)
 
-                    return IrcMessageComponents(parameters)
+                    return if (message.source != null) {
+                        IrcMessageComponents(prefix = PrefixSerialiser.serialise(message.source), parameters = parameters)
+                    } else {
+                        IrcMessageComponents(parameters)
+                    }
                 }
 
             }
@@ -253,7 +266,7 @@ object CapMessage : ICommand {
 
         override val subcommand = "NAK"
 
-        data class Message(val target: String, val caps: List<String>) {
+        data class Message(val source: Prefix?, val target: String, val caps: List<String>) {
 
             // CAP * NAK :
             // TODO: Same as DEL
@@ -267,12 +280,13 @@ object CapMessage : ICommand {
                         return null
                     }
 
+                    val prefix = PrefixParser.parse(components.prefix ?: "")
                     val target = components.parameters[0]
                     val rawCaps = components.parameters[1]
 
                     val caps = ParseHelper.parseToKeysAndOptionalValues(rawCaps, CharacterCodes.SPACE, CharacterCodes.EQUALS).keys.toList()
 
-                    return Message(target, caps)
+                    return Message(prefix, target, caps)
                 }
 
             }
@@ -283,7 +297,11 @@ object CapMessage : ICommand {
                     val capsToValues = message.caps.associate { (it to null) }
                     val caps = SerialiserHelper.serialiseKeysAndOptionalValues(capsToValues, CharacterCodes.EQUALS, CharacterCodes.SPACE)
 
-                    return IrcMessageComponents(parameters = listOf(message.target, caps))
+                    return if (message.source != null) {
+                        IrcMessageComponents(prefix = PrefixSerialiser.serialise(message.source), parameters = listOf(message.target, caps))
+                    } else {
+                        IrcMessageComponents(parameters = listOf(message.target, caps))
+                    }
                 }
 
             }
@@ -296,7 +314,7 @@ object CapMessage : ICommand {
 
         override val subcommand = "NEW"
 
-        data class Message(val target: String, val caps: Map<String, String?>) {
+        data class Message(val source: Prefix?, val target: String, val caps: Map<String, String?>) {
 
             // CAP * NEW :
             // TODO: Same as DEL
@@ -310,12 +328,13 @@ object CapMessage : ICommand {
                         return null
                     }
 
+                    val prefix = PrefixParser.parse(components.prefix ?: "")
                     val target = components.parameters[0]
                     val rawCaps = components.parameters[1]
 
                     val caps = ParseHelper.parseToKeysAndOptionalValues(rawCaps, CharacterCodes.SPACE, CharacterCodes.EQUALS)
 
-                    return Message(target, caps)
+                    return Message(prefix, target, caps)
                 }
 
             }
@@ -325,7 +344,11 @@ object CapMessage : ICommand {
                 override fun serialiseToComponents(message: Message): IrcMessageComponents {
                     val caps = SerialiserHelper.serialiseKeysAndOptionalValues(message.caps, CharacterCodes.EQUALS, CharacterCodes.SPACE)
 
-                    return IrcMessageComponents(parameters = listOf(message.target, caps))
+                    return if (message.source != null) {
+                        IrcMessageComponents(prefix = PrefixSerialiser.serialise(message.source), parameters = listOf(message.target, caps))
+                    } else {
+                        IrcMessageComponents(parameters = listOf(message.target, caps))
+                    }
                 }
 
             }
