@@ -4,6 +4,7 @@ import chat.willow.kale.IrcMessageComponents
 import chat.willow.kale.KaleDescriptor
 import chat.willow.kale.commandMatcher
 import chat.willow.kale.irc.message.IMessageParser
+import chat.willow.kale.irc.message.IrcMessage
 import chat.willow.kale.irc.message.MessageParser
 import chat.willow.kale.irc.message.MessageSerialiser
 

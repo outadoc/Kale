@@ -16,26 +16,17 @@ val kotlinVersion by project
 
 val projectTitle = "Kale"
 
-buildscript {
-    val buildscriptKotlinVersion = "1.1.61"
-
-    repositories {
-        gradleScriptKotlin()
-        jcenter()
-    }
-
-    dependencies {
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$buildscriptKotlinVersion")
-        classpath("com.github.jengelman.gradle.plugins:shadow:1.2.3")
-    }
-}
-
 apply {
-    plugin("kotlin")
-    plugin("com.github.johnrengelman.shadow")
     plugin("maven")
     plugin("maven-publish")
     plugin("jacoco")
+}
+
+plugins {
+    java
+    kotlin("jvm") version "1.2.10"
+    kotlin("kapt") version "1.2.10"
+    id("com.github.johnrengelman.shadow") version "2.0.2"
 }
 
 jacoco {
@@ -59,8 +50,8 @@ jacocoTestReport.doFirst {
 }
 
 compileJava {
-    sourceCompatibility = JavaVersion.VERSION_1_7.toString()
-    targetCompatibility = JavaVersion.VERSION_1_7.toString()
+    sourceCompatibility = JavaVersion.VERSION_1_8.toString()
+    targetCompatibility = JavaVersion.VERSION_1_8.toString()
 }
 
 repositories {
@@ -69,11 +60,13 @@ repositories {
 }
 
 dependencies {
-    compile(kotlinModule("stdlib", kotlinVersion as String))
+    compile(kotlin("stdlib", kotlinVersion as String))
+    compile("javax.xml.bind:jaxb-api:2.3.0")
 
     compile("org.slf4j:slf4j-api:1.7.21")
     compile("io.reactivex.rxjava2:rxjava:2.1.6")
     compile("io.reactivex.rxjava2:rxkotlin:2.1.0")
+    compile("com.squareup:kotlinpoet:0.6.0")
 
     testCompile("junit:junit:4.12")
     testCompile("org.mockito:mockito-core:2.2.9")
@@ -84,7 +77,6 @@ dependencies {
 test {
     testLogging.setEvents(listOf("passed", "skipped", "failed", "standardError"))
 }
-
 
 val buildNumberAddition = if(project.hasProperty("BUILD_NUMBER")) { ".${project.property("BUILD_NUMBER")}" } else { "" }
 
@@ -132,4 +124,3 @@ fun Project.test(setup: Test.() -> Unit) = (project.tasks.getByName("test") as T
 fun Project.compileJava(setup: JavaCompile.() -> Unit) = (project.tasks.getByName("compileJava") as JavaCompile).setup()
 fun shadowJarTask() = (project.tasks.findByName("shadowJar") as ShadowJar)
 fun sourceSets(name: String) = (project.property("sourceSets") as SourceSetContainer).getByName(name)
-fun kotlin(module: String) = "org.jetbrains.kotlin:kotlin-$module:$kotlinVersion"
