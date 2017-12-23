@@ -15,5 +15,6 @@ internal object NumericRegistry {
     @SourceTargetChannelContent(numeric = "331") object NOTOPIC
     @SourceTargetChannelContent(numeric = "332") object TOPIC
     @SourceTargetChannelContent(numeric = "366") object ENDOFNAMES
+    @SourceTargetChannelContent(numeric = "403") object NOSUCHCHANNEL
     @SourceTargetChannelContent(numeric = "471") object CHANNELISFULL
 }
