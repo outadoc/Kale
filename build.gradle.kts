@@ -77,6 +77,10 @@ dependencies {
     testImplementation("org.mockito:mockito-core:2.2.9")
     testImplementation("com.nhaarman:mockito-kotlin:1.3.0")
     testImplementation("ch.qos.logback:logback-classic:1.1.2")
+
+    subprojects.forEach {
+        archives(it)
+    }
 }
 
 test {

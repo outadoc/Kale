@@ -11,6 +11,7 @@ internal object NumericRegistry {
     @SourceTargetContent(numeric = "375")        object MOTDSTART
     @SourceTargetContent(numeric = "376")        object ENDOFMOTD
     @SourceTargetContent(numeric = "422")        object NOMOTD
+    @SourceTargetContent(numeric = "433")        object NICKNAMEINUSE
     @SourceTargetChannelContent(numeric = "331") object NOTOPIC
     @SourceTargetChannelContent(numeric = "332") object TOPIC
     @SourceTargetChannelContent(numeric = "366") object ENDOFNAMES
