@@ -1,5 +1,7 @@
 import org.gradle.kotlin.dsl.*
 
+project.setProperty("archivesBaseName", "processor")
+
 plugins {
     java
     kotlin("jvm")
