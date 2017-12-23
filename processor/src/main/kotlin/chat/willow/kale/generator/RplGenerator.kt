@@ -1,6 +1,5 @@
-package chat.willow.kale.core
+package chat.willow.kale.generator
 
-import chat.willow.kale.core.message.ICommand
 import com.squareup.kotlinpoet.*
 import java.io.File
 import javax.annotation.processing.*
@@ -21,12 +20,12 @@ class RplGenerator : AbstractProcessor() {
         return mutableSetOf("*")
     }
 
-    fun rpl_container(numeric: String, name: String, parent: KClass<*>): TypeSpec {
-        val parentClassName = parent.asClassName()
-        val message = ClassName.bestGuess("$parentClassName.Message")
-        val parser = ClassName.bestGuess("$parentClassName.Parser")
-        val serialiser = ClassName.bestGuess("$parentClassName.Serialiser")
-        val descriptor = ClassName.bestGuess("$parentClassName.Descriptor")
+    fun rpl_container(numeric: String, name: String, parent: ClassName, parameters: Iterable<ParameterSpec>): TypeSpec {
+        val message = ClassName.bestGuess("$parent.Message")
+        val parser = ClassName.bestGuess("$parent.Parser")
+        val serialiser = ClassName.bestGuess("$parent.Serialiser")
+        val descriptor = ClassName.bestGuess("$parent.Descriptor")
+        val command = ClassName.bestGuess("ICommand")
 
         val messageTypeSpec = TypeSpec
                 .classBuilder("Message")
@@ -34,12 +33,10 @@ class RplGenerator : AbstractProcessor() {
                 .primaryConstructor(
                         FunSpec
                                 .constructorBuilder()
-                                .addParameter("source", String::class)
-                                .addParameter("target", String::class)
-                                .addParameter("content", String::class)
+                                .addParameters(parameters)
                                 .build()
                 )
-                .addSuperclassConstructorParameter(CodeBlock.of("source, target, content"))
+                .addSuperclassConstructorParameter(CodeBlock.of(parameters.map { it.name }.joinToString(separator = ", ")))
                 .build()
 
         val parserTypeSpec = TypeSpec
@@ -50,19 +47,19 @@ class RplGenerator : AbstractProcessor() {
 
         val serialiserTypeSpec = TypeSpec
                 .objectBuilder(serialiser)
-                .superclass(RplSourceTargetContent.Serialiser::class)
+                .superclass(serialiser)
                 .addSuperclassConstructorParameter(CodeBlock.of("command"))
                 .build()
 
         val descriptorTypeSpec = TypeSpec
                 .objectBuilder(descriptor)
-                .superclass(RplSourceTargetContent.Descriptor::class)
+                .superclass(descriptor)
                 .addSuperclassConstructorParameter(CodeBlock.of("command, Parser"))
                 .build()
 
         return TypeSpec
                 .objectBuilder("RPL_${name.toUpperCase()}")
-                .addSuperinterface(ICommand::class)
+                .addSuperinterface(command)
                 .addProperty(PropertySpec
                         .builder("command", String::class, KModifier.OVERRIDE)
                         .initializer(CodeBlock.of("%S", numeric))
@@ -87,10 +84,12 @@ class RplGenerator : AbstractProcessor() {
 
         val kaleNumerics = kaleNumericsTypeSpec.build()
 
-        val fileSpec = FileSpec.get("chat.willow.kale.generator.rpl", kaleNumerics)
+        val fileSpec = FileSpec.builder("chat.willow.kale.generated", "KaleNumerics")
+        fileSpec.addType(kaleNumerics)
+        fileSpec.addStaticImport("chat.willow.kale.core", "*")
 
         val kaptKotlinGeneratedDir = processingEnv.options[KAPT_KOTLIN_GENERATED_OPTION_NAME]
-        fileSpec.writeTo(File(kaptKotlinGeneratedDir, ""))
+        fileSpec.build().writeTo(File(kaptKotlinGeneratedDir, ""))
 
         return true
     }
@@ -104,7 +103,14 @@ class RplGenerator : AbstractProcessor() {
                     val numeric = annotation.numeric
                     val className = it.simpleName.toString()
 
-                    generate(kaleNumericsTypeSpec, numeric, className, RplSourceTargetContent::class)
+                    val parent = ClassName.bestGuess("RplSourceTargetContent")
+                    val parameters = listOf(
+                            ParameterSpec.builder("source", String::class).build(),
+                            ParameterSpec.builder("target", String::class).build(),
+                            ParameterSpec.builder("content", String::class).build()
+                    )
+
+                    generate(kaleNumericsTypeSpec, numeric, className, parent, parameters)
                 }
     }
 
@@ -117,12 +123,21 @@ class RplGenerator : AbstractProcessor() {
                     val numeric = annotation.numeric
                     val className = it.simpleName.toString()
 
-                    generate(kaleNumericsTypeSpec, numeric, className, RplSourceTargetChannelContent::class)
+                    val parent = ClassName.bestGuess("RplSourceTargetChannelContent")
+
+                    val parameters = listOf(
+                            ParameterSpec.builder("source", String::class).build(),
+                            ParameterSpec.builder("target", String::class).build(),
+                            ParameterSpec.builder("channel", String::class).build(),
+                            ParameterSpec.builder("content", String::class).build()
+                    )
+
+                    generate(kaleNumericsTypeSpec, numeric, className, parent, parameters)
                 }
     }
 
-    fun generate(kaleNumericsTypeSpec: TypeSpec.Builder, numeric: String, className: String, parent: KClass<*>) {
-        val rplTypeSpec = rpl_container(numeric, className, RplSourceTargetContent::class)
+    fun generate(kaleNumericsTypeSpec: TypeSpec.Builder, numeric: String, className: String, parent: ClassName, parameters: Iterable<ParameterSpec>) {
+        val rplTypeSpec = rpl_container(numeric, className, parent, parameters)
         kaleNumericsTypeSpec.addType(rplTypeSpec)
     }
 

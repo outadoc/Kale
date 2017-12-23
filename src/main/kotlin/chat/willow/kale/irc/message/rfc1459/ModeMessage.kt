@@ -1,6 +1,7 @@
 package chat.willow.kale.irc.message.rfc1459
 
 import chat.willow.kale.*
+import chat.willow.kale.core.ICommand
 import chat.willow.kale.core.message.*
 import chat.willow.kale.irc.CharacterCodes
 import chat.willow.kale.irc.prefix.Prefix

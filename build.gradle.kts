@@ -66,6 +66,9 @@ dependencies {
     implementation(kotlin("stdlib", kotlinVersion as String))
     implementation("javax.xml.bind:jaxb-api:2.3.0")
 
+    implementation(project(":processor"))
+    kapt(project(":processor"))
+
     implementation("org.slf4j:slf4j-api:1.7.21")
     implementation("io.reactivex.rxjava2:rxjava:2.1.6")
     implementation("io.reactivex.rxjava2:rxkotlin:2.1.0")
@@ -116,6 +119,26 @@ configure<PublishingExtension> {
             artifact(sourcesTask)
 
             artifactId = projectTitle
+
+            // todo: workaround: remove "processor" subproject from POM dependencies
+            pom.withXml {
+                val dependencies = (asNode().get("dependencies") as NodeList)
+                val dependenciesNodeList = dependencies
+                        .map { it as Node }
+                        .first()
+                        .children()
+
+                val processorDependency = dependenciesNodeList
+                        .map { it as Node }
+                        .first {
+                            val node = (it["artifactId"] as NodeList).first() as Node
+                            val value = (node.value() as NodeList).first() as String
+
+                            value == "processor"
+                        }
+
+                dependenciesNodeList.remove(processorDependency)
+            }
         }
     }
 }

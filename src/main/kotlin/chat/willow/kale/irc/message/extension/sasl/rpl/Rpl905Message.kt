@@ -1,6 +1,6 @@
 package chat.willow.kale.irc.message.extension.sasl.rpl
 
-import chat.willow.kale.core.message.ICommand
+import chat.willow.kale.core.ICommand
 import chat.willow.kale.core.RplSourceTargetContent
 
 typealias Rpl905MessageType = RplSourceTargetContent.Message

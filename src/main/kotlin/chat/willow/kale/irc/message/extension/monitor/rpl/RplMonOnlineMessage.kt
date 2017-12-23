@@ -1,6 +1,6 @@
 package chat.willow.kale.irc.message.extension.monitor.rpl
 
-import chat.willow.kale.core.message.ICommand
+import chat.willow.kale.core.ICommand
 import chat.willow.kale.core.message.IrcMessageComponents
 import chat.willow.kale.irc.CharacterCodes
 import chat.willow.kale.core.message.MessageParser
