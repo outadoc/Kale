@@ -58,7 +58,7 @@ class RplGenerator : AbstractProcessor() {
                 .build()
 
         return TypeSpec
-                .objectBuilder("RPL_${name.toUpperCase()}")
+                .objectBuilder(name.toUpperCase())
                 .addSuperinterface(command)
                 .addProperty(PropertySpec
                         .builder("command", String::class, KModifier.OVERRIDE)
