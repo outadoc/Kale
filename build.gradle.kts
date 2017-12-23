@@ -116,26 +116,6 @@ configure<PublishingExtension> {
             artifact(sourcesTask)
 
             artifactId = projectTitle
-
-            // todo: workaround: remove "processor" subproject from POM dependencies
-            pom.withXml {
-                val dependencies = (asNode().get("dependencies") as NodeList)
-                val dependenciesNodeList = dependencies
-                        .map { it as Node }
-                        .first()
-                        .children()
-
-                val processorDependency = dependenciesNodeList
-                        .map { it as Node }
-                        .first {
-                            val node = (it["artifactId"] as NodeList).first() as Node
-                            val value = (node.value() as NodeList).first() as String
-
-                            value == "processor"
-                        }
-
-                dependenciesNodeList.remove(processorDependency)
-            }
         }
     }
 }
