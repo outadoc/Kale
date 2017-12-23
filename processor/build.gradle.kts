@@ -1,7 +1,5 @@
 import org.gradle.kotlin.dsl.*
 
-project.setProperty("archivesBaseName", "processor")
-
 plugins {
     java
     kotlin("jvm")
@@ -13,10 +11,10 @@ repositories {
 }
 
 dependencies {
-    compile(kotlin("stdlib", "1.1.51"))
-    compile("com.squareup:kotlinpoet:0.6.0")
+    implementation(kotlin("stdlib", "1.1.51"))
+    implementation("com.squareup:kotlinpoet:0.6.0")
 
-    testCompile("junit:junit:4.12")
-    testCompile("org.mockito:mockito-core:2.2.9")
-    testCompile("com.nhaarman:mockito-kotlin:1.3.0")
+    testImplementation("junit:junit:4.12")
+    testImplementation("org.mockito:mockito-core:2.2.9")
+    testImplementation("com.nhaarman:mockito-kotlin:1.3.0")
 }

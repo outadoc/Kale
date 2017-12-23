@@ -1,5 +1,7 @@
 import org.gradle.jvm.tasks.Jar
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+import groovy.util.Node
+import groovy.util.NodeList
 import org.gradle.api.JavaVersion
 import org.gradle.api.Project
 import org.gradle.api.publish.PublishingExtension
@@ -61,20 +63,20 @@ repositories {
 }
 
 dependencies {
-    compile(kotlin("stdlib", kotlinVersion as String))
-    compile("javax.xml.bind:jaxb-api:2.3.0")
+    implementation(kotlin("stdlib", kotlinVersion as String))
+    implementation("javax.xml.bind:jaxb-api:2.3.0")
 
-    compile("org.slf4j:slf4j-api:1.7.21")
-    compile("io.reactivex.rxjava2:rxjava:2.1.6")
-    compile("io.reactivex.rxjava2:rxkotlin:2.1.0")
+    implementation("org.slf4j:slf4j-api:1.7.21")
+    implementation("io.reactivex.rxjava2:rxjava:2.1.6")
+    implementation("io.reactivex.rxjava2:rxkotlin:2.1.0")
 
-    compile(project(":processor"))
+    implementation(project(":processor"))
     kapt(project(":processor"))
 
-    testCompile("junit:junit:4.12")
-    testCompile("org.mockito:mockito-core:2.2.9")
-    testCompile("com.nhaarman:mockito-kotlin:1.3.0")
-    testCompile("ch.qos.logback:logback-classic:1.1.2")
+    testImplementation("junit:junit:4.12")
+    testImplementation("org.mockito:mockito-core:2.2.9")
+    testImplementation("com.nhaarman:mockito-kotlin:1.3.0")
+    testImplementation("ch.qos.logback:logback-classic:1.1.2")
 }
 
 test {
@@ -116,6 +118,26 @@ configure<PublishingExtension> {
             artifact(sourcesTask)
 
             artifactId = projectTitle
+
+            // todo: workaround: remove "processor" subproject from POM dependencies
+            pom.withXml {
+                val dependencies = (asNode().get("dependencies") as NodeList)
+                val dependenciesNodeList = dependencies
+                        .map { it as Node }
+                        .first()
+                        .children()
+
+                val processorDependency = dependenciesNodeList
+                        .map { it as Node }
+                        .first {
+                            val node = (it["artifactId"] as NodeList).first() as Node
+                            val value = (node.value() as NodeList).first() as String
+
+                            value == "processor"
+                        }
+
+                dependenciesNodeList.remove(processorDependency)
+            }
         }
     }
 }
