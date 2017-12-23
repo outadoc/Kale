@@ -1,7 +1,7 @@
 package chat.willow.kale.irc.message.rfc1459.rpl
 
-import chat.willow.kale.generator.SourceTargetChannelContent
-import chat.willow.kale.generator.SourceTargetContent
+import chat.willow.kale.core.SourceTargetChannelContent
+import chat.willow.kale.core.SourceTargetContent
 
 internal object NumericRegistry {
     @SourceTargetContent(numeric = "001")        object WELCOME

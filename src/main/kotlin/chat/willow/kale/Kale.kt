@@ -1,6 +1,6 @@
 package chat.willow.kale
 
-import chat.willow.kale.generator.message.*
+import chat.willow.kale.core.message.*
 import chat.willow.kale.irc.message.IrcMessageParser
 import chat.willow.kale.irc.message.rfc1459.ModeMessage
 import io.reactivex.Observable

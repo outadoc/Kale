@@ -1,6 +1,6 @@
 package chat.willow.kale.irc.message.extension.sasl.rpl
 
-import chat.willow.kale.generator.RplSourceTargetContent
+import chat.willow.kale.core.RplSourceTargetContent
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before

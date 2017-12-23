@@ -1,6 +1,6 @@
 package chat.willow.kale
 
-import chat.willow.kale.generator.message.IMessageSerialiser
+import chat.willow.kale.core.message.IMessageSerialiser
 import com.nhaarman.mockito_kotlin.mock
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue

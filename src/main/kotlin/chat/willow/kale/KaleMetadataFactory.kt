@@ -1,10 +1,10 @@
 package chat.willow.kale
 
-import chat.willow.kale.generator.message.IrcMessage
-import chat.willow.kale.generator.tag.IKaleTagRouter
-import chat.willow.kale.generator.tag.ITagStore
-import chat.willow.kale.generator.tag.Tag
-import chat.willow.kale.generator.tag.TagStore
+import chat.willow.kale.core.message.IrcMessage
+import chat.willow.kale.core.tag.IKaleTagRouter
+import chat.willow.kale.core.tag.ITagStore
+import chat.willow.kale.core.tag.Tag
+import chat.willow.kale.core.tag.TagStore
 
 typealias KaleMetadataStore = ITagStore
 

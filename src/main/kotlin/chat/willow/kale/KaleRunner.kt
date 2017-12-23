@@ -1,9 +1,9 @@
 package chat.willow.kale
 
+import chat.willow.kale.core.tag.KaleTagRouter
 import chat.willow.kale.irc.message.extension.batch.BatchMessage
 import chat.willow.kale.irc.message.rfc1459.*
 import chat.willow.kale.irc.prefix.Prefix
-import chat.willow.kale.generator.tag.KaleTagRouter
 
 object KaleRunner {
     @JvmStatic

@@ -69,18 +69,12 @@ dependencies {
     implementation("org.slf4j:slf4j-api:1.7.21")
     implementation("io.reactivex.rxjava2:rxjava:2.1.6")
     implementation("io.reactivex.rxjava2:rxkotlin:2.1.0")
-
-    implementation(project(":processor"))
-    kapt(project(":processor"))
+    implementation("com.squareup:kotlinpoet:0.6.0")
 
     testImplementation("junit:junit:4.12")
     testImplementation("org.mockito:mockito-core:2.2.9")
     testImplementation("com.nhaarman:mockito-kotlin:1.3.0")
     testImplementation("ch.qos.logback:logback-classic:1.1.2")
-
-    subprojects.forEach {
-        archives(it)
-    }
 }
 
 test {

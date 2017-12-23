@@ -1,9 +1,9 @@
 package chat.willow.kale.irc.message.extension.monitor.rpl
 
-import chat.willow.kale.generator.message.ICommand
-import chat.willow.kale.generator.message.IrcMessageComponents
-import chat.willow.kale.generator.message.MessageParser
-import chat.willow.kale.generator.message.MessageSerialiser
+import chat.willow.kale.core.message.ICommand
+import chat.willow.kale.core.message.IrcMessageComponents
+import chat.willow.kale.core.message.MessageParser
+import chat.willow.kale.core.message.MessageSerialiser
 import chat.willow.kale.irc.prefix.Prefix
 import chat.willow.kale.irc.prefix.PrefixParser
 import chat.willow.kale.irc.prefix.PrefixSerialiser

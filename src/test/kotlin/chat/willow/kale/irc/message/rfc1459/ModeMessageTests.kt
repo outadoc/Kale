@@ -1,7 +1,7 @@
 package chat.willow.kale.irc.message.rfc1459
 
 import chat.willow.kale.IKaleParsingStateDelegate
-import chat.willow.kale.generator.message.IrcMessage
+import chat.willow.kale.core.message.IrcMessage
 import chat.willow.kale.irc.prefix.prefix
 import org.junit.Assert.assertEquals
 import org.junit.Before

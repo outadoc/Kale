@@ -1,6 +1,6 @@
 package chat.willow.kale.irc.message.extension.sasl
 
-import chat.willow.kale.generator.message.*
+import chat.willow.kale.core.message.*
 import chat.willow.kale.irc.CharacterCodes
 
 object AuthenticateMessage : ICommand {

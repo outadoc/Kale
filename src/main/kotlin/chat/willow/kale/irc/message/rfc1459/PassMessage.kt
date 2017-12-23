@@ -1,6 +1,6 @@
 package chat.willow.kale.irc.message.rfc1459
 
-import chat.willow.kale.generator.message.*
+import chat.willow.kale.core.message.*
 
 object PassMessage : ICommand {
 

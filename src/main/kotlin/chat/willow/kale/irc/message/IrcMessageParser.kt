@@ -1,6 +1,6 @@
 package chat.willow.kale.irc.message
 
-import chat.willow.kale.generator.message.IrcMessage
+import chat.willow.kale.core.message.IrcMessage
 import chat.willow.kale.irc.CharacterCodes
 
 interface IIrcMessageParser {
