@@ -1,7 +1,7 @@
 package chat.willow.kale.irc.message.utility
 
-import chat.willow.kale.irc.message.IMessageSerialiser
-import chat.willow.kale.irc.message.IrcMessage
+import chat.willow.kale.generator.message.IMessageSerialiser
+import chat.willow.kale.generator.message.IrcMessage
 import chat.willow.kale.irc.message.IrcMessageParser
 
 object RawMessage {

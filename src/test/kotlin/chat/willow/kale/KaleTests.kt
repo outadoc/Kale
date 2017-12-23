@@ -1,9 +1,8 @@
 package chat.willow.kale
 
-import chat.willow.kale.irc.message.IMessageSerialiser
-import chat.willow.kale.irc.message.IrcMessage
-import chat.willow.kale.irc.message.MessageParser
-import chat.willow.kale.irc.tag.IKaleTagRouter
+import chat.willow.kale.generator.message.*
+import chat.willow.kale.generator.tag.IKaleTagRouter
+import chat.willow.kale.generator.tag.ITagStore
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.whenever
@@ -19,7 +18,7 @@ class KaleTests {
     private lateinit var router: IKaleRouter
     private lateinit var tagRouter: IKaleTagRouter
     private lateinit var metadataFactory: IKaleMetadataFactory
-    private lateinit var metadata: IMetadataStore
+    private lateinit var metadata: ITagStore
 
     object TestMessageOne
     object TestMessageTwo

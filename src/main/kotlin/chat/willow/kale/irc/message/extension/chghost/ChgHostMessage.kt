@@ -1,11 +1,6 @@
 package chat.willow.kale.irc.message.extension.chghost
 
-import chat.willow.kale.ICommand
-import chat.willow.kale.IrcMessageComponents
-import chat.willow.kale.KaleDescriptor
-import chat.willow.kale.commandMatcher
-import chat.willow.kale.irc.message.MessageParser
-import chat.willow.kale.irc.message.MessageSerialiser
+import chat.willow.kale.generator.message.*
 import chat.willow.kale.irc.prefix.Prefix
 import chat.willow.kale.irc.prefix.PrefixParser
 import chat.willow.kale.irc.prefix.PrefixSerialiser

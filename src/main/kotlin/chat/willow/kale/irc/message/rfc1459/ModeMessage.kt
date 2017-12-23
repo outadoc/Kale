@@ -1,9 +1,8 @@
 package chat.willow.kale.irc.message.rfc1459
 
 import chat.willow.kale.*
+import chat.willow.kale.generator.message.*
 import chat.willow.kale.irc.CharacterCodes
-import chat.willow.kale.irc.message.MessageParser
-import chat.willow.kale.irc.message.MessageSerialiser
 import chat.willow.kale.irc.prefix.Prefix
 import chat.willow.kale.irc.prefix.PrefixParser
 import chat.willow.kale.irc.prefix.PrefixSerialiser
@@ -77,7 +76,7 @@ object ModeMessage : ICommand {
                     return null
                 }
 
-                val source = PrefixParser.parse(components.prefix) ?: return null
+                val source = PrefixParser.parse(components.prefix ?: "") ?: return null
                 val target = components.parameters[0]
 
                 if (components.parameters.size >= 2) {

@@ -1,9 +1,7 @@
 package chat.willow.kale.irc.message.extension.monitor
 
-import chat.willow.kale.*
+import chat.willow.kale.generator.message.*
 import chat.willow.kale.irc.CharacterCodes
-import chat.willow.kale.irc.message.SubcommandParser
-import chat.willow.kale.irc.message.SubcommandSerialiser
 
 object MonitorMessage : ICommand {
 

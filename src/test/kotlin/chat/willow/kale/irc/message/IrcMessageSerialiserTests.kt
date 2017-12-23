@@ -1,5 +1,6 @@
 package chat.willow.kale.irc.message
 
+import chat.willow.kale.generator.message.IrcMessage
 import org.junit.Assert.assertEquals
 import org.junit.Test
 

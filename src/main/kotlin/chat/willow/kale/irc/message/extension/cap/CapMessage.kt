@@ -1,6 +1,6 @@
 package chat.willow.kale.irc.message.extension.cap
 
-import chat.willow.kale.*
+import chat.willow.kale.generator.message.*
 import chat.willow.kale.irc.CharacterCodes
 import chat.willow.kale.irc.message.*
 import chat.willow.kale.irc.prefix.Prefix

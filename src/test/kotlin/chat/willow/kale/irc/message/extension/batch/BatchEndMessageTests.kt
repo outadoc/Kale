@@ -1,6 +1,6 @@
 package chat.willow.kale.irc.message.extension.batch
 
-import chat.willow.kale.irc.message.IrcMessage
+import chat.willow.kale.generator.message.IrcMessage
 import chat.willow.kale.irc.prefix.prefix
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull

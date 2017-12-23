@@ -20,6 +20,7 @@ apply {
     plugin("maven")
     plugin("maven-publish")
     plugin("jacoco")
+    plugin("idea")
 }
 
 plugins {
@@ -66,7 +67,9 @@ dependencies {
     compile("org.slf4j:slf4j-api:1.7.21")
     compile("io.reactivex.rxjava2:rxjava:2.1.6")
     compile("io.reactivex.rxjava2:rxkotlin:2.1.0")
-    compile("com.squareup:kotlinpoet:0.6.0")
+
+    compile(project(":processor"))
+    kapt(project(":processor"))
 
     testCompile("junit:junit:4.12")
     testCompile("org.mockito:mockito-core:2.2.9")

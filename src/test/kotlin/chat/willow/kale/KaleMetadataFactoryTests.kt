@@ -1,8 +1,8 @@
 package chat.willow.kale
 
-import chat.willow.kale.irc.message.IrcMessage
-import chat.willow.kale.irc.tag.IKaleTagRouter
-import chat.willow.kale.irc.tag.ITagParser
+import chat.willow.kale.generator.message.IrcMessage
+import chat.willow.kale.generator.tag.IKaleTagRouter
+import chat.willow.kale.generator.tag.ITagParser
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.whenever

@@ -1,9 +1,7 @@
 package chat.willow.kale.irc.message.extension.batch
 
-import chat.willow.kale.*
+import chat.willow.kale.generator.message.*
 import chat.willow.kale.irc.CharacterCodes
-import chat.willow.kale.irc.message.PrefixSubcommandParser
-import chat.willow.kale.irc.message.PrefixSubcommandSerialiser
 import chat.willow.kale.irc.prefix.Prefix
 import chat.willow.kale.irc.prefix.PrefixParser
 import chat.willow.kale.irc.prefix.PrefixSerialiser

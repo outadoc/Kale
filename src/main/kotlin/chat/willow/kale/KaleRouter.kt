@@ -1,6 +1,6 @@
 package chat.willow.kale
 
-import chat.willow.kale.irc.message.IMessageSerialiser
+import chat.willow.kale.generator.message.IMessageSerialiser
 import chat.willow.kale.irc.message.extension.cap.CapMessage
 import chat.willow.kale.irc.message.extension.monitor.MonitorMessage
 import chat.willow.kale.irc.message.extension.sasl.AuthenticateMessage
