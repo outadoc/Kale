@@ -1,16 +1,5 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
-import groovy.util.Node
-import groovy.util.NodeList
-import org.gradle.api.JavaVersion
-import org.gradle.api.Project
-import org.gradle.api.publish.PublishingExtension
-import org.gradle.api.publish.maven.MavenPublication
-import org.gradle.api.tasks.SourceSetContainer
-import org.gradle.api.tasks.compile.JavaCompile
-import org.gradle.api.tasks.testing.Test
 import org.gradle.jvm.tasks.Jar
-import org.gradle.testing.jacoco.plugins.JacocoPluginExtension
-import org.gradle.testing.jacoco.tasks.JacocoReport
 
 val kaleVersion = "5.0.0"
 
@@ -47,8 +36,8 @@ jacocoTestReport.doFirst {
         }
     )
 
-    jacocoTestReport.reports.xml.isEnabled = true
-    jacocoTestReport.reports.html.isEnabled = true
+    jacocoTestReport.reports.xml.required.set(true)
+    jacocoTestReport.reports.html.required.set(true)
 }
 
 compileJava {
@@ -62,9 +51,6 @@ repositories {
 
 dependencies {
     implementation("javax.xml.bind:jaxb-api:2.3.0")
-
-    implementation(project(":processor"))
-    kapt(project(":processor"))
 
     implementation("org.slf4j:slf4j-api:1.7.21")
     implementation("io.reactivex.rxjava2:rxjava:2.1.6")
@@ -102,7 +88,7 @@ val sourcesTask = task<Jar>("sourcesJar") {
     dependsOn("classes")
 
     from(sourceSets("main").allSource)
-    classifier = "sources"
+    archiveClassifier.set("sources")
 }
 
 project.artifacts.add("archives", sourcesTask)
@@ -114,36 +100,16 @@ configure<PublishingExtension> {
     } else {
         project.buildDir.absolutePath
     }
-    this.repositories.maven({ setUrl("$deployUrl") })
+
+    repositories.maven {
+        setUrl("$deployUrl")
+    }
 
     publications {
         create<MavenPublication>("mavenJava") {
             from(components.getByName("java"))
-
-            artifact(shadowJarTask())
             artifact(sourcesTask)
-
             artifactId = projectTitle
-
-            // todo: workaround: remove "processor" subproject from POM dependencies
-            pom.withXml {
-                val dependencies = (asNode().get("dependencies") as NodeList)
-                val dependenciesNodeList = dependencies
-                    .map { it as Node }
-                    .first()
-                    .children()
-
-                val processorDependency = dependenciesNodeList
-                    .map { it as Node }
-                    .first {
-                        val node = (it["artifactId"] as NodeList).first() as Node
-                        val value = (node.value() as NodeList).first() as String
-
-                        value == "processor"
-                    }
-
-                dependenciesNodeList.remove(processorDependency)
-            }
         }
     }
 }
