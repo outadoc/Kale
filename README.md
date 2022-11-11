@@ -11,13 +11,16 @@ Kotlin/JVM IRC message parsing, serialising and notifying. Provides useful abstr
 
 There are basic examples of usage in [KaleRunner.kt](src/main/kotlin/chat/willow/kale/KaleRunner.kt)
 
+## Fork
+
+This project is a fork of https://github.com/WillowChat/Kale, made to keep artifacts buildable and available.
+Some dependencies have been updated and the annotation processor has been stripped.
+
 ## Goals
 
 * Own the parsing & serialising bit of IRC clients and servers
 * Let users feed raw lines in, and be notified with strongly typed output messages, covering RFC1459 and IRCv3
 * Verify the above with an extensive suite of unit tests
-
-If this sounds good to you, you can support development through [Patreon](https://crrt.io/patreon) 🎉!
 
 ## Code License
 The source code of this project is licensed under the terms of the ISC license, listed in the [LICENSE](LICENSE.md) file. A concise summary of the ISC license is available at [choosealicense.org](http://choosealicense.com/licenses/isc/).
