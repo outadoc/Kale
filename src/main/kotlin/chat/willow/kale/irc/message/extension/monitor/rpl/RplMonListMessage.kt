@@ -29,7 +29,7 @@ object RplMonList : ICommand {
                 val rawTargets = components.parameters[1]
 
                 val targets = rawTargets
-                        .split(delimiters = CharacterCodes.COMMA)
+                        .split(CharacterCodes.COMMA)
                         .mapNotNull { PrefixParser.parse(it) }
 
                 return Message(prefix = prefix, nick = nick, targets = targets)

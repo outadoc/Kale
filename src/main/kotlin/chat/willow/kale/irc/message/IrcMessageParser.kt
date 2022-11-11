@@ -175,7 +175,7 @@ object ParseHelper {
     fun parseToKeysAndOptionalValues(string: String, chunkSeparator: Char, keyValueSeparator: Char, valueTransform: ((String) -> (String))? = null): Map<String, String?> {
         val keyValues = mutableMapOf<String, String?>()
 
-        val unparsedChunks = string.split(delimiters = chunkSeparator).filterNot(String::isEmpty)
+        val unparsedChunks = string.split(chunkSeparator).filterNot(String::isEmpty)
         for (chunk in unparsedChunks) {
             val nextEquals = findNext(chunk, 0, keyValueSeparator)
             if (nextEquals != null) {

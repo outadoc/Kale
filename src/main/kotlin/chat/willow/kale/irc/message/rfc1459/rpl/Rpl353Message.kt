@@ -23,7 +23,7 @@ object Rpl353Message : ICommand {
                 val target = components.parameters[0]
                 val visibility = components.parameters[1]
                 val channel = components.parameters[2]
-                val names = components.parameters[3].split(delimiters = CharacterCodes.SPACE).filterNot(String::isEmpty)
+                val names = components.parameters[3].split(CharacterCodes.SPACE).filterNot(String::isEmpty)
 
                 return Message(source, target, visibility, channel, names)
             }

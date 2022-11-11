@@ -25,7 +25,7 @@ object Rpl005Message : ICommand {
                 val tokens = mutableMapOf<String, String?>()
 
                 for (i in 1 until components.parameters.size) {
-                    val token = components.parameters[i].split(delimiters = CharacterCodes.EQUALS, limit = 2)
+                    val token = components.parameters[i].split(CharacterCodes.EQUALS, limit = 2)
 
                     if (token.isEmpty() || token[0].isEmpty()) {
                         continue

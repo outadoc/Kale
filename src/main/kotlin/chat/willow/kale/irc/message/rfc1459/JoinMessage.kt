@@ -23,13 +23,13 @@ object JoinMessage : ICommand {
                 }
 
                 val unsplitChannels = components.parameters[0]
-                val channels = unsplitChannels.split(delimiters = CharacterCodes.COMMA).filterNot(String::isEmpty)
+                val channels = unsplitChannels.split(CharacterCodes.COMMA).filterNot(String::isEmpty)
 
                 return if (components.parameters.size < 2) {
                     Command(channels)
                 } else {
                     val unsplitKeys = components.parameters[1]
-                    val keys = unsplitKeys.split(delimiters = CharacterCodes.COMMA).filterNot(String::isEmpty)
+                    val keys = unsplitKeys.split(CharacterCodes.COMMA).filterNot(String::isEmpty)
 
                     Command(channels, keys)
                 }
@@ -66,7 +66,7 @@ object JoinMessage : ICommand {
 
                 val source = PrefixParser.parse(components.prefix ?: "") ?: return null
                 val unsplitChannels = components.parameters[0]
-                val channels = unsplitChannels.split(delimiters = CharacterCodes.COMMA).filterNot(String::isEmpty)
+                val channels = unsplitChannels.split(CharacterCodes.COMMA).filterNot(String::isEmpty)
 
                 return Message(source, channels)
             }

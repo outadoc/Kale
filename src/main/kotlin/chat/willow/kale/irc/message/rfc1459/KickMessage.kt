@@ -22,8 +22,8 @@ object KickMessage : ICommand {
                     return null
                 }
 
-                val channels = components.parameters[0].split(delimiters = CharacterCodes.COMMA)
-                val users = components.parameters[1].split(delimiters = CharacterCodes.COMMA)
+                val channels = components.parameters[0].split(CharacterCodes.COMMA)
+                val users = components.parameters[1].split(CharacterCodes.COMMA)
 
                 if (channels.isEmpty() || channels.size != users.size) {
                     return null
@@ -66,8 +66,8 @@ object KickMessage : ICommand {
                 }
 
                 val source = PrefixParser.parse(components.prefix ?: "") ?: return null
-                val channels = components.parameters[0].split(delimiters = CharacterCodes.COMMA)
-                val users = components.parameters[1].split(delimiters = CharacterCodes.COMMA)
+                val channels = components.parameters[0].split(CharacterCodes.COMMA)
+                val users = components.parameters[1].split(CharacterCodes.COMMA)
 
                 if (channels.isEmpty() || channels.size != users.size) {
                     return null

@@ -128,7 +128,7 @@ object CapMessage : ICommand {
 
                     val rawCaps = components.parameters[0]
 
-                    val caps = rawCaps.split(delimiters = CharacterCodes.SPACE).filterNot(String::isEmpty)
+                    val caps = rawCaps.split(CharacterCodes.SPACE).filterNot(String::isEmpty)
 
                     return Command(caps)
                 }
@@ -164,7 +164,7 @@ object CapMessage : ICommand {
                     val target = components.parameters[0]
                     val rawCaps = components.parameters[1]
 
-                    val caps = rawCaps.split(delimiters = CharacterCodes.SPACE).filterNot(String::isEmpty)
+                    val caps = rawCaps.split(CharacterCodes.SPACE).filterNot(String::isEmpty)
 
                     return Message(prefix, target, caps)
                 }
@@ -378,7 +378,7 @@ object CapMessage : ICommand {
 
                     val rawCaps = components.parameters[0]
 
-                    val caps = rawCaps.split(delimiters = CharacterCodes.SPACE).filterNot(String::isEmpty)
+                    val caps = rawCaps.split(CharacterCodes.SPACE).filterNot(String::isEmpty)
 
                     return Command(caps)
                 }

@@ -25,7 +25,7 @@ object MonitorMessage : ICommand {
 
                     val rawTargets = components.parameters[0]
 
-                    val targets = rawTargets.split(delimiters = CharacterCodes.COMMA)
+                    val targets = rawTargets.split(CharacterCodes.COMMA)
 
                     return Command(targets)
                 }
@@ -120,7 +120,7 @@ object MonitorMessage : ICommand {
 
                     val rawTargets = components.parameters[0]
 
-                    val targets = rawTargets.split(delimiters = CharacterCodes.COMMA)
+                    val targets = rawTargets.split(CharacterCodes.COMMA)
 
                     return Command(targets)
                 }

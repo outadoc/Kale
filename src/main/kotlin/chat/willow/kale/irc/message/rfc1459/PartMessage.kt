@@ -23,7 +23,7 @@ object PartMessage : ICommand {
                 }
 
                 val unsplitChannels = components.parameters[0]
-                val channels = unsplitChannels.split(delimiters = CharacterCodes.COMMA)
+                val channels = unsplitChannels.split(CharacterCodes.COMMA)
 
                 return Command(channels)
             }
@@ -55,7 +55,7 @@ object PartMessage : ICommand {
 
                 val source = PrefixParser.parse(components.prefix ?: "") ?: return null
                 val unsplitChannels = components.parameters[0]
-                val channels = unsplitChannels.split(delimiters = CharacterCodes.COMMA)
+                val channels = unsplitChannels.split(CharacterCodes.COMMA)
 
                 return Message(source, channels)
             }

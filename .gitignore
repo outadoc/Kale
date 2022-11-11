@@ -32,3 +32,6 @@ out
 
 # Certificates
 *.pem
+
+# AS files
+/local.properties
