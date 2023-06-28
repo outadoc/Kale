@@ -49,7 +49,7 @@ object QuitMessage : ICommand {
                     return null
                 }
 
-                val source = PrefixParser.parse(components.prefix ?: "") ?: return null
+                val source = PrefixParser.parse(components.prefix) ?: return null
 
                 val quitMessage = components.parameters.getOrNull(0)
 

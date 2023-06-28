@@ -77,7 +77,7 @@ object ModeMessage : ICommand {
                     return null
                 }
 
-                val source = PrefixParser.parse(components.prefix ?: "") ?: return null
+                val source = PrefixParser.parse(components.prefix) ?: return null
                 val target = components.parameters[0]
 
                 if (components.parameters.size >= 2) {

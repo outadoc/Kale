@@ -50,7 +50,7 @@ object NoticeMessage : ICommand {
                     return null
                 }
 
-                val source = PrefixParser.parse(components.prefix ?: "") ?: return null
+                val source = PrefixParser.parse(components.prefix) ?: return null
                 val target = components.parameters[0]
                 val privMessage = components.parameters[1]
 

@@ -18,12 +18,12 @@ enum class CaseMapping(val upperToLowerMapping: Map<Char, Char>) {
 
     fun toLower(string: String): String {
         val charArray = string.toCharArray()
-        for (i in 0 until charArray.size) {
+        for (i in charArray.indices) {
             val replacement = upperToLowerMapping[charArray[i]]
             if (replacement != null) {
                 charArray[i] = replacement
             } else {
-                charArray[i] = charArray[i].toLowerCase()
+                charArray[i] = charArray[i].lowercaseChar()
             }
         }
 

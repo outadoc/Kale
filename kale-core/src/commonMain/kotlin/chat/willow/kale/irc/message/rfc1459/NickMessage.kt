@@ -49,7 +49,7 @@ object NickMessage : ICommand {
                     return null
                 }
 
-                val source = PrefixParser.parse(components.prefix ?: "") ?: return null
+                val source = PrefixParser.parse(components.prefix) ?: return null
                 val nickname = components.parameters[0]
 
                 return Message(source = source, nickname = nickname)

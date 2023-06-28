@@ -21,7 +21,7 @@ object ExtendedJoinMessage : ICommand {
                     return null
                 }
 
-                val source = PrefixParser.parse(components.prefix ?: "") ?: return null
+                val source = PrefixParser.parse(components.prefix) ?: return null
                 val channel = components.parameters[0]
                 val account = components.parameters[1]
                 val realName = components.parameters[2]
