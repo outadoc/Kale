@@ -10,6 +10,7 @@ version = "6.0.0"
 group = "chat.willow.kale"
 
 kotlin {
+    ios()
     jvm {
         compilations.all {
             kotlinOptions {
@@ -36,7 +37,6 @@ kotlin {
                 implementation("junit:junit:4.12")
                 implementation("org.mockito:mockito-core:2.2.9")
                 implementation("com.nhaarman:mockito-kotlin:1.3.0")
-                implementation("ch.qos.logback:logback-classic:1.1.2")
             }
         }
     }
