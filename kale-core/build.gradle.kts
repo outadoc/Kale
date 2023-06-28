@@ -1,10 +1,9 @@
 plugins {
-    java
     kotlin("multiplatform")
-    `maven-publish`
     id("org.jetbrains.kotlinx.kover")
     id("org.kodein.mock.mockmp")
     id("com.google.devtools.ksp")
+    `maven-publish`
 }
 
 version = "6.0.0"
@@ -12,6 +11,7 @@ group = "chat.willow.kale"
 
 kotlin {
     ios()
+
     jvm {
         compilations.all {
             kotlinOptions {
