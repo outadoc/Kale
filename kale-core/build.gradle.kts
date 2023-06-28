@@ -1,9 +1,9 @@
 plugins {
     java
     kotlin("multiplatform")
-    kotlin("kapt")
     `maven-publish`
     id("org.jetbrains.kotlinx.kover")
+    id("org.kodein.mock.mockmp")
 }
 
 version = "6.0.0"
@@ -44,8 +44,6 @@ kotlin {
         val jvmTest by getting {
             dependencies {
                 implementation("org.jetbrains.kotlin:kotlin-test")
-                implementation("org.mockito:mockito-core:5.4.0")
-                implementation("com.nhaarman:mockito-kotlin:1.3.0")
             }
         }
     }
@@ -55,4 +53,8 @@ java {
     toolchain {
         languageVersion.set(JavaLanguageVersion.of(17))
     }
+}
+
+mockmp {
+    usesHelper = true
 }
