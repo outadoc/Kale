@@ -4,6 +4,7 @@ plugins {
     `maven-publish`
     id("org.jetbrains.kotlinx.kover")
     id("org.kodein.mock.mockmp")
+    id("com.google.devtools.ksp")
 }
 
 version = "6.0.0"
