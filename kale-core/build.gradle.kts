@@ -6,7 +6,7 @@ plugins {
     id("org.jetbrains.kotlinx.kover")
 }
 
-version = "5.0.0"
+version = "6.0.0"
 group = "chat.willow.kale"
 
 kotlin {
