@@ -37,7 +37,7 @@ kotlin {
         val jvmTest by getting {
             dependencies {
                 implementation("junit:junit:4.12")
-                implementation("org.mockito:mockito-core:2.2.9")
+                implementation("org.mockito:mockito-core:5.4.0")
                 implementation("com.nhaarman:mockito-kotlin:1.3.0")
             }
         }
