@@ -47,13 +47,11 @@ open class CaseInsensitiveNamedMap<NamedType : INamed>(private val mapper: ICase
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (other?.javaClass != javaClass) return false
+        if (other == null || this::class != other::class) return false
 
         other as CaseInsensitiveNamedMap<*>
 
-        if (namedThings != other.namedThings) return false
-
-        return true
+        return namedThings == other.namedThings
     }
 
     override fun hashCode(): Int {

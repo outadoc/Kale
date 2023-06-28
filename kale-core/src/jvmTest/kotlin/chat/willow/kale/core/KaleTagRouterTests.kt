@@ -40,7 +40,7 @@ class KaleTagRouterTests {
         val mockTag: Any = mock()
         sut.routeTagToSerialiser(mockTag::class, mockTagSerialiser)
 
-        val serialiser = sut.serialiserFor(mockTag::class.java)
+        val serialiser = sut.serialiserFor(mockTag::class)
 
         assertSame(mockTagSerialiser, serialiser)
     }
@@ -50,7 +50,7 @@ class KaleTagRouterTests {
         val mockTag: Any = mock()
         sut.routeTagToSerialiser(mockTag::class, mockTagSerialiser)
 
-        val serialiser = sut.serialiserFor(Int::class.java)
+        val serialiser = sut.serialiserFor(Int::class)
 
         assertNull(serialiser)
     }

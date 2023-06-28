@@ -27,7 +27,7 @@ enum class CaseMapping(val upperToLowerMapping: Map<Char, Char>) {
             }
         }
 
-        return String(charArray)
+        return charArray.concatToString()
     }
 }
 

@@ -4,24 +4,15 @@ import chat.willow.kale.core.tag.ITagParser
 import chat.willow.kale.core.tag.ITagSerialiser
 import chat.willow.kale.core.tag.Tag
 import chat.willow.kale.loggerFor
-import java.text.SimpleDateFormat
-import java.time.Instant
-import java.util.*
+import kotlinx.datetime.Instant
 
 data class ServerTimeTag(val time: Instant) {
 
-    companion object Factory: ITagParser<ServerTimeTag>, ITagSerialiser<ServerTimeTag> {
+    companion object Factory : ITagParser<ServerTimeTag>, ITagSerialiser<ServerTimeTag> {
 
         private val LOGGER = loggerFor<Factory>()
 
-        private val timeZone = TimeZone.getTimeZone("UTC")
-        private val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss.sss'Z'")
-
-        val name = "time"
-
-        init {
-            dateFormat.timeZone = timeZone
-        }
+        const val name = "time"
 
         override fun parse(tag: Tag): ServerTimeTag? {
             val value = tag.value ?: return null

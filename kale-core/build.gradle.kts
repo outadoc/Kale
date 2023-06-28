@@ -22,7 +22,7 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                implementation("org.jetbrains.kotlin:kotlin-stdlib-common")
+                implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.3.0")
             }
         }
 
@@ -31,6 +31,8 @@ kotlin {
                 implementation("org.slf4j:slf4j-api:1.7.21")
             }
         }
+
+        val iosMain by getting
 
         val jvmTest by getting {
             dependencies {
@@ -46,8 +48,4 @@ java {
     toolchain {
         languageVersion.set(JavaLanguageVersion.of(17))
     }
-}
-
-repositories {
-    mavenCentral()
 }

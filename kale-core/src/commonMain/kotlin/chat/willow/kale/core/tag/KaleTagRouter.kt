@@ -10,14 +10,14 @@ interface IKaleTagRouter {
     fun parserFor(name: String): ITagParser<*>?
 
     fun <T: Any> routeTagToSerialiser(tagClass: KClass<T>, serialiser: ITagSerialiser<T>)
-    fun <T: Any> serialiserFor(tagClass: Class<T>): ITagSerialiser<T>?
+    fun <T: Any> serialiserFor(tagClass: KClass<T>): ITagSerialiser<T>?
 
 }
 
 class KaleTagRouter: IKaleTagRouter {
 
     private val namesToParsers = hashMapOf<String, ITagParser<*>>()
-    private val tagsToSerialisers = hashMapOf<Class<*>, ITagSerialiser<*>>()
+    private val tagsToSerialisers = hashMapOf<KClass<*>, ITagSerialiser<*>>()
 
     override fun <T> routeTagToParser(name: String, parser: ITagParser<T>) {
         namesToParsers[name] = parser
@@ -28,10 +28,10 @@ class KaleTagRouter: IKaleTagRouter {
     }
 
     override fun <T : Any> routeTagToSerialiser(tagClass: KClass<T>, serialiser: ITagSerialiser<T>) {
-        tagsToSerialisers[tagClass.java] = serialiser
+        tagsToSerialisers[tagClass] = serialiser
     }
 
-    override fun <T : Any> serialiserFor(tagClass: Class<T>): ITagSerialiser<T>? {
+    override fun <T : Any> serialiserFor(tagClass: KClass<T>): ITagSerialiser<T>? {
         @Suppress("UNCHECKED_CAST")
         return tagsToSerialisers[tagClass] as? ITagSerialiser<T>
     }

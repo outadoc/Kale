@@ -11,19 +11,19 @@ import kotlin.reflect.KClass
 interface IKaleRouter {
 
     fun <M: Any> register(messageClass: KClass<M>, serialiser: IMessageSerialiser<M>)
-    fun <M: Any> serialiserFor(messageClass: Class<M>): IMessageSerialiser<M>?
+    fun <M: Any> serialiserFor(messageClass: KClass<M>): IMessageSerialiser<M>?
 
 }
 
 open class KaleRouter : IKaleRouter {
 
-    private val messagesToSerialisers = hashMapOf<Class<*>, IMessageSerialiser<*>>()
+    private val messagesToSerialisers = hashMapOf<KClass<*>, IMessageSerialiser<*>>()
 
     override fun <M : Any> register(messageClass: KClass<M>, serialiser: IMessageSerialiser<M>) {
-        messagesToSerialisers[messageClass.java] = serialiser
+        messagesToSerialisers[messageClass] = serialiser
     }
 
-    override fun <M : Any> serialiserFor(messageClass: Class<M>): IMessageSerialiser<M>? {
+    override fun <M : Any> serialiserFor(messageClass: KClass<M>): IMessageSerialiser<M>? {
         @Suppress("UNCHECKED_CAST")
         return messagesToSerialisers[messageClass] as? IMessageSerialiser<M>
     }

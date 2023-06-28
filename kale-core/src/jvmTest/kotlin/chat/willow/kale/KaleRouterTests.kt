@@ -16,7 +16,7 @@ class KaleRouterTests {
     }
 
     @Test fun test_serialiserFor_MessageNotRegistered_ReturnsNull() {
-        val serialiser = sut.serialiserFor(Int::class.java)
+        val serialiser = sut.serialiserFor(Int::class)
 
         assertNull(serialiser)
     }
@@ -25,7 +25,7 @@ class KaleRouterTests {
         val serialiserOne: IMessageSerialiser<Int> = mock()
         sut.register(Int::class, serialiserOne)
 
-        val serialiser = sut.serialiserFor(Int::class.java)
+        val serialiser = sut.serialiserFor(Int::class)
 
         assertTrue(serialiserOne === serialiser)
     }
@@ -38,7 +38,7 @@ class KaleRouterTests {
         sut.register(String::class, serialiserTwo)
         sut.register(Int::class, newSerialiserOne)
 
-        val serialiser = sut.serialiserFor(Int::class.java)
+        val serialiser = sut.serialiserFor(Int::class)
 
         assertTrue(newSerialiserOne === serialiser)
     }

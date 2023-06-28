@@ -2,11 +2,11 @@ package chat.willow.kale.core
 
 import chat.willow.kale.core.tag.Tag
 import chat.willow.kale.core.tag.extension.ServerTimeTag
+import kotlinx.datetime.Instant
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Test
-import java.time.Instant
 
 class ServerTimeTagTests {
 
@@ -21,7 +21,7 @@ class ServerTimeTagTests {
 
         val tag = sut.parse(rawTag)
 
-        assertEquals(tag, ServerTimeTag(Instant.ofEpochMilli(1487536992345)))
+        assertEquals(tag, ServerTimeTag(Instant.fromEpochMilliseconds(1487536992345)))
     }
 
     @Test fun test_parse_MissingValue_ReturnsNull() {
@@ -41,7 +41,7 @@ class ServerTimeTagTests {
     }
 
     @Test fun test_serialise_SanityCheck() {
-        val tag = ServerTimeTag(time = Instant.ofEpochMilli(1487536992345))
+        val tag = ServerTimeTag(time = Instant.fromEpochMilliseconds(1487536992345))
 
         val rawTag = sut.serialise(tag)
 

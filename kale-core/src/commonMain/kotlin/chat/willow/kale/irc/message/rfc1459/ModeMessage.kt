@@ -7,7 +7,6 @@ import chat.willow.kale.irc.CharacterCodes
 import chat.willow.kale.irc.prefix.Prefix
 import chat.willow.kale.irc.prefix.PrefixParser
 import chat.willow.kale.irc.prefix.PrefixSerialiser
-import java.util.*
 
 object ModeMessage : ICommand {
 
@@ -127,7 +126,7 @@ object ModeMessage : ICommand {
             get() = this.type == null
     }
 
-    private data class ModeChunk(val modes: String, val parameters: Queue<String> = LinkedList())
+    private data class ModeChunk(val modes: String, val parameters: MutableList<String> = mutableListOf())
 
     private fun parseIrcParameters(parameters: List<String>): List<ModeModifier> {
         val chunks = this.parseParametersToModeChunks(parameters)
@@ -201,7 +200,7 @@ object ModeMessage : ICommand {
                 if (takesAParameter) {
                     val parameter = parameters.poll()
 
-                    if (parameter.isNullOrEmpty()) {
+                    if (parameter.isEmpty()) {
                         LOGGER.warn("MODE modifier was missing an expected parameter - not processing it: '$token'")
 
                         continue
