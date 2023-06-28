@@ -3,6 +3,7 @@ plugins {
     kotlin("multiplatform")
     kotlin("kapt")
     `maven-publish`
+    id("org.jetbrains.kotlinx.kover")
 }
 
 version = "5.0.0"
