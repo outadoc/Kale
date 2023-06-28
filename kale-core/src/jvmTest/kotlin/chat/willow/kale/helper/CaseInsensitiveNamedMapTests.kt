@@ -2,17 +2,17 @@ package chat.willow.kale.helper
 
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.verify
-import org.junit.Assert.assertNull
-import org.junit.Assert.assertTrue
-import org.junit.Before
-import org.junit.Test
+import kotlin.test.assertNull
+import kotlin.test.assertTrue
+import kotlin.test.BeforeTest
+import kotlin.test.Test
 
 class CaseInsensitiveNamedMapTests {
 
     private lateinit var sut: CaseInsensitiveNamedMap<MockNamedThing>
     private lateinit var mockMapper: ICaseMapper
 
-    @Before fun setUp() {
+    @BeforeTest fun setUp() {
         mockMapper = mock()
         sut = CaseInsensitiveNamedMap(mockMapper)
     }

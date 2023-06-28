@@ -34,9 +34,16 @@ kotlin {
 
         val iosMain by getting
 
+        val commonTest by getting {
+            dependencies {
+                implementation("org.jetbrains.kotlin:kotlin-test-common")
+                implementation("org.jetbrains.kotlin:kotlin-test-annotations-common")
+            }
+        }
+
         val jvmTest by getting {
             dependencies {
-                implementation("junit:junit:4.12")
+                implementation("org.jetbrains.kotlin:kotlin-test")
                 implementation("org.mockito:mockito-core:5.4.0")
                 implementation("com.nhaarman:mockito-kotlin:1.3.0")
             }

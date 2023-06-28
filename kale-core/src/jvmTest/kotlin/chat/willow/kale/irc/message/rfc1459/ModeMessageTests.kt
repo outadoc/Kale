@@ -3,9 +3,9 @@ package chat.willow.kale.irc.message.rfc1459
 import chat.willow.kale.IKaleParsingStateDelegate
 import chat.willow.kale.core.message.IrcMessage
 import chat.willow.kale.irc.prefix.prefix
-import org.junit.Assert.assertEquals
-import org.junit.Before
-import org.junit.Test
+import kotlin.test.assertEquals
+import kotlin.test.BeforeTest
+import kotlin.test.Test
 
 class ModeMessageTests {
 
@@ -13,7 +13,7 @@ class ModeMessageTests {
     private lateinit var messageSerialiser: ModeMessage.Command.Serialiser
     private lateinit var modeMessage: ModeMessage
 
-    @Before fun setUp() {
+    @BeforeTest fun setUp() {
         messageParser = ModeMessage.Message.Parser
         messageSerialiser = ModeMessage.Command.Serialiser
 

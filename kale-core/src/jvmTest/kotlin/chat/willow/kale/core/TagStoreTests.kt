@@ -1,15 +1,15 @@
 package chat.willow.kale.core
 
 import chat.willow.kale.core.tag.TagStore
-import org.junit.Assert.assertEquals
-import org.junit.Before
-import org.junit.Test
+import kotlin.test.assertEquals
+import kotlin.test.BeforeTest
+import kotlin.test.Test
 
 class TagStoreTests {
 
     private lateinit var sut: TagStore
 
-    @Before fun setUp() {
+    @BeforeTest fun setUp() {
         sut = TagStore()
     }
 

@@ -1,17 +1,17 @@
 package chat.willow.kale.irc.message.extension.monitor
 
 import chat.willow.kale.core.message.IrcMessage
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNull
-import org.junit.Before
-import org.junit.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertNull
+import kotlin.test.BeforeTest
+import kotlin.test.Test
 
 class MonitorAddMessageTests {
 
     private lateinit var messageParser: MonitorMessage.Add.Command.Parser
     private lateinit var messageSerialiser: MonitorMessage.Add.Command.Serialiser
 
-    @Before fun setUp() {
+    @BeforeTest fun setUp() {
         messageParser = MonitorMessage.Add.Command.Parser
         messageSerialiser = MonitorMessage.Add.Command.Serialiser
     }

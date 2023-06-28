@@ -4,16 +4,16 @@ import chat.willow.kale.core.tag.ITagParser
 import chat.willow.kale.core.tag.ITagSerialiser
 import chat.willow.kale.core.tag.KaleTagRouter
 import com.nhaarman.mockito_kotlin.mock
-import org.junit.Assert.assertNull
-import org.junit.Assert.assertSame
-import org.junit.Before
-import org.junit.Test
+import kotlin.test.assertNull
+import kotlin.test.assertSame
+import kotlin.test.BeforeTest
+import kotlin.test.Test
 
 class KaleTagRouterTests {
 
     private lateinit var sut: KaleTagRouter
 
-    @Before fun setUp() {
+    @BeforeTest fun setUp() {
         sut = KaleTagRouter()
     }
 

@@ -3,16 +3,16 @@ package chat.willow.kale.core
 import chat.willow.kale.core.tag.Tag
 import chat.willow.kale.core.tag.extension.ServerTimeTag
 import kotlinx.datetime.Instant
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNull
-import org.junit.Before
-import org.junit.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertNull
+import kotlin.test.BeforeTest
+import kotlin.test.Test
 
 class ServerTimeTagTests {
 
     private lateinit var sut: ServerTimeTag.Factory
 
-    @Before fun setUp() {
+    @BeforeTest fun setUp() {
         sut = ServerTimeTag.Factory
     }
 

@@ -2,17 +2,17 @@ package chat.willow.kale.irc.message.extension.monitor.rpl
 
 import chat.willow.kale.core.message.IrcMessage
 import chat.willow.kale.irc.prefix.Prefix
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNull
-import org.junit.Before
-import org.junit.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertNull
+import kotlin.test.BeforeTest
+import kotlin.test.Test
 
 class RplMonOnlineMessageTests {
 
     private lateinit var messageParser: RplMonOnline.Message.Parser
     private lateinit var messageSerialiser: RplMonOnline.Message.Serialiser
 
-    @Before fun setUp() {
+    @BeforeTest fun setUp() {
         messageParser = RplMonOnline.Message.Parser
         messageSerialiser = RplMonOnline.Message.Serialiser
     }

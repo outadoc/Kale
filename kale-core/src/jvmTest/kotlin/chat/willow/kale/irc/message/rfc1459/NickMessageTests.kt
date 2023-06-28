@@ -3,17 +3,17 @@ package chat.willow.kale.irc.message.rfc1459
 import chat.willow.kale.core.message.IrcMessage
 import chat.willow.kale.irc.prefix.Prefix
 import chat.willow.kale.irc.prefix.prefix
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNull
-import org.junit.Before
-import org.junit.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertNull
+import kotlin.test.BeforeTest
+import kotlin.test.Test
 
 class NickMessageTests {
 
     private lateinit var messageParser: NickMessage.Message.Parser
     private lateinit var messageSerialiser: NickMessage.Command.Serialiser
 
-    @Before fun setUp() {
+    @BeforeTest fun setUp() {
         messageParser = NickMessage.Message.Parser
         messageSerialiser = NickMessage.Command.Serialiser
     }

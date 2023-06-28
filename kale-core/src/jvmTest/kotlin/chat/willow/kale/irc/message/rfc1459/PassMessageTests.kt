@@ -1,17 +1,17 @@
 package chat.willow.kale.irc.message.rfc1459
 
 import chat.willow.kale.core.message.IrcMessage
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNull
-import org.junit.Before
-import org.junit.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertNull
+import kotlin.test.BeforeTest
+import kotlin.test.Test
 
 class PassMessageTests {
 
     private lateinit var messageParser: PassMessage.Command.Parser
     private lateinit var messageSerialiser: PassMessage.Command.Serialiser
 
-    @Before fun setUp() {
+    @BeforeTest fun setUp() {
         messageParser = PassMessage.Command.Parser
         messageSerialiser = PassMessage.Command.Serialiser
     }

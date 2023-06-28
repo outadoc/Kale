@@ -6,17 +6,17 @@ import chat.willow.kale.core.tag.ITagParser
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.whenever
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNull
-import org.junit.Before
-import org.junit.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertNull
+import kotlin.test.BeforeTest
+import kotlin.test.Test
 
 class KaleMetadataFactoryTests {
 
     private lateinit var sut: KaleMetadataFactory
     private lateinit var tagRouter: IKaleTagRouter
 
-    @Before fun setUp() {
+    @BeforeTest fun setUp() {
         tagRouter = mock()
 
         sut = KaleMetadataFactory(tagRouter)

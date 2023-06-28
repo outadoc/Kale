@@ -1,17 +1,17 @@
 package chat.willow.kale.irc.message.extension.sasl
 
 import chat.willow.kale.core.message.IrcMessage
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNull
-import org.junit.Before
-import org.junit.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertNull
+import kotlin.test.BeforeTest
+import kotlin.test.Test
 
 class AuthenticateMessageTests {
 
     private lateinit var messageParser: AuthenticateMessage.Message.Parser
     private lateinit var messageSerialiser: AuthenticateMessage.Message.Serialiser
 
-    @Before fun setUp() {
+    @BeforeTest fun setUp() {
         messageParser = AuthenticateMessage.Message.Parser
         messageSerialiser = AuthenticateMessage.Message.Serialiser
     }

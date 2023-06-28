@@ -1,16 +1,16 @@
 package chat.willow.kale.irc.message.extension.sasl.rpl
 
 import chat.willow.kale.core.RplSourceTargetContent
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
-import org.junit.Before
-import org.junit.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertTrue
+import kotlin.test.BeforeTest
+import kotlin.test.Test
 
 class Rpl903MessageTests {
 
     private lateinit var sut: Rpl903Message
 
-    @Before fun setUp() {
+    @BeforeTest fun setUp() {
         sut = Rpl903Message
     }
 

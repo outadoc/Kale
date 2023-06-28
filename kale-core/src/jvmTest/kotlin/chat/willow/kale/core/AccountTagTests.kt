@@ -2,20 +2,22 @@ package chat.willow.kale.core
 
 import chat.willow.kale.core.tag.Tag
 import chat.willow.kale.core.tag.extension.AccountTag
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNull
-import org.junit.Before
-import org.junit.Test
+import kotlin.test.BeforeTest
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertNull
 
 class AccountTagTests {
 
     private lateinit var sut: AccountTag.Factory
 
-    @Before fun setUp() {
+    @BeforeTest
+    fun setUp() {
         sut = AccountTag
     }
 
-    @Test fun test_parse_SanityCheck() {
+    @Test
+    fun test_parse_SanityCheck() {
         val rawTag = Tag(name = "account", value = "someone")
 
         val tag = sut.parse(rawTag)
@@ -23,7 +25,8 @@ class AccountTagTests {
         assertEquals(AccountTag(account = "someone"), tag)
     }
 
-    @Test fun test_parse_MissingValue_ReturnsNull() {
+    @Test
+    fun test_parse_MissingValue_ReturnsNull() {
         val rawTag = Tag(name = "account", value = null)
 
         val tag = sut.parse(rawTag)
@@ -31,7 +34,8 @@ class AccountTagTests {
         assertNull(tag)
     }
 
-    @Test fun test_serialise_SanityCheck() {
+    @Test
+    fun test_serialise_SanityCheck() {
         val tag = AccountTag(account = "someone")
 
         val rawTag = sut.serialise(tag)

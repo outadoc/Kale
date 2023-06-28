@@ -2,17 +2,17 @@ package chat.willow.kale.irc.message.extension.extended_join
 
 import chat.willow.kale.core.message.IrcMessage
 import chat.willow.kale.irc.prefix.Prefix
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNull
-import org.junit.Before
-import org.junit.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertNull
+import kotlin.test.BeforeTest
+import kotlin.test.Test
 
 class ExtendedJoinMessageTests {
 
     private lateinit var messageParser: ExtendedJoinMessage.Message.Parser
     private lateinit var messageSerialiser: ExtendedJoinMessage.Message.Serialiser
 
-    @Before fun setUp() {
+    @BeforeTest fun setUp() {
         messageParser = ExtendedJoinMessage.Message.Parser
         messageSerialiser = ExtendedJoinMessage.Message.Serialiser
     }

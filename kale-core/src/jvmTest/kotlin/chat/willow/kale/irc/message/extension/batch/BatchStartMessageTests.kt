@@ -2,17 +2,17 @@ package chat.willow.kale.irc.message.extension.batch
 
 import chat.willow.kale.core.message.IrcMessage
 import chat.willow.kale.irc.prefix.prefix
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNull
-import org.junit.Before
-import org.junit.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertNull
+import kotlin.test.BeforeTest
+import kotlin.test.Test
 
 class BatchStartMessageTests {
 
     private lateinit var messageParser: BatchMessage.Start.Message.Parser
     private lateinit var messageSerialiser: BatchMessage.Start.Message.Serialiser
 
-    @Before fun setUp() {
+    @BeforeTest fun setUp() {
         messageParser = BatchMessage.Start.Message.Parser
         messageSerialiser = BatchMessage.Start.Message.Serialiser
     }

@@ -2,17 +2,17 @@ package chat.willow.kale.irc.message.extension.account_notify
 
 import chat.willow.kale.core.message.IrcMessage
 import chat.willow.kale.irc.prefix.Prefix
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNull
-import org.junit.Before
-import org.junit.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertNull
+import kotlin.test.BeforeTest
+import kotlin.test.Test
 
 class AccountMessageTests {
 
     lateinit var messageParser: AccountMessage.Message.Parser
     lateinit var messageSerialiser: AccountMessage.Message.Serialiser
 
-    @Before fun setUp() {
+    @BeforeTest fun setUp() {
         messageParser = AccountMessage.Message.Parser
         messageSerialiser = AccountMessage.Message.Serialiser
     }

@@ -1,13 +1,13 @@
 package chat.willow.kale.irc.prefix
 
-import org.junit.Assert.assertEquals
-import org.junit.Before
-import org.junit.Test
+import kotlin.test.assertEquals
+import kotlin.test.BeforeTest
+import kotlin.test.Test
 
 class PrefixSerialiserTests {
     lateinit var prefixSerialiser: IPrefixSerialiser
 
-    @Before fun setUp() {
+    @BeforeTest fun setUp() {
         prefixSerialiser = PrefixSerialiser
     }
 

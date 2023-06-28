@@ -1,8 +1,8 @@
 package chat.willow.kale.irc.message
 
 import chat.willow.kale.core.message.IrcMessage
-import org.junit.Assert.assertEquals
-import org.junit.Test
+import kotlin.test.assertEquals
+import kotlin.test.Test
 
 class IrcMessageSerialiserTests {
 

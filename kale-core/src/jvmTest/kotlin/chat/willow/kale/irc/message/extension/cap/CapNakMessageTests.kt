@@ -1,17 +1,17 @@
 package chat.willow.kale.irc.message.extension.cap
 
 import chat.willow.kale.core.message.IrcMessage
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNull
-import org.junit.Before
-import org.junit.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertNull
+import kotlin.test.BeforeTest
+import kotlin.test.Test
 
 class CapNakMessageTests {
 
     lateinit var messageParser: CapMessage.Nak.Message.Parser
     lateinit var messageSerialiser: CapMessage.Nak.Message.Serialiser
 
-    @Before fun setUp() {
+    @BeforeTest fun setUp() {
         messageParser = CapMessage.Nak.Message.Parser
         messageSerialiser = CapMessage.Nak.Message.Serialiser
     }

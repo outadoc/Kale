@@ -2,16 +2,16 @@ package chat.willow.kale.irc.message.rfc1459
 
 import chat.willow.kale.core.message.IrcMessage
 import chat.willow.kale.irc.prefix.prefix
-import org.junit.Assert.assertEquals
-import org.junit.Before
-import org.junit.Test
+import kotlin.test.assertEquals
+import kotlin.test.BeforeTest
+import kotlin.test.Test
 
 class QuitMessageTests {
 
     private lateinit var messageParser: QuitMessage.Message.Parser
     private lateinit var messageSerialiser: QuitMessage.Command.Serialiser
 
-    @Before fun setUp() {
+    @BeforeTest fun setUp() {
         messageParser = QuitMessage.Message.Parser
         messageSerialiser = QuitMessage.Command.Serialiser
     }

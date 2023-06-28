@@ -2,17 +2,17 @@ package chat.willow.kale.irc.message.extension.away_notify
 
 import chat.willow.kale.core.message.IrcMessage
 import chat.willow.kale.irc.prefix.Prefix
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNull
-import org.junit.Before
-import org.junit.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertNull
+import kotlin.test.BeforeTest
+import kotlin.test.Test
 
 class AwayMessageTests {
 
     lateinit var messageParser: AwayMessage.Message.Parser
     lateinit var messageSerialiser: AwayMessage.Message.Serialiser
 
-    @Before fun setUp() {
+    @BeforeTest fun setUp() {
         messageParser = AwayMessage.Message.Parser
         messageSerialiser = AwayMessage.Message.Serialiser
     }
